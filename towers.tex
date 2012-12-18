@@ -1,0 +1,147 @@
+\documentclass{sig-alternate}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{mysymbols}
+\usepackage{hyperref}
+
+\usepackage{xcolor}
+\newcommand{\todo}[1]{\textcolor{red}{(#1)}}
+
+\begin{document}
+
+\title{Cool title to catch Lenstra's eye goes here}
+\numberofauthors{3}
+\author{
+  \alignauthor Luca De Feo
+  \alignauthor Javad Doliskani
+  \alignauthor Éric Schost
+}
+
+\maketitle
+\begin{abstract}
+  We build towers.
+\end{abstract}
+\category{F.2.1}{Theory of computation}{Analysis of algorithms and problem complexity}[Computations in finite fields]
+\category{G.4}{Mathematics of computing}{Mathematical software}
+\terms{Algorithms,Theory}
+\keywords{Finite fields, irreducible polynomials, extension towers, algebraic tori, elliptic curves.}
+
+%%%
+
+\section{Introduction}
+\label{sec:intro}
+
+Building arbitrary finite extensions of finite fields is a fundamental
+task in any computer algebra system. Disregarding generic solutions
+using multivariate algebra and Grobner bases, most systems are limited
+to construct extensions of prime fields. There is one notable
+exception: Magma~\cite{MAGMA} has implemented for a long time a
+powerful system of ``compatibly embedded finite
+fields''~\cite{bosma+cannon+steel97}, capable of building extensions
+of any finite field and taking track of the embeddings between the
+fields.
+
+The system implemented in Magma, as described in the original paper,
+uses linear algebra to describe the embeddings of finite fields. From
+a complexity point of view this is far from optimal, indeed one may
+hope to compute and apply the morphisms in (quasi)-linear time (in the
+degree of the extension). Even worse, the quadratic memory
+requirements make the system unsuitable for embeddings of large degree
+extensions. Although the Magma core has evolved since the publication
+of the paper, our experiments in Section~\ref{sec:bench} show that
+embeddings of large extension fields are still out of reach in Magma.
+
+In this paper we propose an approach based on polynomial arithmetic
+rather than linear algebra, yielding much better performances. Our
+solution only applies to some special cases, but we hope that it will
+pave the way towards a complete solution. The technique we present is
+similar to the one in~\cite{df+schost12} in that we construct families
+of irreducible polynomials with special properties, then give
+algorithms (called \emph{lift} and \emph{push}) that exploit the
+special form of those polynomials to apply the embeddings. The
+families of polynomials we use come from work of Lenstra and De Smit
+on the algebraic closure of finite
+fields~\cite{lenstra+desmit08-stdmodels}, and from work of Couveignes
+and Lercier on constructing irreducible polynomials in quasi-linear
+time~\cite{couveignes+lercier11}.
+
+The focus of this paper is on the representation of extensions of
+\emph{large} degree and their embeddings. We do not consider issues
+related to special representations of small finite fields, such as
+primitive polynomials, Zech logarithms, Conway polynomials, etc. A
+user doing computations in a single, fixed, extension field will
+clearly benefit more from these optimizations than from our
+construction. However, a variety of computations in number theory and
+algebraic geometry requires frequently constructing new extension
+fields and moving elements from one to the other. Examples of these
+algorithms are~\cite{df10} \todo{cite more}. Our construction makes
+them feasible for much larger sizes than it was previously possible.
+
+This paper is organized as follows. \todo{How?}
+
+%%%
+
+\section{Finite fields and embeddings}
+\label{sec:finite-field-embedd}
+Basic theory of finite fields. Standard algorithms, Shoup's algorithm.
+
+%%%
+
+\section{Lenstra's and De Smit's tower}
+\label{sec:LDtower}
+The $p$-adic extension of $\Q$ and its reduction mod $p$.
+
+%%%
+
+\section{Towers from irreducible fibers}
+\label{sec:fibers}
+Interpreting the primitive roots tower and the LD-tower as fibers of
+$T_1$ and $T_2$ respectively. Using elliptic curves.
+
+
+%%%
+
+\section{Lifting and pushing}
+\label{sec:lift-push}
+
+The two algorithms given in the notes for the rational fraction case
+(and how they reduce to the polynomial case).
+
+%%%
+
+\section{The general case}
+\label{sec:general}
+
+Composita, general LD-towers, other algebraic tori, higher dimensional
+fibers...
+
+%%%
+
+\section{Benchmarks}
+\label{sec:bench}
+
+Sage implementation and timings.
+
+%%%
+
+\section{Aknowledgements}
+De Feo would like to thank Antoine Joux.
+
+\bibliographystyle{abbrv}
+\bibliography{defeo}
+\end{document}
+
+
+% Local Variables:
+% mode:flyspell
+% ispell-local-dictionary:"american"
+% mode:TeX-PDF
+% mode:reftex
+% End:
+%
+% LocalWords:  Isogeny abelian isogenies hyperelliptic supersingular Frobenius
+% LocalWords:  isogenous embeddings morphisms
