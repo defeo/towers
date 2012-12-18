@@ -1,0 +1,883 @@
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{soul}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{mysymbols}
+\usepackage{amsmath}
+\usepackage{biblatex}
+\bibliography{defeo}
+
+\title{Notes on the theory behind all this}
+
+\begin{document}
+\maketitle
+
+\setcounter{tocdepth}{3}
+\tableofcontents
+\vspace*{1cm}
+
+\section{Towers of extensions from algebraic groups}
+
+Let $\F_q$ be a finite field, let $\ell$ be a prime not dividing $q$,
+our goal is to construct the $\ell$-adic closure of $\F_q$ by giving
+efficient (quasi-linear) algorithms to perform all the basic
+operations (arithmetic, going up and down, but also traces,
+frobeniuses, etc.) in it, much in the same spirit as our previous work
+on Artin-Schreier towers \cite{df+schost12}.
+
+We start from two works. One is De Smit's and Lenstra's canonical
+construction of $\bar{\F}_q$, based on the theory of cyclotomic
+extensions and Gauss periods \cite{lenstra+desmit08-stdmodels}. The
+other one is Couveignes' ans Lercier's algorithm to generate
+irreducible polynomials from isogeny fibers of elliptic curves
+\cite{couveignes+lercier11}. While on the surface these two works may
+seem very different in spirit, they are deeply linked by a brillant
+intuition of Couveignes and Lercier.
+
+Roughly speaking, the idea goes as follows. Take an algebraic group
+$G/F_q$ of cardinality $n$ such that $\ell$ divides $n$ (for example
+an elliptic curve). Construct an $\F_q$-rational ``isogeny''
+$\phi:G\to G'$ of degree $\ell$ with non-trivial kernel in
+$\F_q$. Because the kernel is non trivial over $\F_q$, and because $G$
+and $G'$ have the same cardinality, the map $\phi$ restricted to
+$\F_q$ must necessarily miss some point of $G'$. Let $A$ be any such
+point of $G'$, then its fiber contains $n$ points defined over a
+finite extension of $\F_q$. If we are ``lucky'', the action of the
+Galois group of $\F_q$ over the fiber is transitive, and thus the
+fiber must be an irreducible zero-dimensional set. Now one just needs
+to compute the polynomials defining the map $\phi$, write down the
+system of equations $\phi(x,y,\ldots)=A$ and compute a univariate
+representation of it. The resulting polynomial will necessarily be
+irreducible.
+
+Couveignes and Lercier show how to use the same idea in two different
+cases. When $\ell$ divides $q-1$, they consider the group
+$\mathbb{G}_m/F_q$ together with the map $\phi:X\mapsto X^\ell$. When
+$\ell$ does not divide $q-1$, they take an elliptic curve with
+cardinality divisible by $\ell$. Because of the constraints, the
+discriminant of the endomorphism algebra is not divisible by $\ell$,
+thus the isogeny volcano of degree $\ell$ is reduced to a cycle. There
+are two directions to travel this cycle: one taking isogenies with
+rational kernels (corresponding to the Frobenius eigenvalue $1$), and
+one taking their duals (corresponding to the Frobenius eigenvalue
+$q$). Using complex multiplication, they show that the isogenies in
+the first direction have irreducible fibers (the proof does not work
+for their duals, and indeed I have verified that the statement does
+not hold in general). Furthermore, these isogenies are easy to compute
+using Vélu's formulas, and their fibers are easily described as the
+roots of a univariate polynomial. This construction can be iterated
+over the whole cycle (eventually running through it more than once),
+thus obtaining a tower of extensions of degree $\ell$.
+
+\textbf{Note:} I am not sure whether there is a reasonable definition
+for \emph{isogeny} outside the world of abelian varieties. Desirable
+properties are that it is an algebraic map, a group morphism, it has
+finite kernel and is surjective over the algebraic closure. The
+$\ell$-th power in $\mathbb{G}_m$ definitely has all the required
+properties.
+
+\textbf{Note:} It is hard to imagine a general statement for these
+types of constructions based on algebraic groups. The fact that they
+may fail in the elliptic case, depending on which kind of isogeny is
+taken, leaves little hope of finding such statement. Couveignes and
+Lercier also apply a similar construction for $\ell=p$, but no
+algebraic group seems to be involved here.
+
+   
+\subsection{Using algebraic tori}
+
+The problem with Couveignes' and Lercier's construction is that
+finding an elliptic curve with the required cardinality is expensive:
+a good fraction of all elliptic curves will have cardinality divisible
+by $\ell$ only if $\ell\ll q^{1/4}$, and for each trial curve one
+needs to perform point counting. Thus it is natural to ask whether
+there are other algebraic groups that can be used in the construction.
+
+Algebraic tori are a natural choice, they indeed are subgroups of
+$\mathbb{G}_m$. Useful references are
+\cite{rubin+silverberg03,rubin-silverberg+crypto03}
+
+\textbf{Definition:} An algebraic torus $T$ over $\F_q$ is an
+algebraic group defined over $\F_q$ that over some finite extension
+field is isomorphic to $(\mathbb{G}_m)^d$ , where $\mathbb{G}_m$ is
+the multiplicative group and $d$ is necessarily the dimension of
+$T$. If $T$ is isomorphic to $(\mathbb{G}_m)^d$ over $\F_{q^n}$ , then
+one says that $\F_{q^n}$ splits $T$ .
+
+Define $T_n$ as the subgroup 
+
+\begin{equation}
+  T_n = \{\alpha \in F_{q^n} | N_{\F_q/k}(\alpha) = 1 \text{ for any } \F_q\subset k\subset\F_{q^n}\}
+\end{equation}
+
+\begin{itemize}
+\item $T_n$ is a torus (more precisely, its Weil descent to $\F_q$),
+\item the dimension of $T_n$ is $\phi(n)$,
+\item the cardinality of $T_n$ is $\Phi_n(q)$, where $\Phi_n$ is the
+  $n$-th cyclotomic polynomial,
+\item if $h\in T_n(\F_q)$ is an element of prime order not dividing
+  $n$, then $h$ does not lie in a proper subfield of $\F_{q^n}/\F_q$.
+\end{itemize}
+
+Obviously, $T_n$ is an algebraic variety embedded in $\mathbb{A}^n$,
+but it is natural to ask whether it could be embedded in a smaller
+space. A torus $T$ of dimension $d$ is said to be \emph{rational} if
+there is a birational map $\rho : T\to \mathbb{A}_d$ defined over
+$\F_q$.
+
+\textbf{Conjecture (Voskresenskii \cite{voskresenskii98}):} the torus
+$T_n$ is rational.
+
+This conjecture is known to be true for $n$ a prime power or the
+product of two prime powers. Note, however, that a birational mapping
+may \emph{miss} points, and thus it may not be a group morphism. A
+computational gain from the rationality of $T_n$ can be hoped for only
+if the mapping is a group morphism.
+
+Why are we interested in algebraic tori? Consider the case of $\ell$
+not dividing $q-1$. Then it is not possible to use Couveignes' and
+Lercier's construction over $\mathbb{G}_m/\F_q$, indeed the
+multiplication by $\ell$ map has trivial kernel in this case. However,
+if $n|\ell-1$ is the order of $q$ modulo $\ell$, we can apply
+Couveignes' and Lercier's algorithm to $\mathbb{G}_m/\F_{q^n}$. We can
+use a smaller group by taking $T_n\subset\F_{q^n}^\ast$, indeed $\ell$
+divides $\card T_n=\Phi_n(q)$ and this is in general the smallest
+subgroup with such property.
+    
+Parameterizing $T_1$ is trivial, as this is just $\F_q^\ast$. The
+first interesting case is $T_2$, which has dimension $1$ and
+cardinality $q+1$. We give two equivalent parameterizaions.
+    
+The first one is given by the Pell conic. Let $d\in\F_q$ be a
+quadratic non-residue, the Pell conic is the affine curve
+    
+\begin{equation}
+  C\;:\;X^2 - dY^2 = 1.
+\end{equation}
+    
+If we fix any point on the conic, we have a group law given by the
+following construction. To sum two points $A$ and $B$, take the line
+through them. Take the parallel line to this passing through the
+distinguished point, the second point of intersection is $A+B$. On the
+complex unit circle, this law is equivalent to the classical one. If
+we fix the point \$(1,0), the group law is given by the following
+equation.
+    
+\begin{equation}
+  (r,s) \oplus (t,u) = (rt+dsu, ru+st)
+\end{equation}
+    
+Let $\ell$ divide $q+1$. From the group law, it is not hard to write
+the polynomials defining the multiplication-by-$\ell$ map. Let
+    
+\begin{equation}
+  [n](x,y) = (Ax + B, 2Ay)
+\end{equation}
+   
+for some $A,B\in\F_q[x]$, then
+   
+\begin{align}
+  &[n+1](x,y) = (2Ax^2 + Bx -A, (2Ax + B)y),\\
+  &[2n](x,y) = (2A^2x^2 + 2ABx + B^2 - A^2, (2A^2x + 2AB)y).
+\end{align}
+   
+Using these two equations, it is immediate to compute $[\ell]$ using
+$O(\Mult(\ell))$ operations by double-and-add. Call $f_\ell$ the
+polynomial defining the action of $[\ell]$ on the abscissa, then
+$f_\ell - a$ is irreducible if and only if $a$ is the abscissa of a
+point of maximal $\ell^\alpha$-order. \textbf{Note:} of course, we
+need a proof here, but this doesn't seem too hard.
+
+The following Sage code implements the algorithm devised above (and
+even a bit more, dealing with $\ell$ non necessarily prime dividing
+$q\pm 1$).
+
+
+\begin{verbatim}
+def genpell(K, d):
+    primes = d.prime_divisors()
+    q = K.cardinality()
+
+    if all(p.divides(q-1) for p in primes):
+        qres = True
+        C = q - 1
+    elif all(p.divides(q+1) for p in primes):
+        qres = False
+        C = q + 1
+    else:
+        raise RuntimeError('The prime divisors of d must divide q-1 or q+1.')
+
+    P = PolynomialRing(K, 'x')
+
+    # The 0-division polynomial is 1
+    a, b = P(0), P(1)
+    for c in reversed(d.digits(2)):
+        # double
+        a2, b2 = a**2, b**2
+        a, b = 2*(a2.shift(1) + a*b), b2 - a2
+        # and add
+        if c == 1:
+            a, b = 2*a.shift(1) + b, -a
+
+    # Here's the d-division polynomial
+    f = a.shift(1) + b
+
+    # Find a point on the right twist with the right order
+    x = False
+    while not x:
+        x = K.random_element()
+        if (x**2 - 1).is_square() == qres:
+            if any(pellmul(x, C // p) == 1 for p in primes):
+                x = False
+        else:
+            x = False
+
+    return f - x
+
+# Montgomery ladder for Pell conics
+def pellmul(x, n):
+    # The zero point and ours
+    A, B = 1, x
+    for c in reversed(n.digits(2)):
+        if c == 0:
+            A, B = 2*A**2 - 1, 2*A*B - x
+        else:
+            A, B = 2*A*B - x, 2*B**2 - 1
+    return A
+\end{verbatim}
+
+
+Another parameterization of $T_2$ is due to Rubin and Silverberg
+\cite{rubin-silverberg+crypto03}. Let $d$ be a quadratic non-residue
+and define the map $\psi:\mathbb{A}^1(\F_q) \to T_2(\F_q)$ as
+    
+\begin{equation}
+  \phi(a) = \frac{a+\sqrt{d}}{a-\sqrt{d}} = \frac{a^2+d}{a^2-d} + \frac{2a}{a^2-d}\sqrt{d}.
+\end{equation}
+    
+Conversely, suppose $\beta = \beta_1+\beta_2\sqrt{d}\in T_2$, with
+$\beta\ne\pm 1$ (so $\beta_2\ne 0$). Then
+
+\begin{equation}
+  \beta = \frac{1+\beta}{1+\beta_1+\beta_2\sqrt{d}}{1+\beta_1-\beta_2\sqrt{d}}
+  =\psi\left(\frac{1+\beta_1}{\beta_2}\right).
+\end{equation}
+    
+Thus we have a birational mapping between $T_2 - \{\pm 1\}$ and
+$\mathbb{A}^1 - \{0\}$. This map can be extended to an isomorphism by
+sending $1$ to $\infty$ and $-1$ to $0$. A simple calculation shows
+that if $a,b\in\F_q$ and $a\ne -b$, then
+    
+\begin{equation}
+  \psi(a) = \psi\left(\frac{ab+d}{a+b}\right).
+\end{equation}
+
+\textbf{Note:} I haven't checked it, but I am persuaded that this
+group law on the projective line comes from the classical way of
+mapping the circle onto it. Adapting the previous algorithm to this
+case should be straightforward.
+
+$T_1$ and $T_2$ are the only $1$-dimensional tori. The next step would
+be to handle $T_3$, $T_6$ and $T_4$. Rubin and Silverberg, to
+construct their cryptosystem CEILIDH \cite{rubin-silverberg+crypto03},
+give some rational parameterizations of $T_6$ using a birational
+mapping to $\mathbb{A}^2$. These mappings are not group morphisms and
+still require to do all the computations in $\F_{q^6}^\ast$, so they
+are of no interest to us.
+
+Parameterizing $T_n$ in general is not hard: write the restriction of
+scalar from $\F_{q^n}$ to $\F_q$ of $\mathbb{G}_m$, throw in the
+equation saying that all elements must have norm $1$, and you're
+done. The problem with this representation is that it is suboptimal
+(using $n$ coordinates and $n$ equations instead of $m$ and
+$m-\phi(n)$), and that it is hardly a convenient one for computations.
+
+The same cases could be handled with supersingular elliptic curves,
+thus avoiding point counting. Notice indeed that $\Phi_3(q)=q^2+q+1$,
+$\Phi_6(q)=q^2-q+1$, $\Phi_4(q)=q^2+1$, and that for each of these
+cases there is a supersingular curve defined over $\F_{q^2}$ (with
+some exceptions depending on the order modulo $3$ or $4$ of the prime
+$p$ dividing $q$). Write down the equation of this curve, Weil descend
+it over $\F_q$ and you're done. This is better in terms of number of
+variables ($4$ of them) and equations ($2$ of them), but it is still
+rather messy as computations are concerned.
+
+I will argue later why I think there is no hope of successfully using
+higher dimensional groups this way, but for the moment I'll just keep
+focusing on $T_1$ and $T_2$.
+
+\subsection{Another parameterization of $T_2$}
+    
+Let's go back to Lenstra's and De Smit's construction
+\cite{lenstra+desmit08-stdmodels}. The basic idea is very simple: if
+$\ell^\alpha$ divides exactly $q-1$, take an $\ell^\alpha$-th root of
+unity $\eta_0$ and construct the tower of extensions
+$\eta_1^\ell=\eta_0$, $\eta_2^\ell=\eta_1$ and so on.
+
+Compared with just taking a non $\ell$-adic residue and construct the
+tower of its $\ell^\beta$-th roots, this construction has the
+advantage of being deterministic, and can be even made canonical by
+fixing an arbitrary (e.g., lexicographic) ordering on the
+$\ell^\alpha$ roots of unity. But, since we are not really interested
+in this level of canonicity, we'll just forget it in this case.
+
+When $\ell$ does not divide $q-1$, things get more interesting. In
+this case the cyclotomic polynomial splits into factors of degree
+$\ord_\ell(q)$. Pick one of those (this can be done canonically by an
+arbitrary ordering, too) and construct its residue class field over
+$\F_q$. Call this residue field $L$. Pick any of the roots of this
+polynomial, say $\eta_0$, and construct the tower of extensions
+$\eta_1^\ell=\eta_0$, $\eta_2^\ell=\eta_1$, etc. This tower is not the
+one we were looking for, but setting $\theta_1 =
+\Tr_{\F_{q^p}}\eta_1$, $\theta_2 = \Tr_{\F_{q^{p^2}}}(\eta_2)$, etc.,
+the $\theta_i$ generate the $\ell$-adic closure of $\F_q$. So one just
+needs to find the minimal polynomials of those $\theta$'s and is done.
+
+Shoup had already given an almost identical construction in
+\cite{shoup94}. Once the splitting field of $\Phi_\ell$ is
+constructed, instead of constructing the tower over one of its roots,
+he takes a random $\ell$-adic residue, thus loosing determinism. If he
+does so, it is mainly to present both the $\ell|q-1$ and
+$\ell\not|q-1$ cases under the same hood, so we may as well be content
+with taking a root of $\Phi_\ell$ in Shoup's algorithm.
+
+Lenstra and De Smit view both of the above constructions as the
+reduction modulo $p$ of the cyclotomic $\Z_\ell$-extension of $\Q$
+\cite{lang1990cyclotomic,washington1997introduction}. This is the
+unique extension of $\Q$ with Galois group isomorphic to the
+$\ell$-adic integers, and is constructed as the fixed field of
+$\Q(\zeta_\ell, \zeta_{\ell^2}, \ldots)$ under the action of the
+torsion part of its Galois group. The elements $\eta$ are called
+Gauss' periods, and are constructed as traces of the elements of the
+generators of $\Q(\zeta_\ell, \zeta_{\ell^2}, \ldots)$ down to some
+subfield.
+
+\textbf{Note:} For algorithms computing the minimal polynomials of
+Gauss' periods, see
+\cite{gupta+zagier93,gurak06powers,gurak06,thaine01,thaine00}.
+However none of these papers gives an algorithm good for our
+purposes. Shoup's algorithm \cite{shoup94} remains the best way to
+compute these irreducible polynomials modulo $p$. Just for a degree
+$\ell$ polynomial, its complexity is
+
+\begin{itemize}
+\item $\tildO(\ell^2\log q)$ when $q$ has high order modulo $\ell$,
+\item $\tildO(\ell^{\frac{\omega+1}{2}} + \ell\log q)$ when the order
+  is small (it obviously uses modular composition in this case),
+\item $\tildO(\ell + \log q)$ when $\ell$ divides $q-1$.
+\end{itemize}
+Let's now focus on the case where $\ell$ divides $q+1$, so that
+$\Phi_\ell$ splits into quadratic factors in $\F_q$. Let $Q_0$ be any
+of these factors and let $\eta_0$ be one of its roots. Then
+$N(\eta_0)=\eta_0^{q+1}=1$ and
+
+\begin{equation}
+  Q_0(X) = X^2 - X\Tr_{\F_q}\eta_0 + 1.
+\end{equation}
+
+Construct the tower of extensions $\eta_1^\ell=\eta_0$,
+$\eta_2^\ell=\eta_1$, etc.  Set $\theta_0 = \Tr\eta_0 \in \F_q$.  Like
+before, take the traces of the $\eta_i$'s down to a well chosen
+subfield. In this case:
+
+\begin{equation}
+  \theta_i = \Tr_{\F_{q^{\ell^i}}}\eta_i = \eta_i + \eta_i^{q^{\ell^i}} = \eta_i + \eta_i^{-1}.
+\end{equation}
+    
+Then $\F_{q^{\ell^i}} = \F_q(\theta_i)$. By the equation above, the
+minimal polynomial of $\eta_i$ over $\F_q(\theta_i)$ is $X^2
+-\theta_iX+1$. By composition, it follows that the minimal polynomial
+of $\eta_i$ over $\F_q(\theta_{i-j})$ is
+$X^{2\ell^j}-\theta_{i-j}X^{\ell^j}+1$. We deduce then that $Q_{i,j}$,
+where
+
+\begin{equation}
+  Q_{i,j}(Y)^2 = \mathrm{Res}_X(X^{2\ell^j}-\theta_{i-j}X^{\ell^j}+1, X^2-YX+1),
+\end{equation}
+
+is the minimal polynomial of $\theta_i$ over
+$\F_q(\theta_{i-j})$. Indeed, by the well known properties of the
+resultant,
+
+\begin{multline}
+  Q_{i,j}(Y)^2 = \prod_{\sigma\in\Gal_{\F_q(\eta_i)/\F_q(\theta_{i-j})}}
+  (\eta_i^2 - Y\eta_i + 1)^\sigma =\\
+  % 
+  N_{\F_q(\theta_{i-j})}(\eta_i) \prod_{\sigma\in\Gal_{\F_q(\eta_i)/\F_q(\theta_{i-j})}} 
+  (\eta_i + \eta_i^{-1} - Y)^\sigma =\\
+  % 
+  \left(\prod_{\sigma\in\Gal_{\F_q(\eta_i)/\F_q(\theta_{i-j})}/\langle\tau\rangle}
+    (\theta_i - Y)^\sigma\right)^2 =\\
+  % 
+  \left(\prod_{\sigma\in\Gal_{\F_q(\theta_i)/\F_q(\theta_{i-j})}}
+    (\theta_i - Y)^\sigma\right)^2,
+\end{multline}
+
+where the third equality is true because
+$N_{\F_q(\theta_{i-j})}(\eta_i)=1$, as seen from the minimal
+polynomial of $\eta_i$, and where $\tau$ is the element of
+$\Gal_{\F_q(\eta_i)/\F_q(\theta_{i-j})}$ such that
+$\tau:\eta_i\mapsto\eta_i^{-1}$.
+
+Because of its very special form, this resultant can be computed
+efficiently, probably in $O(\ell^j)$. The polynomials $Q_{i,1}$
+are of special interest to us, because they define each level of the
+tower, and are fundamental for the going up and down operations we
+will discuss next. As evident from the formula, they depend on
+$\theta_{i-1}$ and they all have the same form. To compute their
+general shape, we just need to compute
+\begin{equation}
+  Q_\ell(Y, z) = \sqrt{\mathrm{Res}_X(X^{2\ell}-zX^\ell+1, X^2-YX+1)}.
+\end{equation}
+
+Let $\eta$ and $1/\eta$ be the two roots of $X^2-YX+1$, by direct
+calculation we find
+\begin{equation}
+  \label{eq:1}
+  Q_\ell = \eta^\ell + \frac{1}{\eta^\ell} - z.
+\end{equation}
+The factor $p_\ell=\eta^\ell + 1/\eta^\ell$ is the $\ell$-th power sum
+of $X^2-YX+1$, thus
+
+\begin{align}
+  p_0 &= 2,\\
+  p_1 &= Y,\\
+  \label{eq:simple}
+  p_{\ell+1} &= Yp_{\ell} - p_{\ell-1},\\
+  \label{eq:double}
+  p_{2\ell} &= p_{\ell}^2 - 2,\\
+  \label{eq:add}
+  p_{2\ell+1} &= p_{\ell+1}p_\ell - Y.
+\end{align}
+
+From equation \eqref{eq:simple} we can derive a formula for the
+coefficients of $Q_\ell$. Indeed, writing $p_\ell = \sum_i
+c_{\ell,i}Y^{\ell-i}$, we obtain the relation
+\begin{equation}
+  c_{\ell,i} = c_{\ell-1,i} - c_{\ell-2,i-2}.
+\end{equation}
+We arrange these coefficients like in Pascal's triangle:
+\begin{equation}
+  \begin{tabular}{*{9}{c@{}}}
+    &&&&2\\
+    &&&1&&0\\
+    &&1&&0&&-2\\
+    &1&&0&&-3&&0\\
+    1&&0&&-4&&0&&2
+  \end{tabular}
+\end{equation}
+It is then evident that every second column is identically zero, and
+that signs alternate in odd columns. We remove the zero columns and
+take absolute values, i.e., we set $b_{n,k}=\lvert c_{n+k,2k}\rvert$, so
+that the new coefficients satisfy the relation
+\begin{equation}
+  b_{n,k} = b_{n-1,k} + b_{n-1,k-1},
+\end{equation}
+which is the same as Pascal's relation. Indeed, we obtain the
+$(1,2)$-Pascal triangle, also called Lucas' triangle~\cite{benjamin10}:
+\begin{equation}
+  \begin{tabular}{*{9}{c@{}}}
+    &&&&2\\
+    &&&1&&2\\
+    &&1&&3&&2\\
+    &1&&4&&5&&2\\
+    1&&5&&9&&7&&2
+  \end{tabular}
+\end{equation}
+
+It is well known that the coefficients of Lucas' triangle are related
+to those of Pascal's by
+\begin{equation}
+  \label{eq:lucas-tri}
+  b_{n,k} = \binom{n}{k} + \binom{n-1}{k-1} = \frac{n+k}{n}\binom{n}{k}.
+\end{equation}
+One remarkable property of the Lucas triangle is that the
+anti-diagonals sum up to the Lucas numbers:
+\begin{equation}
+  \sum_{k\ge0} b_{n-k,k} = \sum_{k\ge0} \lvert c_{n,2k}\rvert = L_n.
+\end{equation}
+An immediate consequence of this property is the remarkable equality
+\begin{equation}
+  p_\ell(i) = \sum_{k\ge0} c_{\ell,k}i^{\ell-k} = i^\ell L_\ell.
+\end{equation}
+
+According to OEIS and Plouffe's thesis, other notable properties are
+that the columns contain the coefficients of some Chebyshev
+polynomials\footnote{OEIS A5581, A5582, A5583, A5584. Which kind of
+  Chebyshev polynomials these are, I really don't know.}:
+\begin{equation}
+  \sum_{n\ge0}b_{n+k,k}z^n = \sum_{n\ge0}\lvert c_{n+2k,2k}\rvert z^n = \frac{2-z}{(z-1)^{k+1}},
+\end{equation}
+and that the diagonals contain the $n$-dimensional pyramidal
+numbers\footnote{OEIS A330, A2415, A5585.}:
+\begin{equation}
+  \sum_{k\ge0} b_{n+k,k}z^k \sum_{k\ge0} \lvert c_{n+2k,2k} \rvert z^k =
+  \frac{1+z}{(z-1)^{n+1}}.
+\end{equation}
+
+By using Eq.~\eqref{eq:lucas-tri} and the sign alternation property,
+we obtain 
+\begin{gather}
+  c_{\ell,2k} = (-1)^kb_{\ell-k,k} = (-1)^k\frac{\ell}{\ell-k}\binom{\ell-k}{k},\\
+  \frac{c_{\ell,2k+2}}{c_{\ell,2k}} = 
+  -\frac{(\ell-2k)(\ell-2k-1)}{(\ell-k-1)(k+1)}.
+\end{gather}
+The last equation allows us to compute all the coefficients of
+$Q_\ell$ using $O(\ell)$ operations in the base field. For example, we
+have
+\begin{align}
+  Q_5 &= Y^5 - 5Y^3 + 5Y - z,\\
+  Q_7 &= Y^7 - 7Y^5 + 14Y^3 - 7Y - z,\\
+  Q_{11} &= Y^{11} - 11Y^9 + 44Y^7 - 77Y^5 + 55Y^3 - 11Y - z.
+\end{align}
+
+These facts are not new: a special case was already settled by Gauss,
+and the general case is in \cite[Proposition~1]{gurak06}.
+
+To go back to the geometric point of view, observe that
+equations~\eqref{eq:double} and~\eqref{eq:add} are almost identical to
+the equations defining the group law on the torus. This is no
+coincidence, as we will show that, by seeing $\F_q(\eta_i)^\ast$ as a
+degree $2$ extension over $\F_q(\theta_i)$, the $\ell$-th power map is
+just the multiplication-by-$\ell$ map on $T_1\oplus T_2$, and it is
+straightforward to obtain a parameterization of $T_2/\F_q(\eta_i)$ as
+a Pell conic.
+
+Let $\sigma$ be the non trivial element of the Galois group of
+$\F_q(\eta_i)/\F_q(\theta_i)$, so that
+$\sigma(\eta_i)=\eta_i^{-1}$. Set $d = \eta_i - \sigma(\eta_i)$. Then
+$\sigma(d)=-d$ and $d^2 = \theta_i^2-4$, so that
+
+\begin{equation}
+  \F_q(\eta_i) = \F_q(d) = \F_q\left(\sqrt{\theta_i^2-4}\right).
+\end{equation}
+
+Every element $\alpha\in\F_q(\eta_i)$ can be uniquely written as
+$x + yd$ with $x,y\in\F_q(\theta_i)$, where
+
+\begin{align}
+  x &= \frac{\alpha + \sigma(\alpha)}{2},\\
+  y &= \frac{\alpha - \sigma(\alpha)}{2}\frac{d}{\theta_i^2-4}.
+\end{align}
+    
+An element of $\F_q(\eta_i)$ belongs to $T_2$ if and only if its norm
+is $1$, i.e. if and only if
+
+\begin{equation}
+  N(x + yd) = (x + yd)(x - yd) = x^2 - (\theta_i^2-4)y^2 = 1.
+\end{equation}
+
+Thus we have defined an isomorphism between
+$T_2\subset\F_q(\eta_i)^\ast$ and a Pell conic defined over
+$\F_q(\theta_i)$. The neutral element of $T_2$ is sent over $(1,0)$,
+and we check that the morphism is a group morphism: by the definition
+of the previous section
+
+\begin{equation}
+  (x,y) \oplus (x',y') = (xx' + (\theta_i^2-4)yy', xy' + x'y),
+\end{equation}
+
+and, similarly,
+
+\begin{equation}
+  (x + yd)(x' + y'd) = xx' + (\theta_i^2 - 4)yy' + (xy' + x'y)d,
+\end{equation}
+
+as needed. Let now $[\ell]$ denote multiplication by $\ell$ on the
+conic and suppose that
+
+\begin{equation}
+  [\ell](x,y) = \left(f_\ell(x), g_\ell(x, y)\right).
+\end{equation}
+
+Observe that
+
+\begin{align}
+  \eta_i &= \frac{1}{2}\theta_i + \frac{1}{2}d,\\
+  \eta_{i-1} &= \eta_i^\ell = f_\ell\left(\frac{1}{2}\theta_i\right) + g_\ell\left(\frac{1}{2}\theta_i, \frac{1}{2}\right)d,
+\end{align}
+    
+Then, since $\sigma(\eta_{i-1}) = \eta_{i-1}^{-1}$, we have
+
+\begin{equation}
+  f_\ell\left(\frac{1}{2}\theta_i\right) = \frac{1}{2}\theta_{i-1}.
+\end{equation}
+
+By the previous section, we know that $f_\ell$ has degree $\ell$, thus
+
+\begin{equation}
+  2f_\ell\left(\frac{Y}{2}\right) - \theta_{i-1}
+\end{equation}
+
+is the minimal polynomial of $\theta_i$.
+
+\subsection{Up and down in the one dimensional case}
+
+Summarizing, when $\ell$ divides $q^2-1$, using Couveignes' and
+Lercier's idea on either $T_1$ or $T_2$ we obtain a series of
+irreducible polynomials of the form
+
+\begin{equation}
+  f(X_i) - X_{i-1},
+\end{equation}
+
+defining the $\ell$-adic closure of $\F_q$. We have also seen that
+Lenstra's and De Smit's construction yields exactly the same families.
+
+When $\ell$ does not divide $q^2-1$, we can find an elliptic curve
+such that its cardinality is a multiple of $\ell$ and use the original
+Couveignes' and Lercier's algorithm. This can be done efficiently only
+if $\ell\ll q^{1/4}$, and in general only if $\ell<q+2\sqrt{q}+1$
+because of Hasse's bound. In this case, the family of irreducible
+polynomials obtained is of the form
+
+\begin{equation}
+  f_i(X_i) - X_{i-1}g_i(X_i).
+\end{equation}
+
+We call these cases the \emph{one dimensional} cases because indeed we
+are using one dimensional varieties to construct these families. An
+elementary combinatorial argument shows that the one dimensional case
+can only deal with $\ell\in O(q)$, because a one dimensional variety
+over $\F_q$ cannot have more points.
+
+It turns out that the two families above (and intuitively, any family
+issued by a one dimensional object) are perfectly suited for going up
+and down in the tower. A metatheorem we know well says that once a
+quasi-linear algorithm is known for going down (resp. up), going up
+(resp. down) follows immediately with the same complexity using the
+classical works of Rouiller, Shoup, and others (see Chapter 5 of my
+thesis for a review \cite{df+thesis}). However, we will give explicit
+algorithms for both operations.
+
+\subsubsection{Using algebraic tori}
+
+Let's consider the algebraic tori case first. We have
+$\F_{q^{\ell^i}}$ represented as an univariate extension of $\F_q$,
+and we want to take one of its elements $P(X_i)$ down to the basis
+bivariate $\F_{q^{\ell^{i-1}}}[X_i]$. All it takes is to compute
+
+\begin{equation}
+  P(X_i) \mod f(X_i) - X_{i-1}, Q(X_{i-1})
+\end{equation}
+
+and we are done. Using Algorithm 9.14 of von zur Gathen and Gerhard
+\cite{vzGG}, we rewrite $P(X_i)=\sum_j a_j(X_i)f(X_i)^j$ with $\deg
+a_j<\ell$ in quasi linear time, then the reduction is $\sum_j
+a_j(X_i)X_{i-1}^j$. Algorithm 9.14 is as simple as the following Sage
+code:
+
+\begin{verbatim}
+def decompose(P, f):
+    if P.degree() < f.degree() * 2:
+        return P.quo_rem(f)
+    else:
+        return sum((g.quo_rem(f) for g in decompose(P, f^2)), ())
+\end{verbatim}
+
+To go the opposite direction, we could use the machinery of trace
+formulas, but it is very easy to do it directly. Our input is a
+bivariate polynomial $P(X_{i-1},X_i)$ of degree $<\ell$ in $X_i$ and
+$<\ell^{i-1}$ in $X_{i-1}$, and we want to reduce it modulo the
+relation $X_{i-1}=f(X_i)$, thus we need to compute
+\begin{equation}
+  P(f(X_i), X_i).  
+\end{equation}
+Horner rule is not optimal in this case, but a binary divide and
+conquer approach like in the previous case has the right complexity:
+$O(\ell)$ at the leaves (there is $\ell^{i-1}$ of them) and
+$O(\Mult(\ell^i))$ at each level. Here's one way of coding the
+algorithm in Sage (\verb+P+ is a list of lenght $\le\ell^{i-1}$ of
+polynomials of degree $<\ell$ in $X_i$).
+
+\begin{verbatim}
+def compose(P, f):
+    if len(P) == 0:
+        return f.parent()(0)
+    elif len(P) == 1:
+        return f.parent()(P[0])
+    else:
+        g = f^2
+        return compose(P[::2], g) + f*compose(P[1::2], g)
+\end{verbatim}
+
+
+\subsubsection{Using elliptic curves}
+    
+If we are in the elliptic curve case, now, we can rewrite the
+equation above as
+
+\begin{equation}
+  \label{eq:elliptic-relation}
+  \frac{f_i(X_i)}{g_i(X_i)} = X_{i-1}.
+\end{equation}
+
+I find it easier to deal with going up in this case. Like before, we
+have a polynomial $P(X_{i-1},X_i)$ and we want to compute
+\begin{equation}
+  P\left(\frac{f(X_i)}{g(X_i)}, X_i\right).
+\end{equation}
+From now on, we view $P$ as a polynomial in $X_{i-1}$ with coefficients in
+$\F_q[X_i]$. Let
+\begin{equation}
+  P = \sum_{j=0}^n p_j(X_i)X_{i-1}^j,
+\end{equation}
+and let
+\begin{equation}
+  \bar{P} = g^n P\left(\frac{f}{g}\right) =
+  \sum_{j=0}^n p_jf^jg^{n-j}.
+\end{equation}
+The univariate polynomial $\bar{P}$ can be computed recursively as
+follows. We suppose $n$ is even to simplify matters, let
+$P=P_0+X_{i-1}^{n/2+1}P_1$ with $\deg P_0\le n/2$, and let $\bar{P}_0$
+and $\bar{P}_1$ be defined as above, then
+\begin{equation}
+  \bar{P} = f^{n/2}\bar{P}_0 + g^{n/2+1}\bar{P}_1.
+\end{equation}
+Thus, to compute $\bar{P}$ we need $O(\Mult(\ell^i)\log_2\ell^i)$
+operations as in the case of the algebraic torus. After we compute
+$\bar{P}$, we can compute $g^n$ using $O(\Mult(\ell^i))$ operations,
+interpret it as an element of $\F_{q^{\ell^i}}$ and invert it, then
+obtain the final result by multiplying $\bar{P}$ by $g^{-n}$.
+
+Going down can be done with about the same complexity using trace
+formulas. It took me a while to figure out how to do it directly. In
+this case, our input is a polynomial $P(X_i)$ of degree $<\ell^i$,
+and we want to reduce it modulo Eq.~\eqref{eq:elliptic-relation}. By
+analogy with the previous algorithm, it seems natural to compute
+$\bar{P}=g^nP$, where $n=\ell^{i-1}-1$, and then try to recursively
+decompose $\bar{P}$ as
+\begin{equation}
+  \bar{P} = f^{m}\bar{P}_0 + g^{m}\bar{P}_1.
+\end{equation}
+
+We start by solving a simpler problem. Let $a,b$ be two polynomials
+with $\deg a\ge \deg b$ ($b$ can eventually be $1$), and let $P$ be
+another polynomial with degree less than $2\deg a$. Our goal is to
+find an expression
+\begin{equation}
+  P = aP_0 + bP_1  
+\end{equation}
+with $\deg P_0$ and $\deg P_1$ less than $\deg a$. Observe that if
+$\deg P<\deg a+\deg b$, then the result is easily obtained by an
+inverse Chinese remainder. Indeed, let
+\begin{equation}
+  ua + vb = 1
+\end{equation}
+with $\deg u<\deg b$ and $\deg v<\deg a$, then
+\begin{equation}
+  P = (Pu\bmod b)a + (Pv\bmod a)b.
+\end{equation}
+When $\deg P \ge \deg a+\deg b$, handling the extra factors is as
+easy. By Euclidean division, write
+\begin{equation}
+  P = Qa + R,
+\end{equation}
+then
+\begin{equation}
+  P = \bigl(Q + (Ru\bmod b)\bigr)a + (Rv\bmod a)b.
+\end{equation}
+Although this decomposition is not unique, the degree constraints are
+satisfied. Observe that, when $b=1$, this amounts to decompose $P$ as
+$Qa+R$. I must thank Antoine Joux for helping me out on this.
+
+Now back to the original problem. We want to write, if possible,
+$\bar{P}$ as
+\begin{equation}
+  \bar{P} = \sum_{j=0}^n p_jf^jg^{n-j},
+\end{equation}
+with $\deg p_j<\deg f$, where $n$ is a parameter fixed in advance. The
+idea is to compute powers of $f$ and $g$ whose degrees sum up to $n$,
+and to use the algorithm above to iteratively decompose $\bar{P}$. If
+$n$ is even, we let $2m=n$; if $n$ is odd, we let $2m=n+1$. In either
+case, we compute $f^m$ and $g^m$ and decompose $\bar{P}$ as
+\begin{equation}
+  \bar{P} = f^mP_0 + g^mP_1.
+\end{equation}
+Now we apply recursively the algorithm to decompose $P_0$ and $P_1$
+as
+\begin{equation}
+  P_0 = \sum_{j=0}^{n-m} p_{0,j}f^jg^{n-m-j},\qquad
+  P_1 = \sum_{j=0}^{n-m} p_{1,j}f^jg^{n-m-j}.
+\end{equation}
+With a bit of tedious work, we verify that the constraint on the
+degrees of the $p_j$ can be met if $\deg P<(n+1)\deg f$. This is
+exactly what we want, indeed, fixing $n=\ell^{i-1}-1$ as target
+degree, we verify $\deg P < \ell^i = (n+1)\ell$. Observe that when
+$g=1$, this algorithm reduces to a variant of Algorithm 9.14.
+
+\subsection{Implementation}
+I have implemented the algorithms above in the toric and the elliptic
+case (computing the irreducible polynomials, building the tower, going
+up and down). I have written a very simple Sage implementation, but
+this is enough to consistently outperform Magma (I shall need a recent
+version of Magma, though). The toric case is just a few dozen of lines
+of code, and immensely beats Magma for any parameter choice. 
+
+The elliptic case is trickier. While going up and down is almost as
+efficient as the toric case, there is a serious precomputation to
+perform when initializing the tower. This is made of two major steps:
+
+\begin{enumerate}
+\item Find a curve with the right cardinality,
+\item Compute the whole $\ell$-isogeny volcano.
+\end{enumerate}
+
+The first step is done with point counting. Arguably, one could count
+points modulo $\ell$, thus, in some cases, the cost could be (a large)
+polynomial in $\ell$. In general, however, this is done by a full
+point counting.
+
+The necessity for the second step occurred to me as a
+surprise. Ideally, one would want to compute isogenies one at a time,
+by adding one for each level. However, we need to compute the
+isogenies with rational kernel. The easiest way to do this is to
+repeatedly apply Velu's formulas, but this gives a chain of isogenies
+\emph{starting} from $E$, while we need a chain \emph{ending} in
+$E$. So we are bound to compute the whole isogeny cycle, and stop when
+we hit the starting curve again. The length of the cycle is equal to
+the order of a certain ideal class, this is at most the class number
+of the endomorphism algebra of the curve. In general, the class number
+is $\sim\sqrt{q}$, thus we have another polynomial factor in $q$
+intervening in the complexity.
+
+An alternative approach to compute the isogenies would be to factor
+the $\ell$-th modular polynomials in order to follow the cycle
+backwards. This has the advantage of not depending on $q$, but it
+costs $O(\ell^3)$ at least. It looks surprising that this isogeny
+cycle is very easy to compute in one direction, but extremely hard in
+the dual direction; however, I have no other idea on how to compute
+these isogenies backwards.
+
+
+\subsection{Higher dimensions}
+    
+The last question is: what can we do when $\ell$ is much bigger than
+$q$? I think there is no hope of making any of the previous techniques
+work in this case, and I will try to argue on this a bit more
+seriously sometimes later.
+
+
+\section{Bibliography \textbf{:export:}}
+
+\printbibliography
+
+\end{document}
+
+
+% Local Variables:
+% mode:flyspell
+% ispell-local-dictionary:"american"
+% mode:TeX-PDF
+% mode:reftex
+% End:
+%
+% LocalWords:  Isogeny abelian isogenies hyperelliptic supersingular Frobenius
+% LocalWords:  isogenous
