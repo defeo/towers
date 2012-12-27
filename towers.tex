@@ -92,7 +92,11 @@ This paper is organized as follows. \todo{How?}
 \label{sec:finite-field-embedd}
 We fix the following notation: $p$ is a prime, $d$ a positive integer,
 $q=p^d$, $\F_p$ and $\F_q$ are the finite fields with $p$ and $q$
-elements respectively.
+elements respectively. If $L/K$ is a field extension, we write
+$\Tr_{L/K}$, $\Norm_{L/K}$ and $\Gal_{L/K}$ for the trace, the norm
+and the Galois group of the extension, respectively. When the field
+$L$ is clear from the context, we simply write $\Tr_K$ and $\Norm_K$,
+and when the field $K$ is clear too, we may write $\Tr$ and $\Norm$.
 
 The field $\F_q$ can be constructed as the splitting field of any
 irreducible polynomial of degree $d$, we call this the \emph{defining
@@ -115,10 +119,11 @@ the $\ell$-adic closure is the infinite field defined by
 \begin{equation*}
   \F_p^{(\ell)} = \bigcup_{i>0}\F_{p^{\ell^i}}.
 \end{equation*}
-When $\ell$ is prime, the Galois group of $\F_p^{(\ell)}/\F_p$ is a
-procyclic group isomorphic to $\Z_\ell$, the $\ell$-adic integers. Let
-$\bar{\F}_p$ be an algebraic closure of $\F_p$, then there is a well
-known isomorphism
+We also call an \emph{$\ell$-adic tower} the sequence of extensions
+$\F_p,\F_{p^\ell},\dots$ When $\ell$ is prime, the Galois group of
+$\F_p^{(\ell)}/\F_p$ is a procyclic group isomorphic to $\Z_\ell$, the
+$\ell$-adic integers. Let $\bar{\F}_p$ be an algebraic closure of
+$\F_p$, then there is a well known isomorphism
 \begin{equation}
   \label{eq:tensor}
   \bar{\F}_p \isom \bigotimes_{\ell\text{ prime}} \F_p^{(\ell)},
@@ -126,7 +131,7 @@ known isomorphism
 where the tensor products are over $\F_p$.
 
 A \emph{root of unity} is an element of finite multiplicative order;
-the element is said to be a \emph{$n$-th root} if this order divides
+the element is said to be a \emph{$n$-th root} if its order divides
 $n$, a \emph{primitive $n$-th root} if it is exactly $n$. Obviously,
 every element of a finite field is a root of unity. The $n$-th
 cyclotomic polynomial $\Cyc_n$ is the polynomial whose roots are the
@@ -137,6 +142,7 @@ in $\Z/n\Z$, and splits completely in an extension of the same
 degree. We call this splitting field the $n$-th Kummer extension of
 $\F_q$.
 
+\paragraph{Algorithms}
 Most computer algebra systems construct the field $\F_q$ by taking
 degree $d$ polynomials at random until one irreducible is found. This
 approach has a cost at least quadratic in the degree $d$. More
@@ -145,7 +151,7 @@ prime powers, for each prime power construct an extension of $\F_p$ of
 that degree, then glue all the extensions together by taking
 \emph{composita}.
 
-The classical way of taking \emph{composita} is \todo{what?}
+The classical way of taking \emph{composita} is \todo{where?}
 
 \begin{figure}
   \centering
@@ -174,10 +180,12 @@ times, to obtain an extension of degree $\ell^i$ of $K_0$. Finally it
 takes the trace of a random element of $K_1$ down to $\F_{p^\ell}$ and
 computes its minimal polynomial over $\F_p$, which is very likely to
 be a defining polynomial for $\F_{p^\ell}$. Unless $K_0$ equals $F_p$,
-Shoup's construction has quadratic complexity in $\ell$.  Couveignes
-and Lercier give an alternative construction with complexity
-subquadratic in $\ell$~\cite{couveignes+lercier11}; we will discuss it
-in Section~\ref{sec:fibers}.
+Shoup's construction has quadratic complexity in $\ell$ \todo{Maybe
+  this should be made more precise, with a discussion on modular
+  composition}.  Couveignes and Lercier give an alternative
+construction with complexity subquadratic in
+$\ell$~\cite{couveignes+lercier11}; we will discuss it in
+Section~\ref{sec:fibers}.
 
 
 %%%
@@ -218,7 +226,8 @@ Lenstra and De Smit~\cite{lenstra+desmit08-stdmodels}.
 
 From now on, let $\ell$ be a prime different from the characteristic
 $p$. For simplicity, we suppose $\ell\ne2$. Let $\zeta_{\ell^i}$ be
-primitive $\ell^i$-th roots of unity such that
+primitive $\ell^i$-th roots of unity, for algorithmic purposes we
+further require that
 $\zeta_{\ell^i}^\ell=\zeta_{\ell^{i-1}}$. Consider the tower of
 extensions of the rationals given by
 \begin{equation*}
@@ -248,18 +257,211 @@ closure of $\F_p$. Using number fields, this can be easily generalized
 to build the $\ell$-adic closure of $\F_q$. We give two examples of
 this construction.
 
-\paragraph{$T_1$-extensions}
+\paragraph{$T_1$-type extensions}
+Let $\ell$ be an integer (not necessarily prime) dividing $q-1$. In
+this case the field $\F_q$ contains the primitive $\ell$-th roots of
+unity and the map $x\mapsto x^{\ell}$ is not surjective on
+$\F_q^\ast$. The construction is classical: select a non $\ell$-adic
+residue $\zeta\in\F_q$ and construct $K_1,K_2,\dots,K_i$ as the tower
+of extensions defined by the polynomials
+\begin{equation}
+  \label{eq:T1}
+  \left|
+  \begin{array}{rrrrr}
+    X_{i+1}^\ell &- X_i\\
+    &\vdots\\
+    &&X_2^\ell &- X_1\\
+              &&&X_1^\ell &- \zeta
+  \end{array}
+  \right.
+\end{equation}
+The only difference between Shoup's construction and Lenstra's and De
+Smit's is the way $\zeta$ is selected. Shoup selects a random element
+of $\F_q$ and tests it for non-residuosity, the test can be done in
+$O(\log q)$ operations and an element is found after $O(1)$
+trials. Lenstra and De Smit factor the $\ell$-th cyclotomic polynomial
+to obtain a root $\zeta_0$, then take $\ell$-th roots until a non
+$\ell$-adic residue is found. Compared to Shoup's algorithm this is
+more expensive \todo{how much?}, but it has the benefit of being
+deterministic if an arbitrary ordering is put on the $\ell$-th roots
+of unity.
 
-\paragraph{$T_2$-extensions}
+\paragraph{$T_2$-type extensions}
+Let now $\ell$ be an odd \todo{isn't $\ell\ne2$ sufficient?} integer
+(not necessarily prime) dividing $q+1$, this generalizes the way
+Lenstra and De Smit handle $\ell=3$. The cyclotomic polynomial
+$\Phi_\ell$ splits into $\euler(\ell)/2$ quadratic factors. Let $P$ be
+one of these factors and let $\zeta_0$ be one of its roots (the choice
+of $P$ can be made canonical by putting an ordering on the
+factors). Then $\Norm(\zeta_0)=\zeta_0^{q+1}=1$ and
+\begin{equation}
+  \label{eq:quad-factor}
+  P(X) = X^2 - X\Tr\zeta_0 + 1
+\end{equation}
+is the defining polynomial of $\F_q(\zeta_0)$. The cyclotomic tower (left
+in Figure~\ref{fig:ladic}) is defined by the equations
+\begin{equation}
+  \label{eq:T2}
+  \left|
+  \begin{array}{rrrrr}
+    \zeta_{i+1}^\ell &- \zeta_i\\
+    &\vdots\\
+    &&\zeta_2^\ell &- \zeta_1\\
+              &&&\zeta_1^\ell &- \zeta_0\\
+              &&&&P(\zeta_0)
+  \end{array}
+  \right.
+\end{equation}
+Its Galois group is isomorphic to $\Z/2\Z\times\Z_\ell$. 
 
+At this point, Shoup's algorithm would select a random element of
+$\F_q(\zeta_i)$ and take its trace down to a subfield of index
+$2$. Following Lenstra and De Smit, we instead define some specific
+Gauss periods generating the $\ell$-adic tower. These are the
+following traces of the $\zeta_i$'s:
+\begin{equation}
+  \label{eq:T2-gauss-periods}
+  \eta_i = \zeta_i + \zeta_i^{q^{\ell^i}} = \zeta_i + \zeta_i^{-1}.
+\end{equation}
+Then $\bigcup_i\F_q(\eta_i)$ is the $\ell$-adic closure of $\F_q$. By
+Eq.~\eqref{eq:T2-gauss-periods}, the minimal polynomial of $\zeta_i$
+over $\F_q(\eta_i)$ is $X^2 -\eta_iX+1$. By composition, it follows
+that the minimal polynomial of $\zeta_i$ over $\F_q(\eta_{i-j})$ is
+$X^{2\ell^j}-\eta_{i-j}X^{\ell^j}+1$. We deduce that the minimal
+polynomial of $\eta_i$ over $\F_q(\eta_{i-j})$ is $Q_{i,j}$, where
+\begin{equation}
+  \label{eq:T2-relpols}
+  Q_{i,j}(Y)^2 = \mathrm{Res}_X(X^{2\ell^j}-\eta_{i-j}X^{\ell^j}+1,\; X^2-YX+1).
+\end{equation}
+Indeed, by the well known properties of the resultant,
+\begin{multline*}
+  Q_{i,j}(Y)^2 = \prod_{\sigma\in\Gal_{\F_q(\zeta_i)/\F_q(\eta_{i-j})}}
+  (\zeta_i^2 - Y\zeta_i + 1)^\sigma =\\
+  % 
+  \Norm_{\F_q(\eta_{i-j})}(\zeta_i) \prod_{\sigma\in\Gal_{\F_q(\zeta_i)/\F_q(\eta_{i-j})}} 
+  (\zeta_i + \zeta_i^{-1} - Y)^\sigma =\\
+  % 
+  \left(\prod_{\sigma\in\Gal_{\F_q(\zeta_i)/\F_q(\eta_{i-j})}/\langle\tau\rangle}
+    (\eta_i - Y)^\sigma\right)^2 =\\
+  % 
+  \left(\prod_{\sigma\in\Gal_{\F_q(\eta_i)/\F_q(\eta_{i-j})}}
+    (\eta_i - Y)^\sigma\right)^2,
+\end{multline*}
+where the third equality is true because
+$\Norm_{\F_q(\eta_{i-j})}(\zeta_i)=1$, as seen from the minimal
+polynomial of $\zeta_i$, and where $\tau$ is the element of
+$\Gal_{\F_q(\zeta_i)/\F_q(\eta_{i-j})}$ such that
+$\tau:\zeta_i\mapsto\zeta_i^{-1}$.
+
+As evident from the formula, the polynomials $Q_{i,j}$ depend on
+$\eta_{i-j}$ and have the same form for any $i$. To explicitly compute
+their general shape, we just need to compute
+\begin{equation}
+  Q_j(Y, z) = \sqrt{\mathrm{Res}_X(X^{2\ell^j}-zX^{\ell^j}+1, X^2-YX+1)}.
+\end{equation}
+Let $\zeta$ and $\zeta^{-1}$ be the two roots of $X^2-YX+1$, by direct
+calculation we find
+\begin{equation}
+  \label{eq:1}
+  Q_j = \zeta^{\ell^j} + \zeta^{-\ell^j} - z.
+\end{equation}
+The factor $p_{\ell^j}=\zeta^{\ell^j} + \zeta^{-\ell^j}$ is the $\ell^j$-th power sum
+of $X^2-YX+1$, thus, using Newton's identities,
+\begin{align}
+  p_0 &= 2,\\
+  p_1 &= Y,\\
+  \label{eq:simple}
+  p_{\ell+1} &= Yp_{\ell} - p_{\ell-1}.
+\end{align}
+From Eq.~\eqref{eq:simple}, writing $p_\ell = \sum_i
+c_{\ell,i}Y^{\ell-i}$, we obtain the relation
+\begin{equation}
+  c_{\ell,i} = c_{\ell-1,i} - c_{\ell-2,i-2}.
+\end{equation}
+We arrange these coefficients like in Pascal's triangle:
+\begin{equation}
+  \begin{tabular}{*{8}{c@{}}}
+    &&&2\\
+    &&1&&0\\
+    &1&&0&&-2\\
+    1&&0&&-3&&0
+  \end{tabular}
+\end{equation}
+It is then evident that every second column is identically zero, and
+that signs alternate in odd columns. We remove the zero columns and
+take absolute values, i.e., we set $b_{n,k}=\lvert c_{n+k,2k}\rvert$, so
+that the new coefficients satisfy the relation
+\begin{equation}
+  b_{n,k} = b_{n-1,k} + b_{n-1,k-1},
+\end{equation}
+which is the same as Pascal's relation. Indeed, we obtain the
+$(1,2)$-Pascal triangle, also called Lucas' triangle~\cite{benjamin10}:
+\begin{equation}
+  \begin{tabular}{*{8}{c@{}}}
+    &&&2\\
+    &&1&&2\\
+    &1&&3&&2\\
+    1&&4&&5&&2
+  \end{tabular}
+\end{equation}
+A special case of this fact was already proven by Gauss, and the
+general proof is in~\cite[Proposition~1]{gurak06}.  It is well known
+that the coefficients of Lucas' triangle are related to those of
+Pascal's by
+\begin{equation}
+  \label{eq:lucas-tri}
+  b_{n,k} = \binom{n}{k} + \binom{n-1}{k-1} = \frac{n+k}{n}\binom{n}{k}.
+\end{equation}
+One remarkable property of the Lucas triangle is that the
+anti-diagonals sum up to the Lucas numbers:
+\begin{equation}
+  \sum_{k\ge0} b_{n-k,k} = \sum_{k\ge0} \lvert c_{n,2k}\rvert = L_n.
+\end{equation}
+A funny consequence of this property is the following equality on
+complex numbers
+\begin{equation}
+  p_\ell(i) = \sum_{k\ge0} c_{\ell,k}i^{\ell-k} = i^\ell L_\ell.
+\end{equation}
+By using Eq.~\eqref{eq:lucas-tri} and the sign alternation property,
+we obtain 
+\begin{gather}
+  c_{\ell,2k} = (-1)^kb_{\ell-k,k} = (-1)^k\frac{\ell}{\ell-k}\binom{\ell-k}{k},\\
+  \label{eq:lucas-recurrence}
+  \frac{c_{\ell,2k+2}}{c_{\ell,2k}} = 
+  -\frac{(\ell-2k)(\ell-2k-1)}{(\ell-k-1)(k+1)}.
+\end{gather}
+Eq.~\eqref{eq:lucas-recurrence} gives a formula to compute all the
+coefficients of $Q_{i,j}$ using $O(\ell)$ operations. Of special
+interest to us are the polynomials $Q_{i,i}$, defining each level of
+the tower over the base field $\F_q$, and the polynomials $Q_{i,1}$,
+defining each level over the previous one. We will come back to the
+importance of these polynomials in Section~\ref{sec:lift-push}.
 
 
 %%%
 
 \section{Towers from irreducible fibers}
 \label{sec:fibers}
-Interpreting the primitive roots tower and the LD-tower as fibers of
-$T_1$ and $T_2$ respectively. Using elliptic curves.
+Every tower obtained by the Lenstra-De Smit construction, as well as
+many others, can be understood in a geometrical way using an intuition
+of Couveignes and Lercier\cite{couveignes+lercier11}. Suppose we are
+given algebraic groups $G/\F_q$, $G'/\F_q$ and a degree $\ell$ map
+$\phi:G'\to G$ surjective over the algebraic closure. If $\phi$ is not
+surjective over $\F_q$, then some points of $G'$ will have fibers
+consisting of $\ell$ distinct points of $G$ living in an algebraic
+extension of $\F_q$. If $\phi$ is chosen well enough, these fibers can
+be made to be irreducible over $\F_q$, so that an annihilating
+polynomial will be irreducible of degree $\ell$, as required. If the
+construction can be repeated with a new map $\phi':G''\to G'$, and so
+on, then one is able to construct a tower of extensions of degree
+$\ell$, ultimately leading to an $\ell$-adic closure. We now show how
+this idea applies to the two examples shown before, then how
+Couveignes and Lercier apply it to elliptic curves.
+
+\paragraph{Algebraic tori}
+
+\paragraph{Elliptic curves}
+
 
 
 %%%
