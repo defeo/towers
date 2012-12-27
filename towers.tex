@@ -7,9 +7,12 @@
 \usepackage{amsmath}
 \usepackage{mysymbols}
 \usepackage{hyperref}
+\usepackage{tikz}
 
 \usepackage{xcolor}
 \newcommand{\todo}[1]{\textcolor{red}{(#1)}}
+
+\newcommand{\Cyc}{\Phi}  % Cyclotomic polynomial
 
 \begin{document}
 
@@ -87,13 +90,169 @@ This paper is organized as follows. \todo{How?}
 
 \section{Finite fields and embeddings}
 \label{sec:finite-field-embedd}
-Basic theory of finite fields. Standard algorithms, Shoup's algorithm.
+We fix the following notation: $p$ is a prime, $d$ a positive integer,
+$q=p^d$, $\F_p$ and $\F_q$ are the finite fields with $p$ and $q$
+elements respectively.
+
+The field $\F_q$ can be constructed as the splitting field of any
+irreducible polynomial of degree $d$, we call this the \emph{defining
+  polynomial} of $\F_q$. There are about $p^d/d$ such irreducible
+polynomials over $\F_p$ \todo{cite something}, giving as many
+different ways of representing $\F_q$. Furthermore, there is no
+canonical way of establishing isomorphisms between them, indeed a
+field with $p^d$ elements has $d$ automorphisms fixing $\F_p$.
+
+A field with $p^d$ elements contains subfields with $p^n$ elements for
+any $n|d$. For the same reasons as above, there is no canonical way of
+embedding one finite field into another.
+
+Let $\ell$ be another integer. We define the \emph{$\ell$-adic
+  closure} of $\F_p$ as follows. Fix arbitrary embeddings
+\begin{equation*}
+  \F_p \subset \F_{p^\ell} \subset \F_{p^{\ell^2}} \subset \cdots,
+\end{equation*}
+the $\ell$-adic closure is the infinite field defined by
+\begin{equation*}
+  \F_p^{(\ell)} = \bigcup_{i>0}\F_{p^{\ell^i}}.
+\end{equation*}
+When $\ell$ is prime, the Galois group of $\F_p^{(\ell)}/\F_p$ is a
+procyclic group isomorphic to $\Z_\ell$, the $\ell$-adic integers. Let
+$\bar{\F}_p$ be an algebraic closure of $\F_p$, then there is a well
+known isomorphism
+\begin{equation}
+  \label{eq:tensor}
+  \bar{\F}_p \isom \bigotimes_{\ell\text{ prime}} \F_p^{(\ell)},
+\end{equation}
+where the tensor products are over $\F_p$.
+
+A \emph{root of unity} is an element of finite multiplicative order;
+the element is said to be a \emph{$n$-th root} if this order divides
+$n$, a \emph{primitive $n$-th root} if it is exactly $n$. Obviously,
+every element of a finite field is a root of unity. The $n$-th
+cyclotomic polynomial $\Cyc_n$ is the polynomial whose roots are the
+primitive $n$-th roots of unity. It has integer coefficients and its
+degree is $\euler(n)$. Viewed as a polynomial with coefficients in $\F_q$,
+it splits into irreducible factors of degree equal to the order of $q$
+in $\Z/n\Z$, and splits completely in an extension of the same
+degree. We call this splitting field the $n$-th Kummer extension of
+$\F_q$.
+
+Most computer algebra systems construct the field $\F_q$ by taking
+degree $d$ polynomials at random until one irreducible is found. This
+approach has a cost at least quadratic in the degree $d$. More
+advanced constructions use Eq.~\eqref{eq:tensor}: they factor $d$ into
+prime powers, for each prime power construct an extension of $\F_p$ of
+that degree, then glue all the extensions together by taking
+\emph{composita}.
+
+The classical way of taking \emph{composita} is \todo{what?}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[node distance=1.4cm]
+    \node(Fp){$\F_p$};
+    \node(K0)[above left of=Fp]{$K_0$};
+    \node(K1)[above right of=K0]{$K_0(\sqrt[d]{\eta})$};
+    \node(Fq)[above right of=Fp]{$\F_{p^\ell}$};
+    \draw (Fp) edge node[auto]{\scriptsize$r$} (K0)
+               edge node[auto,swap]{\scriptsize$\ell$} (Fq)
+          (K1) edge node[auto,swap]{\scriptsize$\ell$} (K0)
+               edge node[auto]{\scriptsize$r$} (Fq);
+  \end{tikzpicture}
+  \caption{Shoup's construction}
+  \label{fig:shoup}
+\end{figure}
+
+Algorithms to construct extensions of degree a prime power can be
+thought of as constructions for $\ell$-adic closures of
+$\F_p$. Shoup's~\cite{shoup94} is summarized in
+Figure~\ref{fig:shoup}. Let $\ell$ be a prime, the algorithm starts by
+constructing $K_0$ the $\ell$-th Kummer extension of $\F_p$, then
+looks for a non $\ell$-adic residue $\eta$ and uses it to construct a
+degree $\ell$ extension $K_1$. This last step can be repeated several
+times, to obtain an extension of degree $\ell^i$ of $K_0$. Finally it
+takes the trace of a random element of $K_1$ down to $\F_{p^\ell}$ and
+computes its minimal polynomial over $\F_p$, which is very likely to
+be a defining polynomial for $\F_{p^\ell}$. Unless $K_0$ equals $F_p$,
+Shoup's construction has quadratic complexity in $\ell$.  Couveignes
+and Lercier give an alternative construction with complexity
+subquadratic in $\ell$~\cite{couveignes+lercier11}; we will discuss it
+in Section~\ref{sec:fibers}.
+
 
 %%%
 
 \section{Lenstra's and De Smit's tower}
 \label{sec:LDtower}
-The $p$-adic extension of $\Q$ and its reduction mod $p$.
+
+Shoup's construction is non-deterministic, and it is shown that any
+degree $\ell$ irreducible polynomial can be obtained that way. We now
+describe a deterministic variant of Shoup's construction given by
+Lenstra and De Smit~\cite{lenstra+desmit08-stdmodels}.
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[node distance=1.4cm]
+    \node(Q){$\Q$};
+    \node(Q0)[above left of=Q]{$\Q(\zeta_\ell)$};
+    \node(K1)[above right of=Q]{$K_1$};
+    \node(Q1)[above right of=Q0]{$\Q(\zeta_{\ell^2})$};
+    \node(K2)[above right of=K1]{$K_2$};
+    \node(Q2)[above right of=Q1]{$\Q(\zeta_{\ell^3})$};
+    \node(Koo)[above right of=K2]{$\qquad \Q^{(\ell)} = \Q_\ell^\Delta$};
+    \node(Qoo)[above right of=Q2]{$\Q(\zeta_\ell,\zeta_{\ell^2},\dots)\qquad$};
+    \draw (Q) edge node[auto]{\scriptsize$\ell-1$} (Q0)
+              edge node[auto,swap]{\scriptsize$\ell$} (K1)
+          (K1) edge node[auto,swap]{\scriptsize$\ell-1$} (Q1)
+               edge node[auto,swap]{\scriptsize$\ell$} (K2)
+          (Q1) edge node[auto,swap]{\scriptsize$\ell$} (Q0)
+          (Q2) edge node[auto]{\scriptsize$\ell-1$} (K2)
+               edge node[auto,swap]{\scriptsize$\ell$} (Q1)
+               edge[dashed] (Qoo)
+          (Koo) edge[dashed] (K2)
+               edge node[auto,swap]{\scriptsize$\ell-1$} (Qoo);
+  \end{tikzpicture}
+  \caption{The $\ell$-adic extension of $\Q$.}
+  \label{fig:ladic}
+\end{figure}
+
+From now on, let $\ell$ be a prime different from the characteristic
+$p$. For simplicity, we suppose $\ell\ne2$. Let $\zeta_{\ell^i}$ be
+primitive $\ell^i$-th roots of unity such that
+$\zeta_{\ell^i}^\ell=\zeta_{\ell^{i-1}}$. Consider the tower of
+extensions of the rationals given by
+\begin{equation*}
+  \Q \subset \Q(\zeta_\ell) \subset \Q(\zeta_{\ell^2}) \subset \cdots,
+\end{equation*}
+its limit is an infinite extension with Galois group isomorphic to
+$\Z_\ell^\ast\isom\Delta\times\Z_\ell$, where $\Delta$ is the torsion
+part of $\Z_\ell^\ast$, a cyclic group of order $\ell-1$. The
+\emph{$\ell$-adic extension of $\Q$} is defined as the subfield fixed
+by $\Delta$:
+\begin{equation}
+  \label{eq:}
+  \Q^{(\ell)} = \Q(\zeta_\ell, \zeta_{\ell^2}, \dots)^\Delta,
+\end{equation}
+it is the unique extension of the rationals having $\Z_\ell$ as Galois
+group~\cite{lang1990cyclotomic,washington1997introduction}. The
+construction of $\Q^{(\ell)}$ is summarized in
+Figure~\ref{fig:ladic}. If we replace $\Q$ with a number field, we
+obtain what is called the \emph{canonical $\ell$-adic extension}; its
+Galois group is still $\Z_\ell$, but now there are others with this
+property.
+
+The cyclotomic extensions used to construct $\Q^{(\ell)}$ are
+integral, thus it makes sense to reduce them modulo $p$. It turns out
+that the reduction modulo $p$ of $\Q^{(\ell)}$ is an $\ell$-adic
+closure of $\F_p$. Using number fields, this can be easily generalized
+to build the $\ell$-adic closure of $\F_q$. We give two examples of
+this construction.
+
+\paragraph{$T_1$-extensions}
+
+\paragraph{$T_2$-extensions}
+
+
 
 %%%
 
