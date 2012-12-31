@@ -239,7 +239,6 @@ part of $\Z_\ell^\ast$, a cyclic group of order $\ell-1$. The
 \emph{$\ell$-adic extension of $\Q$} is defined as the subfield fixed
 by $\Delta$:
 \begin{equation}
-  \label{eq:}
   \Q^{(\ell)} = \Q(\zeta_\ell, \zeta_{\ell^2}, \dots)^\Delta,
 \end{equation}
 it is the unique extension of the rationals having $\Z_\ell$ as Galois
@@ -262,8 +261,8 @@ Let $\ell$ be an integer (not necessarily prime) dividing $q-1$. In
 this case the field $\F_q$ contains the primitive $\ell$-th roots of
 unity and the map $x\mapsto x^{\ell}$ is not surjective on
 $\F_q^\ast$. The construction is classical: select a non $\ell$-adic
-residue $\zeta\in\F_q$ and construct $K_1,K_2,\dots,K_i$ as the tower
-of extensions defined by the polynomials
+residue $\zeta\in\F_q$ and construct $K_1,K_2,\dots$ as the tower of
+extensions defined by the polynomials
 \begin{equation}
   \label{eq:T1}
   \left|
@@ -362,17 +361,18 @@ their general shape, we just need to compute
 Let $\zeta$ and $\zeta^{-1}$ be the two roots of $X^2-YX+1$, by direct
 calculation we find
 \begin{equation}
-  \label{eq:1}
   Q_j = \zeta^{\ell^j} + \zeta^{-\ell^j} - z.
 \end{equation}
 The factor $p_{\ell^j}=\zeta^{\ell^j} + \zeta^{-\ell^j}$ is the $\ell^j$-th power sum
 of $X^2-YX+1$, thus, using Newton's identities,
-\begin{align}
-  p_0 &= 2,\\
-  p_1 &= Y,\\
+\begin{equation}
   \label{eq:simple}
-  p_{\ell+1} &= Yp_{\ell} - p_{\ell-1}.
-\end{align}
+  \begin{aligned}
+    p_0 &= 2,\\
+    p_1 &= Y,\\
+    p_{\ell+1} &= Yp_{\ell} - p_{\ell-1}.
+  \end{aligned}
+\end{equation}
 From Eq.~\eqref{eq:simple}, writing $p_\ell = \sum_i
 c_{\ell,i}Y^{\ell-i}$, we obtain the relation
 \begin{equation}
@@ -420,6 +420,7 @@ anti-diagonals sum up to the Lucas numbers:
 A funny consequence of this property is the following equality on
 complex numbers
 \begin{equation}
+  \label{eq:lucas-fun}
   p_\ell(i) = \sum_{k\ge0} c_{\ell,k}i^{\ell-k} = i^\ell L_\ell.
 \end{equation}
 By using Eq.~\eqref{eq:lucas-tri} and the sign alternation property,
@@ -459,10 +460,211 @@ this idea applies to the two examples shown before, then how
 Couveignes and Lercier apply it to elliptic curves.
 
 \paragraph{Algebraic tori}
+In the case where $\ell$ divides $q-1$, the algebraic group involved
+is the multiplicative group $\mathbb{G}_m/\F_q$, and the map is the
+$\ell$-th power map defined by $\phi:x\mapsto x^\ell$. Since the map
+is an endomorphism of $\mathbb{G}_m$, it can be iterated, yielding
+each of the $\ell^i$-th power maps. It is well known, then, that if
+$\zeta$ is a non $\ell$-adic residue, the polynomials
+$X^{\ell^i}-\zeta$ corresponding to the fibers of $\phi^i$ are
+irreducible over $\F_q$.
+
+The case where $\ell$ divides $q+1$ is more interesting. Now
+$\F_q(\zeta_i)$ is a quadratic extension of $\F_q(\eta_i)$. The
+multiplicative subgroup defined by
+\begin{equation}
+  \label{eq:T2-def}
+  T_2 = \{\alpha\in\F_q(\zeta_i) \;|\; \Norm_{\F_q(\eta_i)}(\alpha) = 1\}
+\end{equation}
+is called the \emph{maximal torus} of $\F_q(\zeta_i)$. Seen as an
+algebraic group defined over $\F_q$, it has dimension one, cardinality
+$q+1$, and is isomorphic to $\mathbb{G}_m$ over the algebraic closure.
+
+We now write down explicit algebraic equations for $T_2/\F_q$ and its
+$\ell$-th power map, we suppose for simplicity that the characteristic
+of $\F_q$ is different from $2$. Let $\sigma$ be the non trivial
+element of the Galois group of $\F_q(\zeta_i)/\F_q(\eta_i)$, so that
+$\sigma(\zeta_i)=\zeta_i^{-1}$. Set $\theta = \zeta_i -
+\sigma(\zeta_i)$, then $\sigma(\theta)=-\theta$ and $\theta^2 =
+\eta_i^2-4$, so that
+\begin{equation}
+  \F_q(\zeta_i) = \F_q(\theta) = \F_q\left(\sqrt{\eta_i^2-4}\right).
+\end{equation}
+Because of our assumption on the characteristic, $(1/2, \theta)$ is a
+basis of $\F_q(\zeta_i)$ seen as a vector space over
+$\F_q(\eta_i)$. Hence, every element $\alpha\in\F_q(\zeta_i)$ can be
+uniquely written as $x/2 + y\theta$ with $x,y\in\F_q(\eta_i)$. By
+virtue of Eq.~\eqref{eq:T2-def}, an element $\alpha=x/2+y\theta$
+belongs to $T_2$ if and only if
+\begin{equation}
+  \label{eq:Pell}
+  \Norm\left(\frac{x}{2} + y\theta\right) = 
+  \left(\frac{x}{2} + y\theta\right)\left(\frac{x}{2} - y\theta\right) =
+  \frac{x^2}{4} - \theta^2y^2 = 1.
+\end{equation}
+Eq.~\eqref{eq:Pell} defines a conic section over $\F_q(\eta_i)$, known
+as \emph{Pell conic}. It has a group law induced by multiplication in
+$T_2$: its neutral element is $(2,0)$, and it is easily checked that
+the addition of two points is defined by
+\begin{equation}
+  \label{eq:Pell-add}
+  (x,y)\oplus(x',y') =
+  \left(\frac{xx'}{2} + 2\theta^2yy', \frac{xy' + x'y}{2}\right).
+\end{equation}
+We denote by $[\ell](x,y)$ the $\ell$-th scalar multiple of the point
+$(x,y)$ on the Pell conic. Thanks to Eq.~\eqref{eq:Pell-add}, we
+verify that
+\begin{equation}
+  \label{eq:Pell-rec}
+  [\ell](x,y) = \bigr(p_\ell(x), yq_\ell(x)\bigl),
+\end{equation}
+where $p_\ell$ is defined as in Eq.~\eqref{eq:simple}, and $q_\ell$ is
+defined by
+\begin{equation}
+  \label{eq:fibonacci}
+  \begin{aligned}
+    q_0 &= 0,\\
+    q_1 &= 1,\\
+    q_{\ell+1} &= Yq_{\ell} - q_{\ell-1} = p_\ell + q_{\ell-1}.
+  \end{aligned}
+\end{equation}
+In particular, the coefficients of $q_\ell$ correspond to the
+anti-diagonals of Pascal's triangle with alternating signs, and we
+have the analogue of Eq.~\eqref{eq:lucas-fun}:
+\begin{equation}
+  \label{eq:fibonacci-fun}
+  q_{\ell+1}(i) = \sum_{k=0}^{\lfloor\ell/2\rfloor} p_{\ell-2k}(i) = 
+  i^\ell F_{\ell+1},
+\end{equation}
+where $F_\ell$ is the $\ell$-th Fibonacci
+number. Eq.~\eqref{eq:Pell-rec} is proved by induction, indeed it is
+easily checked that $[0](x,y) = (2,0)$ and $[1](x,y)=(x,y)$, and the
+general case follows from \todo{This can be safely removed}
+\begin{multline}
+  [\ell+1](x,y) = \bigl(p_\ell(x), yq_\ell(x)\bigr) \oplus (x,y) =\\
+  \left(\frac{xp_\ell(x)}{2} + 2\theta^2y^2q_\ell(x),
+    y\frac{p_{\ell}(x) + xq_\ell(x)}{2}\right) =\\
+  \left(x\frac{p_\ell(x) + xq_\ell(x)}{2} - 2q_\ell(x),
+    y\frac{p_{\ell}(x) + xq_\ell(x)}{2}\right) =\\
+  \bigl(xq_{\ell+1}(x) - 2q_\ell(x), yq_{\ell+1}(x)\bigr) = 
+  \bigl(p_{\ell+1}(x), yq_{\ell+1}(x)\bigr).
+\end{multline}
+
+Now, if $(\eta,\eta')$ is a point on the Pell conic of order different
+from $2$, its fiber via the map $[\ell]$ is composed of $\ell$ points
+with distinct abscissas, and the polynomial $p_\ell-\eta$ vanishes on
+each of them with multiplicity one. In particular $\zeta_i =
+\eta_i/2+\theta/2$, and we have already shown that $p_\ell-\eta_i$ is
+irreducible over $\F_q(\eta_i)$, and is in fact the minimal polynomial
+of $\eta_{i+1}$.  By iterating the map $[\ell]$, we obtain the same
+family of irreducible polynomials
+\begin{equation}
+  Q_{i,j}(Y) = p_{\ell^j}-\eta_{i-j}
+\end{equation}
+from the previous Section.
+
+We obtain an interesting insight from this geometric
+interpretation. In the case where $\ell$ divides $q-1$ we had the
+choice between selecting a specific root of unity, or picking any
+random $\ell$-adic non-residue to initialize the family of irreducible
+polynomials. In the same fashion, $\eta_0$ is not the only possible
+starting point: we can pick any point $(\eta,\eta')$ corresponding to
+an $\ell$-adic non-residue of $T_2$, and its fiber will necessarily be
+irreducible. Algorithmically, in the first case we would factor the
+cyclotomic polynomial \todo{how much does it cost?}, while in the
+second case we would take random points on the conic and test their
+order using $O(\log q)$ operations in $\F_q$.
+
+The two previous cases involving the tori $T_1$ and $T_2$ are very
+special ones. In general, if $n$ is the order of $q$ modulo $\ell$, we
+define the \emph{maximal torus} of $\F_{q^n}$ as
+\begin{equation}
+  \label{eq:T2-def}
+  T_n = \{\alpha\in\F_{q^n} \;|\; \Norm_{\F_{q^m}}(\alpha) = 1 
+  \text{ for any $m|n$} \}.
+\end{equation}
+This is an algebraic group over $\F_q$ of dimension $\euler(n)$ and
+cardinality $\Phi_n(q)$, isomorphic to $\mathbb{G}_m^{\euler(n)}$ over
+the algebraic closure. Compared with the previous cases, we are faced
+with two problems. First, multiplication by $\ell$ is now a degree
+$\ell^{\euler(n)}$ map, thus its fibers have too many points and are
+not irreducible in general. Second, it is an open question whether
+$T_n$ can be parameterized using $\euler(n)$
+coordinates~\cite{rubin-silverberg+crypto03,rubin+silverberg03,voskresenskii98};
+but even assuming it can be, we are still faced with the problem that
+the fibers of algebraic maps would be described as zero-dimensional
+objects embedded in a $\euler(n)$-dimensional space. Going from such a
+description to an irreducible univariate polynomial is not a trivial
+task algorithmically.
 
 \paragraph{Elliptic curves}
+Since it seems hard to deal with higher dimensional algebraic tori, it
+makes sense to look at other algebraic groups. Being one-dimensional,
+elliptic curves are good candidates. We quickly review Couveignes' and
+Lercier's construction and refer to~\cite{couveignes+lercier11} for
+details.
 
+Let $\ell$ be a prime different from $p$ and not dividing $q-1$. Let
+$E_0$ be an elliptic curve whose cardinality is a multiple of
+$\ell$. By Hasse's bound, this is only possible if $\ell\le q +
+2\sqrt{q} + 1$. An \emph{isogeny} is an algebraic group morphism
+between two elliptic curves that is surjective in the algebraic
+closure; it is said to be rational over $\F_q$ if it is invariant
+under the $q$-th power map. A rational isogeny between two curves
+exists if and only if they have the same number of points over
+$\F_q$. The degree of an isogeny is its degree as an algebraic map; an
+isogeny is separable if and only if its degree is prime to $p$, in
+which case its kernel contains as many points as the degree. A
+connected component of the graph whose vertices are elliptic curves up
+to isomorphism and whose edges are rational isogenies of degree $\ell$
+is called an \emph{$\ell$-isogeny
+  volcano}~\cite{kohel,fouquet+morain02}. It is an undirected graph
+and in the specific case at hand it is a
+cycle. Figure~\ref{fig:volcano} shows an example of volcano containing
+$E_0$; from now on, we denote by $E_0,E_1,\dots$ the curves in the
+same volcano as $E_0$, the order of the labeling will be precised in
+the next paragraphs.
 
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+  \end{tikzpicture}
+  \caption{The $\ell$-isogeny volcano}
+  \label{fig:volcano}
+\end{figure}
+
+Suppose that $p\ne2,3$ and let $E_0$ be expressed as the locus
+\begin{equation}
+  E_0 \;:\; y^2 = x^3 + ax + b,
+  \quad\text{with $a,b\in\F_q$},
+\end{equation}
+plus one point at infinity.  Let $H\subset E_0$ be a finite subgroup of
+$E_0$.  Vélu's formulas~\cite{velu71} express the isogeny $\phi$ whose
+kernel is $H$ as a rational fraction
+\begin{equation}
+  \begin{aligned}
+    \phi: E_0 &\to E',\\
+    (x,y) &\mapsto \left(\frac{f(x)}{g(x)}, y\left(\frac{f(x)}{g(x)}\right)'\right).
+  \end{aligned}
+\end{equation}
+Let $\ell$ be the cardinality of $H$, then $g$ is a square polynomial
+of degree $\ell-1$ vanishing on the abscissas of the points of $H$,
+while $f$ is a polynomial of degree $\ell$. Algorithmically, Vélu
+isogenies can be computed using $O(\Mult(\ell))$ operations in $\F_q$.
+
+Under the former assumptions on $\ell$, the $\ell$-Sylow subgroups of
+each of the $E_i$'s are isomorphic to $\Z/\ell^e\Z$ for some
+$e\ge1$. For each $E_i$ we consider the unique subgroup $H_i$ of order
+$\ell$ and we construct the Vélu isogeny $\phi_i:E_i\to E_{i+1}$. For
+an arbitrary $i$, let $P$ be a point on $E_{i+1}$ of order divisible
+by $\ell^e$, Couveignes and Lercier show that its fiber by $\phi_i$ is
+irreducible of cardinality $\ell$. Hence, if the order of $P$ is not
+$2$, and if $\eta$ is the abscissa of $P$, the polynomial
+\begin{equation}
+  \label{eq:isog-fiber}
+  f_i(x) - \eta g_i(x)
+\end{equation}
+is irreducible of degree $\ell$.
 
 %%%
 
@@ -505,4 +707,5 @@ De Feo would like to thank Antoine Joux.
 % End:
 %
 % LocalWords:  Isogeny abelian isogenies hyperelliptic supersingular Frobenius
-% LocalWords:  isogenous embeddings morphisms
+% LocalWords:  isogenous embeddings Vélu
+
