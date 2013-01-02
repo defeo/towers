@@ -9,10 +9,17 @@
 \usepackage{hyperref}
 \usepackage{tikz}
 
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
 \usepackage{xcolor}
 \newcommand{\todo}[1]{\textcolor{red}{(#1)}}
 
 \newcommand{\Cyc}{\Phi}  % Cyclotomic polynomial
+
+\newdef{remark}{Remark}
 
 \begin{document}
 
@@ -40,7 +47,7 @@
 
 Building arbitrary finite extensions of finite fields is a fundamental
 task in any computer algebra system. Disregarding generic solutions
-using multivariate algebra and Grobner bases, most systems are limited
+using multivariate algebra and Gröbner bases, most systems are limited
 to construct extensions of prime fields. There is one notable
 exception: Magma~\cite{MAGMA} has implemented for a long time a
 powerful system of ``compatibly embedded finite
@@ -55,7 +62,7 @@ hope to compute and apply the morphisms in (quasi)-linear time (in the
 degree of the extension). Even worse, the quadratic memory
 requirements make the system unsuitable for embeddings of large degree
 extensions. Although the Magma core has evolved since the publication
-of the paper, our experiments in Section~\ref{sec:bench} show that
+of the paper, our experiments in Section~\ref{sec:impl} show that
 embeddings of large extension fields are still out of reach in Magma.
 
 In this paper we propose an approach based on polynomial arithmetic
@@ -190,7 +197,7 @@ Section~\ref{sec:fibers}.
 
 %%%
 
-\section{Lenstra's and De Smit's tower}
+\section{The canonical tower}
 \label{sec:LDtower}
 
 Shoup's construction is non-deterministic, and it is shown that any
@@ -270,20 +277,20 @@ extensions defined by the polynomials
     X_{i+1}^\ell &- X_i\\
     &\vdots\\
     &&X_2^\ell &- X_1\\
-              &&&X_1^\ell &- \zeta
+              &&&X_1^\ell &- \zeta.
   \end{array}
   \right.
 \end{equation}
-The only difference between Shoup's construction and Lenstra's and De
-Smit's is the way $\zeta$ is selected. Shoup selects a random element
-of $\F_q$ and tests it for non-residuosity, the test can be done in
-$O(\log q)$ operations and an element is found after $O(1)$
-trials. Lenstra and De Smit factor the $\ell$-th cyclotomic polynomial
-to obtain a root $\zeta_0$, then take $\ell$-th roots until a non
-$\ell$-adic residue is found. Compared to Shoup's algorithm this is
-more expensive \todo{how much?}, but it has the benefit of being
-deterministic if an arbitrary ordering is put on the $\ell$-th roots
-of unity.
+
+Shoup's construction and Lenstra's and De Smit's only differ in the
+way $\zeta$ is selected. Shoup selects a random element of $\F_q$ and
+tests it for non-residuosity; the test can be done in $O(\log q)$
+operations and an element is found after $O(1)$ trials. Lenstra and De
+Smit factor the $\ell$-th cyclotomic polynomial to obtain a root
+$\zeta_0$, then take $\ell$-th roots until a non $\ell$-adic residue
+is found. Compared to Shoup's algorithm this is more expensive
+\todo{how much?}, but it has the benefit of being deterministic if an
+arbitrary ordering is put on the $\ell$-th roots of unity.
 
 \paragraph{$T_2$-type extensions}
 Let now $\ell$ be an odd \todo{isn't $\ell\ne2$ sufficient?} integer
@@ -432,7 +439,10 @@ we obtain
   -\frac{(\ell-2k)(\ell-2k-1)}{(\ell-k-1)(k+1)}.
 \end{gather}
 Eq.~\eqref{eq:lucas-recurrence} gives a formula to compute all the
-coefficients of $Q_{i,j}$ using $O(\ell)$ operations. Of special
+coefficients of $Q_{i,j}$ using $O(\ell)$ operations in $\Z$. By
+performing the same computation in the ring of $p$-adic integers with
+just one digit of floating precision, it is possible to compute
+$Q_{i,j}\bmod p$ using $O(\ell)$ operations in $\F_p$. Of special
 interest to us are the polynomials $Q_{i,i}$, defining each level of
 the tower over the base field $\F_q$, and the polynomials $Q_{i,1}$,
 defining each level over the previous one. We will come back to the
@@ -476,14 +486,15 @@ multiplicative subgroup defined by
   \label{eq:T2-def}
   T_2 = \{\alpha\in\F_q(\zeta_i) \;|\; \Norm_{\F_q(\eta_i)}(\alpha) = 1\}
 \end{equation}
-is called the \emph{maximal torus} of $\F_q(\zeta_i)$. Seen as an
-algebraic group defined over $\F_q$, it has dimension one, cardinality
-$q+1$, and is isomorphic to $\mathbb{G}_m$ over the algebraic closure.
+is called the \emph{maximal torus} of
+$\F_q(\zeta_i)/\F_q(\eta_i)$. Seen as an algebraic group defined over
+$\F_q(\eta_i)$, it has dimension one, cardinality $q+1$, and is
+isomorphic to $\mathbb{G}_m$ over the algebraic closure.
 
-We now write down explicit algebraic equations for $T_2/\F_q$ and its
-$\ell$-th power map, we suppose for simplicity that the characteristic
-of $\F_q$ is different from $2$. Let $\sigma$ be the non trivial
-element of the Galois group of $\F_q(\zeta_i)/\F_q(\eta_i)$, so that
+We now write down explicit algebraic equations for $T_2/\F_q(\eta_i)$
+and its $\ell$-th power map, we suppose for simplicity that the
+characteristic of $\F_q$ is different from $2$. Let $\sigma$ be the
+generator of the Galois group of $\F_q(\zeta_i)/\F_q(\eta_i)$, so that
 $\sigma(\zeta_i)=\zeta_i^{-1}$. Set $\theta = \zeta_i -
 \sigma(\zeta_i)$, then $\sigma(\theta)=-\theta$ and $\theta^2 =
 \eta_i^2-4$, so that
@@ -551,7 +562,7 @@ general case follows from \todo{This can be safely removed}
 \end{multline}
 
 Now, if $(\eta,\eta')$ is a point on the Pell conic of order different
-from $2$, its fiber via the map $[\ell]$ is composed of $\ell$ points
+from $2$, its fiber via the map $[\ell]$ consists of $\ell$ points
 with distinct abscissas, and the polynomial $p_\ell-\eta$ vanishes on
 each of them with multiplicity one. In particular $\zeta_i =
 \eta_i/2+\theta/2$, and we have already shown that $p_\ell-\eta_i$ is
@@ -575,11 +586,10 @@ cyclotomic polynomial \todo{how much does it cost?}, while in the
 second case we would take random points on the conic and test their
 order using $O(\log q)$ operations in $\F_q$.
 
-The two previous cases involving the tori $T_1$ and $T_2$ are very
-special ones. In general, if $n$ is the order of $q$ modulo $\ell$, we
-define the \emph{maximal torus} of $\F_{q^n}$ as
+The two cases involving the tori $T_1$ and $T_2$ are very special
+ones. In general, if $n$ is the order of $q$ modulo $\ell$, we define
+the \emph{maximal torus} of $\F_{q^n}/\F_q$ as
 \begin{equation}
-  \label{eq:T2-def}
   T_n = \{\alpha\in\F_{q^n} \;|\; \Norm_{\F_{q^m}}(\alpha) = 1 
   \text{ for any $m|n$} \}.
 \end{equation}
@@ -599,10 +609,32 @@ task algorithmically.
 
 \paragraph{Elliptic curves}
 Since it seems hard to deal with higher dimensional algebraic tori, it
-makes sense to look at other algebraic groups. Being one-dimensional,
-elliptic curves are good candidates. We quickly review Couveignes' and
-Lercier's construction and refer to~\cite{couveignes+lercier11} for
-details.
+is interesting to look at other algebraic groups. Being
+one-dimensional, elliptic curves are good candidates. We quickly
+review Couveignes' and Lercier's construction and refer
+to~\cite{couveignes+lercier11} for details.
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \def\n{4}
+    \foreach \i in {0,...,\n} {
+      \pgfmathparse{360/(\n+1)*(\i-1/2) - 90}
+      \let\angle\pgfmathresult
+      \draw (\angle:1) node (E\i) {$E_\i$};
+      % \draw (\angle:0.4) node {\scriptsize$H_\i$};
+      % \draw (\angle:0.7) node[rotate=\angle] {\scriptsize$\subset$};
+    }
+    \foreach \i in {0,...,\n} {
+      \pgfmathparse{int(mod(\i+1, \n+1))}
+      \let\j\pgfmathresult
+      \draw (E\i) edge[->,bend right=18] node[auto,swap] {\scriptsize$\phi_\i$} (E\j);
+    }
+  \end{tikzpicture}
+  \caption{An $\ell$-isogeny volcano with the Vélu isogenies
+    represented.}
+  \label{fig:volcano}
+\end{figure}
 
 Let $\ell$ be a prime different from $p$ and not dividing $q-1$. Let
 $E_0$ be an elliptic curve whose cardinality is a multiple of
@@ -613,66 +645,258 @@ closure; it is said to be rational over $\F_q$ if it is invariant
 under the $q$-th power map. A rational isogeny between two curves
 exists if and only if they have the same number of points over
 $\F_q$. The degree of an isogeny is its degree as an algebraic map; an
-isogeny is separable if and only if its degree is prime to $p$, in
-which case its kernel contains as many points as the degree. A
-connected component of the graph whose vertices are elliptic curves up
-to isomorphism and whose edges are rational isogenies of degree $\ell$
-is called an \emph{$\ell$-isogeny
+isogeny of degree $n$ is separable if and only if $n$ is prime to $p$,
+in which case its kernel contains exactly $n$ points. A connected
+component of the graph whose vertices are elliptic curves up to
+isomorphism and whose edges are rational isogenies of degree $\ell$ is
+called an \emph{$\ell$-isogeny
   volcano}~\cite{kohel,fouquet+morain02}. It is an undirected graph
-and in the specific case at hand it is a
-cycle. Figure~\ref{fig:volcano} shows an example of volcano containing
-$E_0$; from now on, we denote by $E_0,E_1,\dots$ the curves in the
-same volcano as $E_0$, the order of the labeling will be precised in
-the next paragraphs.
+and, in the specific case at hand, it is a cycle.
+Figure~\ref{fig:volcano} shows one such example with one direction
+highlighted. From now on, we denote by $E_0,E_1,\dots$ the curves in
+the same volcano as $E_0$.
 
-\begin{figure}
-  \centering
-  \begin{tikzpicture}
-  \end{tikzpicture}
-  \caption{The $\ell$-isogeny volcano}
-  \label{fig:volcano}
-\end{figure}
-
-Suppose that $p\ne2,3$ and let $E_0$ be expressed as the locus
+We now make precise the order in which the curves $E_i$ are
+labeled. Suppose that $p\ne2,3$ and let $E_0$ be expressed as the
+locus
 \begin{equation}
   E_0 \;:\; y^2 = x^3 + ax + b,
   \quad\text{with $a,b\in\F_q$},
 \end{equation}
-plus one point at infinity.  Let $H\subset E_0$ be a finite subgroup of
-$E_0$.  Vélu's formulas~\cite{velu71} express the isogeny $\phi$ whose
-kernel is $H$ as a rational fraction
+plus one point at infinity. Under the former assumptions on $\ell$,
+there exists $e\ge1$ such that the $\ell$-Sylow subgroups of
+$E_i/\F_q$ are isomorphic to $\Z/\ell^e\Z$ for any $i$. We denote by
+$H_0$ the unique subgroup of $E_0/\F_q$ of order $\ell$, and by
+$\phi_0$ the unique isogeny whose kernel is $H_0$; we then label $E_1$
+the image curve of $\phi_0$. We go on denoting by $H_i$ the unique
+subgroup of $E_i/\F_q$ of order $\ell$, and by $\phi_i:E_i\to E_{i+1}$
+the unique isogeny with kernel $H_i$, until we get back to the
+starting point.
+
+Vélu's formulas~\cite{velu71} allow us to express the isogenies
+$\phi_i$ as rational fractions
 \begin{equation}
   \begin{aligned}
-    \phi: E_0 &\to E',\\
-    (x,y) &\mapsto \left(\frac{f(x)}{g(x)}, y\left(\frac{f(x)}{g(x)}\right)'\right).
+    \phi_i: E_i &\to E_{i+1},\\
+    (x,y) &\mapsto \left(\frac{f_i(x)}{g_i(x)}, y\left(\frac{f_i(x)}{g_i(x)}\right)'\right),
   \end{aligned}
 \end{equation}
-Let $\ell$ be the cardinality of $H$, then $g$ is a square polynomial
-of degree $\ell-1$ vanishing on the abscissas of the points of $H$,
-while $f$ is a polynomial of degree $\ell$. Algorithmically, Vélu
-isogenies can be computed using $O(\Mult(\ell))$ operations in $\F_q$.
+where $g_i$ is the square polynomial of degree $\ell-1$ vanishing on
+the abscissas of the affine points of $H_i$, and $f_i$ is a polynomial
+of degree $\ell$. Algorithmically, Vélu isogenies can be computed
+using $O(\Mult(\ell))$ operations in $\F_q$. 
 
-Under the former assumptions on $\ell$, the $\ell$-Sylow subgroups of
-each of the $E_i$'s are isomorphic to $\Z/\ell^e\Z$ for some
-$e\ge1$. For each $E_i$ we consider the unique subgroup $H_i$ of order
-$\ell$ and we construct the Vélu isogeny $\phi_i:E_i\to E_{i+1}$. For
-an arbitrary $i$, let $P$ be a point on $E_{i+1}$ of order divisible
-by $\ell^e$, Couveignes and Lercier show that its fiber by $\phi_i$ is
-irreducible of cardinality $\ell$. Hence, if the order of $P$ is not
-$2$, and if $\eta$ is the abscissa of $P$, the polynomial
+In what follows, the index $i$ in $\phi_i$, $f_i$, $g_i$ and $E_i$ is
+to be understood modulo the length of the cycle. This is a slight
+abuse, because of some subtleties linked to Vélu's formulas and the
+way we consider curves up to isomorphism, but it does not hide any
+theoretical or computational difficulty.  For an arbitrary $i$, let
+$P$ be a point on $E_{i+1}$ of order divisible by $\ell^e$, Couveignes
+and Lercier show that its fiber by $\phi_i$ is irreducible of
+cardinality $\ell$. If the order of $P$ is not $2$, all the abscissas
+of its fiber are distinct; hence, if $\eta$ is the abscissa of $P$,
+the polynomial
 \begin{equation}
   \label{eq:isog-fiber}
-  f_i(x) - \eta g_i(x)
+  f_i(X) - g_i(X)\eta
 \end{equation}
-is irreducible of degree $\ell$.
+is irreducible of degree $\ell$. They also show that, under the same
+assumption on $\eta$, the system of equations
+\begin{equation}
+  \label{eq:elliptic}
+  \left|
+  \begin{aligned}
+    \textstyle
+    \frac{f_{i-j}}{g_{i-j}}(X_{j+1}) = X_j\quad\\
+    \vdots\qquad\\
+    \textstyle
+    \frac{f_{i-1}}{g_{i-1}}(X_2) &= X_1\\
+              &\textstyle\frac{f_i}{g_i}(X_1) &= \eta
+  \end{aligned}
+  \right.
+\end{equation}
+defines an $\ell$-adic closure of $\F_q$. By composing the relations,
+we have that
+\begin{equation}
+  \label{eq:elliptic-uni}
+  \frac{f_i}{g_i}\left(\frac{f_{i-1}}{g_{i-1}}\left(\cdots\frac{f_{i-j}}{g_{i-j}}(X)\right)\right) = \eta
+\end{equation}
+defines an extension of $\F_q$ of degree $\ell^{j+1}$. In the next
+section we show how to compute this relation efficiently.
+
+\begin{remark}
+  \label{rk:cycle}
+  There is a major difference between our setting and Couveignes' and
+  Lercier's. Observe that, once a point $P$ of $E_i$ is chosen, the
+  $\ell$-adic tower is constructed by walking \emph{backwards} in the
+  isogeny cycle. The goal of~\cite{couveignes+lercier11}, is to
+  compute an extension of degree $\ell^i$ of $\F_q$ for a certain
+  fixed $i$. Under the former assumptions, using the construction we
+  just presented this can be done in quasi-linear time in $\ell^i$:
+  apply $i$ times Vélu's formulas, then take the fiber of a point of
+  $E_i$ by the isogenies $\phi_{i-1}, \ldots, \phi_0$. In our case, we
+  are interested in building extensions of degree $\ell^i$
+  \emph{incrementally}, i.e.\ without any \emph{a priori} bound on
+  $i$. We have two ways of doing this:
+  \begin{enumerate}
+  \item Precompute the whole cycle, this can be done using Vélu's
+    formulas only. Assuming the cycle has length $n$, chose a point of
+    $E_0$ and take its fiber by the isogenies $\phi_{n-1}, \ldots,
+    \phi_0, \phi_{n-1}, \ldots$ The length of the isogeny cycle is the
+    order of a certain ideal in the class group of the endomorphism
+    ring of $E_0$, thus it is proportional to $\sqrt{q}$. Hence, this
+    approach has a quasi-linear complexity in $\ell^i$, but an
+    exponential complexity in $\log q$.
+  \item Compute the curves on the isogeny cycle backwards, then apply
+    Vélu's formulas. This can be done incrementally, thus it does not
+    require to precompute the whole isogeny cycle. However, computing
+    $E_{i-1}$ from the knowledge of $E_i$ can only be done by
+    factoring the $\ell$-th \emph{modular polynomial}~\cite{schoof95},
+    a task requiring $O(\ell^3)$ bit operations and $O(\ell^2)$
+    operations in $\F_q$~\cite{sutherland10:modpol}.
+  \end{enumerate}
+\end{remark}
 
 %%%
 
 \section{Lifting and pushing}
 \label{sec:lift-push}
 
-The two algorithms given in the notes for the rational fraction case
-(and how they reduce to the polynomial case).
+Until now we have shown how to compute some systems of irreducible
+polynomials defining an $\ell$-adic closure of $\F_q$, but we have not
+explained how to represent the elements of $\F_q^{(\ell)}$ and how to
+perform asymptotically fast arithmetic. For simplicity we will only
+address the construction of $\F_p^{(\ell)}$. Adapting it to
+$\F_q^{(\ell)}$ only requires bivariate arithmetic and presents no
+major difficulty.
+
+We follow the same paradigm as in~\cite{df+schost12}. Each of the
+finite subfields $\F_{p^{\ell^i}}$ of $\F_p^{(\ell)}$ is represented
+as a univariate quotient ring $\F_p[X_i]/P_i(X_i)$. This allows for
+asymptotically fast multiplication and inversion of elements of
+$\F_{p^{\ell^i}}$. Elements of $\F_p^{(\ell)}$ are represented as
+elements of the smallest subfield containing them. Operations between
+elements of different subfields are performed by \emph{lifting} the
+element of the smallest subfield into the largest one. An inverse
+operation, called \emph{push}, is also needed in order to cast,
+whenever possible, elements of a larger subfield into a smaller one.
+
+The lift and push operations need only be described between a pair
+$\F_{p^{\ell^i}}$, $\F_{p^{\ell^{i+1}}}$ of consecutive levels in the
+$\ell$-adic tower. Any other pushing and lifting is done by applying
+repeatedly these elementary operations. According to
+Eqs.~\eqref{eq:T1}, \eqref{eq:T2-relpols} and~\eqref{eq:elliptic}, all
+the constructions of the previous sections fit in the same pattern:
+$\F_{p^{\ell^i}}$ is generated over $\F_p$ by an element $x$ such that
+\begin{equation}
+  \label{eq:level-i}
+  \frac{F_i(x)}{G_i(x)} = \eta,
+\end{equation}
+where $F_i$ is a polynomial of degree $\ell^i$, $G_i$ is a polynomial
+of degree less than $\ell^i$ (eventually, $G_i=1$), and $\eta$ is an
+element of $\F_p$. In its turn, $\F_{p^{\ell^{i+1}}}$ is generated
+over $\F_p$ by an element $y$ such that
+\begin{equation}
+  \label{eq:level-i+1}
+  \frac{f_i(y)}{g_i(y)} = x,
+\end{equation}
+where $f_i$ is a polynomial of degree $\ell$, and $g_i$ is a
+polynomial of degree less than $\ell$ (eventually, $g_i=1$). The
+minimal polynomial of $y$ over $\F_p$ is obtained by composing
+Eqs.~\eqref{eq:level-i} and~\eqref{eq:level-i+1}:
+\begin{equation}
+  \frac{F_i}{G_i}\left(\frac{f_i}{g_i}(y)\right) = \eta.
+\end{equation}
+This polynomial is computed by Algorithm~\ref{alg:compose}.
+
+An element of $\F_p[x]$ is represented as a polynomial $P(x)$ of
+degree less than $\ell^i$. To lift it to $\F_p[y]$ it is enough to
+compute the composition $P(f_i(y)/g_i(y))$. More generally,
+$\F_{p^{\ell^{i+1}}}$ has two natural representations as a vector
+space over $\F_p$. The first one is via the usual polynomial basis in
+$y$:
+\begin{equation}
+  \label{eq:uni-basis}
+  \mathbf{U} = (1,y,y^2,\ldots,y^{\ell^{i+1}-1}).
+\end{equation}
+The second one is via a bivariate basis in $x$ and $y$:
+\begin{equation}
+  \label{eq:bi-basis}
+  \mathbf{B} = (1,x,\ldots,x^{\ell^i-1},y,\ldots,yx^{\ell^i-1},\ldots,y^{\ell-1}x^{\ell^i-1}).
+\end{equation}
+Lifting corresponds to convert an element from $\mathbf{B}$ to
+$\mathbf{U}$, and is performed by Algorithm~\ref{alg:compose}. Pushing
+is the inverse transformation and is performed by
+Algorithm~\ref{alg:decompose}.
+
+\paragraph{Lifting}
+We are faced with the following problem. We have polynomials $P$, $f$
+and $g$ of degrees $n$, $\ell$ and $<\ell$ respectively, and we want
+to compute the composition $P(f/g)$. We denote by $P[f,g]$ the
+numerator of $P(f/g)$, so that
+\begin{equation}
+  P\left(\frac{f}{g}\right) = \frac{g^nP(f/g)}{g^n} = \frac{P[f,g]}{g^n}.
+\end{equation}
+If $P=\sum_0^np_iX^i$, then
+\begin{equation}
+  P[f,g] = \sum_{i=0}^n  p_if^ig^{n-i}.
+\end{equation}
+
+\begin{algorithm}[t]
+  \caption{Compose}
+  \label{alg:compose}
+  \begin{algorithmic}
+    \REQUIRE
+    \ENSURE
+  \end{algorithmic}
+\end{algorithm}
+
+Algorithm~\ref{alg:compose} computes $P[f,g]$ by divide-and-conquer.
+If $f$ and $g$ have coefficients in a field $k$, and if $P$ has
+coefficients in $k[X]$ of degree less than $\ell$, then the output of
+Algorithm~\ref{alg:compose} has degree less than $(n+1)\ell$, and is
+computed using $O(\Mult(n\ell)\log n\ell)$ operations in $k$. Observe
+that when $g=1$, Algorithm~\ref{alg:compose} reduces to a well known
+algorithm for polynomial composition.
+
+In the context of lifting, we are given an element $\alpha$ of
+$\F_{p^{\ell^{i+1}}}$, represented by a polynomial $P$ of degree less
+than $\ell^i$ with coefficients in $\F_p[y]$. We compute $P[f_i,g_i]$
+and $g_i^n$, using $O(\Mult(\ell^{i+1})\log\ell^i)$ operations in
+$\F_p$. We interpret $P[f_i,g_i](y)$ and $g_i^n(y)$ as elements of
+$\F_{p^{\ell^{i+1}}}$, then the lift of $\alpha$ is
+$P[f_i,g_i](y)/g_i^n(y)$, which is computed by a division in
+$\F_{p^{\ell^{i+1}}}$ using $O(\Mult(\ell^{i+1}))$ operations in
+$\F_p$.
+
+\paragraph{Pushing}
+We now have the inverse problem. We are given polynomials $P$, $f$ and
+$g$ of degrees $n$, $\ell$ and $<\ell$ respectively, with coefficients
+in a field $k$. Using the same notation as before, we want to compute
+a decomposition of $P$ as $Q[f,g]$, where $Q$ is a polynomial with
+coefficients of degree less than $\ell$ in $k[X]$.
+
+\begin{algorithm}[t]
+  \caption{Decompose}
+  \label{alg:decompose}
+  \begin{algorithmic}
+    \REQUIRE
+    \ENSURE
+  \end{algorithmic}
+\end{algorithm}
+
+Observe that when $g=1$, Algorithm~\ref{alg:decompose} reduces to
+Algorithm~9.14 of~\cite{vzGG}.
+
+In the context of pushing, we are given an element $\alpha$ of
+$\F_{p^{\ell^{i+1}}}$, represented by a polynomial $P$ of degree less
+than $\ell^{i+1}$ with coefficients in $\F_p$. We start by computing
+$g_i^{\ell^i-1}$ and we set $\bar{P}(y) = g^{\ell^i-1}(y)P(y)$, then
+we apply Algorithm~\ref{alg:decompose} to $\bar{P}$, $f_i$ and
+$g_i$. The result is a bivariate polynomial $Q$, representing $\alpha$
+on the basis $\mathbf{B}$. Again, the dominant phase is
+Algorithm~\ref{alg:decompose}, costing
+$O(\Mult(\ell^{i+1})\log\ell^i))$ operations in $\F_p$.
 
 %%%
 
@@ -684,8 +908,8 @@ fibers...
 
 %%%
 
-\section{Benchmarks}
-\label{sec:bench}
+\section{Implementation and complexity considerations}
+\label{sec:impl}
 
 Sage implementation and timings.
 
