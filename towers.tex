@@ -10,7 +10,7 @@
 \usepackage{tikz}
 
 \usepackage{algorithm}
-\usepackage{algorithmic}
+\usepackage[noend]{algorithmic}
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
 
@@ -18,8 +18,14 @@
 \newcommand{\todo}[1]{\textcolor{red}{(#1)}}
 
 \newcommand{\Cyc}{\Phi}  % Cyclotomic polynomial
+\newcommand{\bb}{\mathbf{B}}  
+\newcommand{\uu}{\mathbf{U}}  % bases for lift and push
 
+
+\newdef{definition}{Definition}
 \newdef{remark}{Remark}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
 
 \begin{document}
 
@@ -782,121 +788,265 @@ operation, called \emph{push}, is also needed in order to cast,
 whenever possible, elements of a larger subfield into a smaller one.
 
 The lift and push operations need only be described between a pair
-$\F_{p^{\ell^i}}$, $\F_{p^{\ell^{i+1}}}$ of consecutive levels in the
+$\F_{p^{\ell^{i-1}}}$, $\F_{p^{\ell^i}}$ of consecutive levels in the
 $\ell$-adic tower. Any other pushing and lifting is done by applying
 repeatedly these elementary operations. According to
 Eqs.~\eqref{eq:T1}, \eqref{eq:T2-relpols} and~\eqref{eq:elliptic}, all
 the constructions of the previous sections fit in the same pattern:
-$\F_{p^{\ell^i}}$ is generated over $\F_p$ by an element $x$ such that
+$\F_{p^{\ell^{i-1}}}$ is generated over $\F_p$ by an element $x$ such
+that
 \begin{equation}
   \label{eq:level-i}
-  \frac{F_i(x)}{G_i(x)} = \eta,
+  \frac{F(x)}{G(x)} = \eta,
 \end{equation}
-where $F_i$ is a polynomial of degree $\ell^i$, $G_i$ is a polynomial
-of degree less than $\ell^i$ (eventually, $G_i=1$), and $\eta$ is an
-element of $\F_p$. In its turn, $\F_{p^{\ell^{i+1}}}$ is generated
-over $\F_p$ by an element $y$ such that
+where $F$ is a polynomial of degree $\ell^{i-1}$, $G$ is a polynomial
+of degree less than $\ell^{i-1}$ (eventually, $G=1$), and $\eta$ is an
+element of $\F_p$. In its turn, $\F_{p^{\ell^i}}$ is generated over
+$\F_p$ by an element $y$ such that
 \begin{equation}
   \label{eq:level-i+1}
-  \frac{f_i(y)}{g_i(y)} = x,
+  \frac{f(y)}{g(y)} = x,
 \end{equation}
-where $f_i$ is a polynomial of degree $\ell$, and $g_i$ is a
-polynomial of degree less than $\ell$ (eventually, $g_i=1$). The
+where $f$ is a polynomial of degree $\ell$, and $g$ is a
+polynomial of degree less than $\ell$ (eventually, $g=1$). The
 minimal polynomial of $y$ over $\F_p$ is obtained by composing
 Eqs.~\eqref{eq:level-i} and~\eqref{eq:level-i+1}:
 \begin{equation}
-  \frac{F_i}{G_i}\left(\frac{f_i}{g_i}(y)\right) = \eta.
+  \label{eq:minpol-compose}
+  \frac{F}{G}\left(\frac{f}{g}(y)\right) = \eta.
 \end{equation}
-This polynomial is computed by Algorithm~\ref{alg:compose}.
 
-An element of $\F_p[x]$ is represented as a polynomial $P(x)$ of
-degree less than $\ell^i$. To lift it to $\F_p[y]$ it is enough to
-compute the composition $P(f_i(y)/g_i(y))$. More generally,
-$\F_{p^{\ell^{i+1}}}$ has two natural representations as a vector
-space over $\F_p$. The first one is via the usual polynomial basis in
-$y$:
-\begin{equation}
-  \label{eq:uni-basis}
-  \mathbf{U} = (1,y,y^2,\ldots,y^{\ell^{i+1}-1}).
-\end{equation}
-The second one is via a bivariate basis in $x$ and $y$:
-\begin{equation}
-  \label{eq:bi-basis}
-  \mathbf{B} = (1,x,\ldots,x^{\ell^i-1},y,\ldots,yx^{\ell^i-1},\ldots,y^{\ell-1}x^{\ell^i-1}).
-\end{equation}
-Lifting corresponds to convert an element from $\mathbf{B}$ to
-$\mathbf{U}$, and is performed by Algorithm~\ref{alg:compose}. Pushing
-is the inverse transformation and is performed by
-Algorithm~\ref{alg:decompose}.
+\begin{corollary}
+  \sloppy
+  Let $y$ be the generator of $\F_{p^{\ell^i}}$ over
+  $\F_{p^{\ell^{i-1}}}$. Its minimal polynomial over $\F_p$ can be
+  computed using $O(\Mult(\ell^i)\log\ell^i)$ operations in $k$.
+\end{corollary}
+\begin{proof}
+  Remark that for $T_1$ and $T_2$-type extension we have more
+  efficient ways of computing these polynomials. In the general case,
+  the composition in Eq.~\eqref{eq:minpol-compose} can be computed
+  using Algorithm~\ref{alg:compose}. The complexity bound is proved in
+  Theorem~\ref{th:compose}.
+\end{proof}
+
+In view of this, there are two natural ways to represent elements of
+$\F_{p^{\ell^i}}$: as univariate polynomials in $y$, or as bivariate
+polynomials in $x$.
+
+\begin{definition}
+  Let $x$ and $y$ be as above, we define the two following
+  $\F_p$-vector space bases of $\F_{p^{\ell^i}}$.
+  \begin{align}
+    \label{eq:uni-basis}
+    \uu &= \left(y^j \;\middle|\; 0\le j <\ell^i\right),\\
+    \label{eq:bi-basis}
+    \bb &= \left(y^jx^k \;\middle|\; 0\le j <\ell, 0\le k <\ell^{i-1}\right).
+  \end{align}
+\end{definition}
+
+We call \emph{lifting} the conversion of an element from $\bb$ to
+$\uu$, \emph{pushing} the inverse transformation. We now present
+algorithms to perform each of them.
 
 \paragraph{Lifting}
 We are faced with the following problem. We have polynomials $P$, $f$
-and $g$ of degrees $n$, $\ell$ and $<\ell$ respectively, and we want
-to compute the composition $P(f/g)$. We denote by $P[f,g]$ the
-numerator of $P(f/g)$, so that
-\begin{equation}
-  P\left(\frac{f}{g}\right) = \frac{g^nP(f/g)}{g^n} = \frac{P[f,g]}{g^n}.
-\end{equation}
-If $P=\sum_0^np_iX^i$, then
-\begin{equation}
-  P[f,g] = \sum_{i=0}^n  p_if^ig^{n-i}.
-\end{equation}
+and $g$ with coefficients in a field $k$, and we want to compute the
+composition $P(f/g)$.
+
+\begin{definition}
+  Let $P,f,g$ be polynomials, we denote by $P[f,g]$ the numerator of
+  $P(f/g)$, so that
+  \begin{equation}
+    P\left(\frac{f}{g}\right) = \frac{g^nP(f/g)}{g^n} = \frac{P[f,g]}{g^n}.
+  \end{equation}
+  If $P=\sum_0^np_iX^i$, then
+  \begin{equation}
+    P[f,g] = \sum_{i=0}^n  p_if^ig^{n-i}.
+  \end{equation}
+\end{definition}
 
 \begin{algorithm}[t]
   \caption{Compose}
   \label{alg:compose}
-  \begin{algorithmic}
-    \REQUIRE
-    \ENSURE
+  \begin{algorithmic}[1]
+    \REQUIRE $P\in k[Y][X]$, $f,g\in k[Y]$;
+    \STATE $n \la \deg_X P$;
+    \IF {$n = 0$}
+    \ENSURE $P$
+    \ELSE
+    \STATE $m \la \lceil n/2\rceil$;
+    \STATE Let $P_0,P_1$ be such that $P = P_0 + X^mP_1$;
+    \STATE $Q_0 \la$ Compose($P_0, f, g$);
+    \STATE $Q_1 \la$ Compose($P_1, f, g$);
+    \STATE \label{alg:compose:res}
+    $Q \la Q_0g^{n-m+1} + Q_1f^m$;
+    \ENSURE $Q$.
+    \ENDIF
   \end{algorithmic}
 \end{algorithm}
 
-Algorithm~\ref{alg:compose} computes $P[f,g]$ by divide-and-conquer.
-If $f$ and $g$ have coefficients in a field $k$, and if $P$ has
-coefficients in $k[X]$ of degree less than $\ell$, then the output of
-Algorithm~\ref{alg:compose} has degree less than $(n+1)\ell$, and is
-computed using $O(\Mult(n\ell)\log n\ell)$ operations in $k$. Observe
-that when $g=1$, Algorithm~\ref{alg:compose} reduces to a well known
-algorithm for polynomial composition.
+\begin{theorem}
+  \label{th:compose}
+  On input $P,f,g$, Algorithm~\ref{alg:compose} computes the
+  polynomial $P[f,g]$. If $n=\deg_XP$, $\ell=\max(\deg f, \deg g)$ and
+  $\deg_YP\in O(\ell)$, it computes its output using $O(\Mult(\ell
+  n)\log n)$ operations in $k$.
+\end{theorem}
+\begin{proof}
+  If $n=0$, the theorem is obvious. Suppose $n>0$, then $P_0$ and
+  $P_1$ have degree $m-1$ and $n-m$ respectively. By induction
+  hypothesis,
+  \begin{equation}
+    \begin{aligned}
+      Q_0 &= P_0[f,g] = \sum_{i=0}^{m-1}p_if^ig^{m-1-i},\\
+      Q_1 &= P_1[f,g] = \sum_{i=0}^{n-m}p_{i+m}f^ig^{n-m-i}.   
+    \end{aligned}
+  \end{equation}
+  Hence,
+  \begin{equation}
+    Q = \sum_{i=0}^{m-1}p_if^ig^{n-i} +
+    \sum_{i=0}^{n-m}p_{i+m}f^{i+m}g^{n-m-i} =
+    P[f,g].
+  \end{equation}
 
-In the context of lifting, we are given an element $\alpha$ of
-$\F_{p^{\ell^{i+1}}}$, represented by a polynomial $P$ of degree less
-than $\ell^i$ with coefficients in $\F_p[y]$. We compute $P[f_i,g_i]$
-and $g_i^n$, using $O(\Mult(\ell^{i+1})\log\ell^i)$ operations in
-$\F_p$. We interpret $P[f_i,g_i](y)$ and $g_i^n(y)$ as elements of
-$\F_{p^{\ell^{i+1}}}$, then the lift of $\alpha$ is
-$P[f_i,g_i](y)/g_i^n(y)$, which is computed by a division in
-$\F_{p^{\ell^{i+1}}}$ using $O(\Mult(\ell^{i+1}))$ operations in
-$\F_p$.
+  The only step that requires a computation is
+  Step~\ref{alg:compose:res}, costing $O(\Mult(\ell n))$ operations in
+  $k$. The recursion has depth $\log n$, hence the overall complexity
+  is $O(\Mult(\ell n)\log n)$.  Observe that when $g=1$,
+  Algorithm~\ref{alg:compose} reduces to a well known algorithm for
+  polynomial composition~\cite[Ex.~9.20]{vzGG}.
+\end{proof}
+
+\begin{corollary}
+  Let $\alpha\in\F_{p^{\ell^i}}$ be represented on the basis $\bb$.
+  We can \emph{lift} $\alpha$ to the basis $\uu$ using
+  $O(\Mult(\ell^i)\log\ell^i)$ operations in $\F_p$.
+\end{corollary}
+\begin{proof}
+  $\alpha$ is represented by a bivariate polynomial $P(y,x)$ with
+  $\deg_yP<\ell$ and $\deg_xP<\ell^{i-1}$.  We compute the univariate
+  polynomials $P[f,g]$ and $g^n$, using $O(\Mult(\ell^i)\log\ell^i)$
+  operations in $\F_p$. We interpret $P[f,g](y)$ and $g^n(y)$ as
+  elements of $\F_{p^{\ell^i}}$ written in the basis $\uu$. Then the
+  lift of $\alpha$ is $P[f,g](y)/g^n(y)$. The inversion of $g^n(y)$
+  can be computed in $O(\Mult(\ell^i)\log\ell^i)$ using the extended
+  Euclidean algorithm.
+\end{proof}
 
 \paragraph{Pushing}
 We now have the inverse problem. We are given polynomials $P$, $f$ and
-$g$ of degrees $n$, $\ell$ and $<\ell$ respectively, with coefficients
-in a field $k$. Using the same notation as before, we want to compute
-a decomposition of $P$ as $Q[f,g]$, where $Q$ is a polynomial with
-coefficients of degree less than $\ell$ in $k[X]$.
+$g$, with coefficients in a field $k$, and such that $(f,g)=1$. Using
+the same notation as before, we want to compute a decomposition
+$P=Q[f,g]$.
 
 \begin{algorithm}[t]
   \caption{Decompose}
   \label{alg:decompose}
-  \begin{algorithmic}
-    \REQUIRE
-    \ENSURE
+  \begin{algorithmic}[1]
+    \REQUIRE $P,f,g\in k[Y]$ s.t. $\deg g<\deg f$ and $(f,g)=1$;
+    \REQUIRE $n\in\N$;
+    \IF {$n=0$}
+    \ENSURE $P$
+    \ELSE
+    \STATE $m \la \lceil n/2 \rceil$;
+    \STATE \label{alg:decompose:xgcd}
+    Compute $u, v$ such that $uf^m + vg^m = 1$;
+    \STATE $r \la 0$;
+    \IF {$\deg P \ge \deg f^m + \deg g^m$}
+    \STATE \label{alg:decompose:div}
+    $q,\; P \la P \div f^m,\; P \bmod f^m$;
+    \ENDIF
+    \STATE \label{alg:decompose:split}
+    $P_0,\; P_1 \la Pv \bmod f^m,\; q + (Pu \bmod g^m)$;
+    \STATE $Q_0 \la$ Decompose($P_0, f, g, n-m$);
+    \STATE $Q_1 \la$ Decompose($P_1, f, g, n-m$);
+    \ENSURE $Q_0 + X^mQ_1$.
+    \ENDIF
   \end{algorithmic}
 \end{algorithm}
 
-Observe that when $g=1$, Algorithm~\ref{alg:decompose} reduces to
-Algorithm~9.14 of~\cite{vzGG}.
+\begin{theorem}
+  On input $P,f,g,n$, Algorithm~\ref{alg:decompose} computes a
+  polynomial $Q\in k[Y][X]$ such that $\deg_X Q=n$ and $P=Q[f,g]$.
 
-In the context of pushing, we are given an element $\alpha$ of
-$\F_{p^{\ell^{i+1}}}$, represented by a polynomial $P$ of degree less
-than $\ell^{i+1}$ with coefficients in $\F_p$. We start by computing
-$g_i^{\ell^i-1}$ and we set $\bar{P}(y) = g^{\ell^i-1}(y)P(y)$, then
-we apply Algorithm~\ref{alg:decompose} to $\bar{P}$, $f_i$ and
-$g_i$. The result is a bivariate polynomial $Q$, representing $\alpha$
-on the basis $\mathbf{B}$. Again, the dominant phase is
-Algorithm~\ref{alg:decompose}, costing
-$O(\Mult(\ell^{i+1})\log\ell^i))$ operations in $\F_p$.
+  Let $\ell=\deg f$. If $\deg P < \ell(n+1)$, then $\deg_Y Q<\ell$. In
+  this case, the output is computed using $O(\Mult(\ell n)\log \ell
+  n)$ operations in $k$.
+\end{theorem}
+\begin{proof}
+  If $n=0$ the statement is obvious. In particular, if $\deg P <
+  \ell$, the output trivially satisfies $\deg_YQ<\ell$.
+
+  Let $n>0$, then $m>0$. We prove the theorem by induction. The
+  polynomials $P_0$ and $P_1$ computed in
+  Step~\ref{alg:decompose:split} verify
+  \begin{equation}
+    \begin{aligned}
+      P &\equiv P_0g^m \mod f^m,\\
+      P &\equiv P_1f^m \mod g^m.
+    \end{aligned}
+  \end{equation}
+  Comparing degrees and using the Chinese remainder theorem, we
+  conclude that
+  \begin{equation}
+    P = P_0g^m + P_1f^m.
+  \end{equation}
+  We necessarily have $n-m<n$, hence, by induction hypothesis, $Q_0$
+  and $Q_1$ have degree $n-m$ and are such that
+  \begin{equation}
+    \begin{aligned}
+      P_0 &= Q_0[f,g] = \sum_{i=0}^{n-m} q_{0,i}f^ig^{n-m-i},\\
+      P_1 &= Q_1[f,g] = \sum_{i=0}^{n-m} q_{1,i}f^ig^{n-m-i}.
+    \end{aligned}
+  \end{equation}
+  Hence, $Q=Q_0+X^mQ_1$ has degree $n$ and is such that
+  \begin{multline}
+    Q[f,g] = \sum_{i=0}^{n-m}q_{0,i}f^ig^{n-i} + 
+    \sum_{i=m}^nq_{1,i-m}f^ig^{n-i} =\\
+    Q_0[f,g]g^m + Q_1[f,g]f^m = P.
+  \end{multline}
+
+  If $\deg P < \ell (n+1)$, both $P_0$ and $P_1$ have degree less than
+  $\ell(n-m+1)$. Then, by induction hypothesis, $\deg q_{0,i}<\ell$
+  and $\deg q_{1,i}<\ell$ for any $i$. We deduce that
+  $\deg_YQ<\ell$. Observe that when $g=1$,
+  Algorithm~\ref{alg:decompose} reduces to Algorithm~9.14
+  of~\cite{vzGG}.
+
+  Finally we analyze the complexity of the algorithm on input $P, f,
+  g, n$, under the constraints on the degrees specified
+  above. Step~\ref{alg:decompose:xgcd} is dominated by the extended
+  Euclidean algorithm, which costs $O(\Mult(\ell n)\log \ell n)$
+  operations in $k$. Although Algorithm~\ref{alg:decompose} is
+  recursive, this step is independent of $P$, thus it can be done just
+  once for every $m$, before running the rest of the algorithm. The
+  dominant cost is the one of the highest power $m$, contributing
+  $O(\Mult(\ell n)\log \ell n)$ to the overall complexity. This
+  precomputation saves a logarithmic factor.
+
+  We are left with the contribution of Steps~\ref{alg:decompose:div}
+  and~\ref{alg:decompose:split}, costing $O(\Mult(\ell n))$ each. The
+  recursion has depth $\log n$, thus the overall cost is $O(\Mult(\ell
+  n)\log n)$. Hence, the total complexity is dominated by the cost of
+  Step~\ref{alg:decompose:xgcd}.
+\end{proof}
+
+\begin{corollary}
+  Let $\alpha\in\F_{p^{\ell^i}}$ be represented on the basis $\uu$. We
+  can \emph{push} $\alpha$ to the basis $\bb$ using
+  $O(\Mult(\ell^i)\log\ell^i)$ operations in $\F_p$.
+\end{corollary}
+\begin{proof}
+  $\alpha$ is represented by a univariate polynomial $P(y)$ of degree
+  less than $\ell^i$. We compute $g^{\ell^{i-1}-1}$ and $\bar{P}(y) =
+  g^{\ell^{i-1}-1}(y)P(y)$ using $O(\Mult(\ell^i))$ operations. Then,
+  we apply Algorithm~\ref{alg:decompose} to $\bar{P}$, $f$ and $g$,
+  with $n=\ell^{i-1}-1$. The result is a bivariate polynomial $Q$,
+  representing $\alpha$ on the basis $\mathbf{B}$. The dominant phase
+  is Algorithm~\ref{alg:decompose}, costing
+  $O(\Mult(\ell^i)\log\ell^i))$ operations in $\F_p$.
+\end{proof}
 
 %%%
 
