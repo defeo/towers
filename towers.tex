@@ -64,7 +64,7 @@ fields.
 The system implemented in Magma, as described in the original paper,
 uses linear algebra to describe the embeddings of finite fields. From
 a complexity point of view this is far from optimal, indeed one may
-hope to compute and apply the morphisms in (quasi)-linear time (in the
+hope to compute and apply the morphisms in quasi-linear time (in the
 degree of the extension). Even worse, the quadratic memory
 requirements make the system unsuitable for embeddings of large degree
 extensions. Although the Magma core has evolved since the publication
@@ -92,7 +92,7 @@ primitive polynomials, Zech logarithms, Conway polynomials, etc. A
 user doing computations in a single, fixed, extension field will
 clearly benefit more from these optimizations than from our
 construction. However, a variety of computations in number theory and
-algebraic geometry requires frequently constructing new extension
+algebraic geometry require frequently constructing new extension
 fields and moving elements from one to the other. Examples of these
 algorithms are~\cite{df10} \todo{cite more}. Our construction makes
 them feasible for much larger sizes than it was previously possible.
@@ -105,7 +105,7 @@ This paper is organized as follows. \todo{How?}
 \label{sec:finite-field-embedd}
 We fix the following notation: $p$ is a prime, $d$ a positive integer,
 $q=p^d$, $\F_p$ and $\F_q$ are the finite fields with $p$ and $q$
-elements respectively. If $L/K$ is a field extension, we write
+elements respectively. If $L/K$ is a Galois extension, we write
 $\Tr_{L/K}$, $\Norm_{L/K}$ and $\Gal_{L/K}$ for the trace, the norm
 and the Galois group of the extension, respectively. When the field
 $L$ is clear from the context, we simply write $\Tr_K$ and $\Norm_K$,
@@ -157,12 +157,12 @@ $\F_q$.
 
 \paragraph{Algorithms}
 Most computer algebra systems construct the field $\F_q$ by taking
-degree $d$ polynomials at random until one irreducible is found. This
-approach has a cost at least quadratic in the degree $d$. More
-advanced constructions use Eq.~\eqref{eq:tensor}: they factor $d$ into
-prime powers, for each prime power construct an extension of $\F_p$ of
-that degree, then glue all the extensions together by taking
-\emph{composita}.
+degree $d$ polynomials at random until an irreducible one is
+found. This approach has a cost at least quadratic in the degree
+$d$. More advanced constructions use Eq.~\eqref{eq:tensor}: they
+factor $d$ into prime powers, for each prime power construct an
+extension of $\F_p$ of that degree, then glue all the extensions
+together by taking \emph{composita}.
 
 The classical way of taking \emph{composita} is \todo{where?}
 
@@ -464,8 +464,8 @@ many others, can be understood in a geometrical way using an intuition
 of Couveignes and Lercier\cite{couveignes+lercier11}. Suppose we are
 given algebraic groups $G/\F_q$, $G'/\F_q$ and a degree $\ell$ map
 $\phi:G'\to G$ surjective over the algebraic closure. If $\phi$ is not
-surjective over $\F_q$, then some points of $G'$ will have fibers
-consisting of $\ell$ distinct points of $G$ living in an algebraic
+surjective over $\F_q$, then some points of $G$ will have fibers
+consisting of $\ell$ distinct points of $G'$ living in an algebraic
 extension of $\F_q$. If $\phi$ is chosen well enough, these fibers can
 be made to be irreducible over $\F_q$, so that an annihilating
 polynomial will be irreducible of degree $\ell$, as required. If the
@@ -738,7 +738,7 @@ section we show how to compute this relation efficiently.
   isogeny cycle. The goal of~\cite{couveignes+lercier11}, is to
   compute an extension of degree $\ell^i$ of $\F_q$ for a certain
   fixed $i$. Under the former assumptions, using the construction we
-  just presented this can be done in quasi-linear time in $\ell^i$:
+  just presented, this can be done in quasi-linear time in $\ell^i$:
   apply $i$ times Vélu's formulas, then take the fiber of a point of
   $E_i$ by the isogenies $\phi_{i-1}, \ldots, \phi_0$. In our case, we
   are interested in building extensions of degree $\ell^i$
@@ -913,7 +913,7 @@ composition $P(f/g)$.
   The only step that requires a computation is
   Step~\ref{alg:compose:res}, costing $O(\Mult(\ell n))$ operations in
   $k$. The recursion has depth $\log n$, hence the overall complexity
-  is $O(\Mult(\ell n)\log n)$.  Observe that when $g=1$,
+  is $O(\Mult(\ell n)\log n)$.  Observe that, when $g=1$,
   Algorithm~\ref{alg:compose} reduces to a well known algorithm for
   polynomial composition~\cite[Ex.~9.20]{vzGG}.
 \end{proof}
@@ -1010,7 +1010,7 @@ $P=Q[f,g]$.
   If $\deg P < \ell (n+1)$, both $P_0$ and $P_1$ have degree less than
   $\ell(n-m+1)$. Then, by induction hypothesis, $\deg q_{0,i}<\ell$
   and $\deg q_{1,i}<\ell$ for any $i$. We deduce that
-  $\deg_YQ<\ell$. Observe that when $g=1$,
+  $\deg_YQ<\ell$. Observe that, when $g=1$,
   Algorithm~\ref{alg:decompose} reduces to Algorithm~9.14
   of~\cite{vzGG}.
 
