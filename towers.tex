@@ -9,8 +9,14 @@
 \usepackage{hyperref}
 \usepackage{tikz}
 
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}[definition]{Theorem}
+\newtheorem{lemma}[definition]{Lemma}
+\newtheorem{corollary}[definition]{Corollary}
+\newtheorem{proposition}[definition]{Proposition}
+
 \usepackage{algorithm}
-\usepackage[noend]{algorithmic}
+\usepackage{algorithmic}
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
 
@@ -21,11 +27,7 @@
 \newcommand{\bb}{\mathbf{B}}  
 \newcommand{\uu}{\mathbf{U}}  % bases for lift and push
 
-
-\newdef{definition}{Definition}
 \newdef{remark}{Remark}
-\newtheorem{theorem}{Theorem}
-\newtheorem{corollary}[theorem]{Corollary}
 
 \begin{document}
 
@@ -34,7 +36,7 @@
 \author{
   \alignauthor Luca De Feo
   \alignauthor Javad Doliskani
-  \alignauthor Éric Schost
+  \alignauthor \'Eric Schost
 }
 
 \maketitle
@@ -52,9 +54,8 @@
 \label{sec:intro}
 
 Building arbitrary finite extensions of finite fields is a fundamental
-task in any computer algebra system. Disregarding generic solutions
-using multivariate algebra and Gröbner bases, most systems are limited
-to construct extensions of prime fields. There is one notable
+task in any computer algebra system. Many systems are limited to
+construct extensions of prime fields, but there is one notable
 exception: Magma~\cite{MAGMA} has implemented for a long time a
 powerful system of ``compatibly embedded finite
 fields''~\cite{bosma+cannon+steel97}, capable of building extensions
@@ -63,99 +64,138 @@ fields.
 
 The system implemented in Magma, as described in the original paper,
 uses linear algebra to describe the embeddings of finite fields. From
-a complexity point of view this is far from optimal, indeed one may
-hope to compute and apply the morphisms in quasi-linear time (in the
-degree of the extension). Even worse, the quadratic memory
-requirements make the system unsuitable for embeddings of large degree
+a complexity point of view, this is far from optimal: one may hope to
+compute and apply the morphisms in quasi-linear time in the degree
+of the extension, but this is usually out of reach of plain linear
+algebra techniques. Even worse, the quadratic memory requirements make
+the system unsuitable for embeddings of large degree
 extensions. Although the Magma core has evolved since the publication
-of the paper, our experiments in Section~\ref{sec:impl} show that
-embeddings of large extension fields are still out of reach in Magma.
+of the paper, experiments in Section~\ref{sec:impl} show that
+embeddings of large extension fields are still out of reach.
 
-In this paper we propose an approach based on polynomial arithmetic
-rather than linear algebra, yielding much better performances. Our
-solution only applies to some special cases, but we hope that it will
-pave the way towards a complete solution. The technique we present is
-similar to the one in~\cite{df+schost12} in that we construct families
-of irreducible polynomials with special properties, then give
-algorithms (called \emph{lift} and \emph{push}) that exploit the
-special form of those polynomials to apply the embeddings. The
-families of polynomials we use come from work of Lenstra and De Smit
-on the algebraic closure of finite
-fields~\cite{lenstra+desmit08-stdmodels}, and from work of Couveignes
-and Lercier on constructing irreducible polynomials in quasi-linear
-time~\cite{couveignes+lercier11}.
+In this paper, we discuss an approach based on polynomial arithmetic
+rather than linear algebra, yielding much better performances. We only
+consider some special cases, but we expect that these results will
+pave the way towards a complete solution.
 
-The focus of this paper is on the representation of extensions of
-\emph{large} degree and their embeddings. We do not consider issues
-related to special representations of small finite fields, such as
-primitive polynomials, Zech logarithms, Conway polynomials, etc. A
-user doing computations in a single, fixed, extension field will
-clearly benefit more from these optimizations than from our
-construction. However, a variety of computations in number theory and
-algebraic geometry require frequently constructing new extension
-fields and moving elements from one to the other. Examples of these
-algorithms are~\cite{df10} \todo{cite more}. Our construction makes
-them feasible for much larger sizes than it was previously possible.
+%% The families of polynomials we use come from work of
+%% Shoup~\cite{Shoup90,shoup94} and Couveignes and Lercier on
+%% constructing irreducible polynomials~\cite{couveignes+lercier11}, as
+%% well as Lenstra and De Smit on the algebraic closure of finite
+%% fields~\cite{lenstra+desmit08-stdmodels}.
 
-This paper is organized as follows. \todo{How?}
-
-%%%
-
-\section{Finite fields and embeddings}
-\label{sec:finite-field-embedd}
-We fix the following notation: $p$ is a prime, $d$ a positive integer,
-$q=p^d$, $\F_p$ and $\F_q$ are the finite fields with $p$ and $q$
-elements respectively. If $L/K$ is a Galois extension, we write
-$\Tr_{L/K}$, $\Norm_{L/K}$ and $\Gal_{L/K}$ for the trace, the norm
-and the Galois group of the extension, respectively. When the field
-$L$ is clear from the context, we simply write $\Tr_K$ and $\Norm_K$,
-and when the field $K$ is clear too, we may write $\Tr$ and $\Norm$.
-
-The field $\F_q$ can be constructed as the splitting field of any
-irreducible polynomial of degree $d$, we call this the \emph{defining
-  polynomial} of $\F_q$. There are about $p^d/d$ such irreducible
-polynomials over $\F_p$ \todo{cite something}, giving as many
-different ways of representing $\F_q$. Furthermore, there is no
-canonical way of establishing isomorphisms between them, indeed a
-field with $p^d$ elements has $d$ automorphisms fixing $\F_p$.
-
-A field with $p^d$ elements contains subfields with $p^n$ elements for
-any $n|d$. For the same reasons as above, there is no canonical way of
-embedding one finite field into another.
-
-Let $\ell$ be another integer. We define the \emph{$\ell$-adic
-  closure} of $\F_p$ as follows. Fix arbitrary embeddings
+Let $q$ be a power of a prime $p$, let $\F_q$ be the finite field with
+$q$ elements and let $\ell$ be a new integer. Our main interest in
+this paper is on the algorithmic aspects of the \emph{$\ell$-adic
+  closure} of $\F_q$, which is defined as follows. Fix arbitrary
+embeddings
 \begin{equation*}
-  \F_p \subset \F_{p^\ell} \subset \F_{p^{\ell^2}} \subset \cdots,
+  \F_q \subset \F_{q^\ell} \subset \F_{q^{\ell^2}} \subset \cdots;
 \end{equation*}
-the $\ell$-adic closure is the infinite field defined by
+then, the $\ell$-adic closure of $\F_q$ is the infinite field defined by
 \begin{equation*}
-  \F_p^{(\ell)} = \bigcup_{i>0}\F_{p^{\ell^i}}.
+  \F_q^{(\ell)} = \bigcup_{i\ge 0}\F_{q^{\ell^i}}.
 \end{equation*}
 We also call an \emph{$\ell$-adic tower} the sequence of extensions
-$\F_p,\F_{p^\ell},\dots$ When $\ell$ is prime, the Galois group of
-$\F_p^{(\ell)}/\F_p$ is a procyclic group isomorphic to $\Z_\ell$, the
-$\ell$-adic integers. Let $\bar{\F}_p$ be an algebraic closure of
-$\F_p$, then there is a well known isomorphism
-\begin{equation}
+$\F_q,\F_{q^\ell},\dots$ An important feature of $\ell$-adic towers is
+that they allow us to build the algebraic closure $\bar{\F}_q$ of
+$\F_q$, as there is an isomorphism
+\begin{equation*}
   \label{eq:tensor}
-  \bar{\F}_p \isom \bigotimes_{\ell\text{ prime}} \F_p^{(\ell)},
+  \bar{\F}_q \isom \bigotimes_{\ell\text{ prime}} \F_q^{(\ell)},
+\end{equation*}
+where the tensor products are over $\F_q$.
+
+In this paper, we give algorithms that allow us to ``compute''
+efficiently in the first levels of such $\ell$-adic towers, in a sense
+defined hereafter.  We do not discuss the representation of the base
+field $\F_q$ itself, and we count arithmetic operations
+$\{+,-,\times,\div\}$ in $\F_q$ at unit cost. 
+
+%% Since our focus is on the representation of extensions of large
+%% degree, we do not consider issues related to special representations
+%% of small finite fields, such as primitive polynomials, Zech
+%% logarithms, Conway polynomials, etc.
+
+The techniques we present are similar to those in~\cite{df+schost12}
+in that we construct families of irreducible polynomials with special
+properties, then give algorithms that exploit the special form of
+those polynomials to apply the embeddings.
+
+Each field $\F_{q^{\ell^i}}$ is represented as a univariate quotient ring
+$\F_q[X_i]/\langle Q_i\rangle$, for some irreducible polynomial $Q_i
+\in \F_q[X_i]$. Below, we will let $x_i$ be the residue class of $X_i$
+modulo $Q_i$, so that $\F_{q^{\ell^i}}$ is endowed with the monomial
+basis
+\begin{equation}
+  \label{eq:uni-basis1}
+  \mathbf{U}_i = (1,x_{i},x_{i}^2,\ldots,x_{i}^{\ell^{i}-1}).
 \end{equation}
-where the tensor products are over $\F_p$.
+Using this representation allows us to use asymptotically fast
+algorithms for basic arithmetic operations. Let indeed $\Mult : \N
+\rightarrow \N$ be such that polynomials in $\F_q[X]$ of degree less
+than $n$ can be multiplied in $\Mult(n)$ operations in $\F_q$, under
+the assumptions of~\cite[Ch.~8.3]{vzGG}; using FFT multiplication, one
+can take $\Mult(n)=O(n\log (n) \log\log (n))$. Then, multiplications
+and inversions in $\F_q[X_i]/\langle Q_i \rangle$ can be done in
+respectively $O(\Mult(\ell^i))$ and $O(\Mult(\ell^i)\log(\ell^i))$
+operations in $\F_q$~\cite[Ch.~9-11]{vzGG}. This is almost optimal, as
+both results are quasi-linear in $[\F_{q^{\ell^i}}:\F_q]=\ell^i$.
 
-A \emph{root of unity} is an element of finite multiplicative order;
-the element is said to be a \emph{$n$-th root} if its order divides
-$n$, a \emph{primitive $n$-th root} if it is exactly $n$. Obviously,
-every element of a finite field is a root of unity. The $n$-th
-cyclotomic polynomial $\Cyc_n$ is the polynomial whose roots are the
-primitive $n$-th roots of unity. It has integer coefficients and its
-degree is $\euler(n)$. Viewed as a polynomial with coefficients in $\F_q$,
-it splits into irreducible factors of degree equal to the order of $q$
-in $\Z/n\Z$, and splits completely in an extension of the same
-degree. We call this splitting field the $n$-th Kummer extension of
-$\F_q$.
+Computing embeddings requires more work. For this problem, it is
+enough consider a pair of consecutive levels in the tower; any other
+embedding is done by applying repeatedly this elementary
+operation. Following again~\cite{df+schost12}, we will introduce two
+slightly more general operations, {\em lift} and {\em push}.
 
-\paragraph{Algorithms}
+For $i \ge 0$, $\F_{q^{\ell^{i+1}}}$ has two natural representations
+as a vector space over $\F_q$. The first one is via the monomial basis
+$\mathbf{U}_{i+1}$ seen above, corresponding to the univariate model
+$\F_q[X_{i+1}]/ \langle Q_{i+1} \rangle$. The second one amounts to
+seeing $\F_{q^{\ell^{i+1}}}$ as a degree $\ell$ extension of
+$\F_{q^{\ell^{i}}}$, that is, as
+\begin{equation}\label{eq:QiTi}
+\F_q[X_i,X_{i+1}]/\langle Q_i(X_i), T_i(X_i,X_{i+1})\rangle,  
+\end{equation}
+for some polynomial $T_i$ monic of degree $\ell$ in $X_{i+1}$, and of
+degree less than $\ell^i$ in $X_i$.  The corresponding basis is
+bivariate and involves $x_i$ and $x_{i+1}$:
+\begin{equation}
+  \label{eq:bi-basis}
+  \mathbf{B}_{i+1} = (1,\ldots,x_i^{\ell^i-1},\ldots,x_{i+1}^{\ell-1},\ldots,x_i^{\ell^i-1}x_{i+1}^{\ell-1}).
+\end{equation}
+{\em Lifting} corresponds to the change of basis from
+$\mathbf{B}_{i+1}$ to $\mathbf{U}_{i+1}$; {\em pushing} is the inverse
+transformation.
+
+Provided $Q_i$ and $T_i$ are known, lift and push allow us to perform
+embeddings as a particular case, but they are also the key to many
+further operations. We will not give details here and refer
+to~\cite{df+schost12,DoSc12,LeSc12} for examples; we simply mention
+the computation of relative traces, norms or characteristic
+polynomials, as well as applications to solving Artin-Schreier
+equations, or quadratic equations, given in~\cite{df+schost12,DoSc12}
+for respectively $\ell=p$ and $\ell=2$.
+
+The main results in this paper are efficient algorithms for building
+the families of polynomials $Q_i$ and $T_i$, and for performing lift
+and push operations. In all that follows, we exclude the cases
+$\ell=p$ and $\ell=2$, which are dealt with
+in~\cite{df+schost12,DoSc12}.
+
+\paragraph*{\bf Previous work}
+In~\cite{Shoup90,shoup94}, Shoup gives an algorithm for constructing
+irreducible polynomials over $\F_q$ that follows the same pattern as
+above: in order to build an irreducible polynomial of degree $n$, one
+reduces to the case where $n$ is a power of a prime $\ell$, with
+special treatments for the quadratic ($\ell=2$) and Artin-Schreier
+cases ($\ell=p$).
+
+Couveignes and Lercier give an alternative construction with
+complexity subquadratic in $\ell$~\cite{couveignes+lercier11}; we will
+discuss it in Section~\ref{sec:fibers}.
+
+
 Most computer algebra systems construct the field $\F_q$ by taking
 degree $d$ polynomials at random until an irreducible one is
 found. This approach has a cost at least quadratic in the degree
@@ -166,293 +206,453 @@ together by taking \emph{composita}.
 
 The classical way of taking \emph{composita} is \todo{where?}
 
-\begin{figure}
-  \centering
-  \begin{tikzpicture}[node distance=1.4cm]
-    \node(Fp){$\F_p$};
-    \node(K0)[above left of=Fp]{$K_0$};
-    \node(K1)[above right of=K0]{$K_0(\sqrt[d]{\eta})$};
-    \node(Fq)[above right of=Fp]{$\F_{p^\ell}$};
-    \draw (Fp) edge node[auto]{\scriptsize$r$} (K0)
-               edge node[auto,swap]{\scriptsize$\ell$} (Fq)
-          (K1) edge node[auto,swap]{\scriptsize$\ell$} (K0)
-               edge node[auto]{\scriptsize$r$} (Fq);
-  \end{tikzpicture}
-  \caption{Shoup's construction}
-  \label{fig:shoup}
-\end{figure}
-
-Algorithms to construct extensions of degree a prime power can be
-thought of as constructions for $\ell$-adic closures of
-$\F_p$. Shoup's~\cite{shoup94} is summarized in
-Figure~\ref{fig:shoup}. Let $\ell$ be a prime, the algorithm starts by
-constructing $K_0$ the $\ell$-th Kummer extension of $\F_p$, then
-looks for a non $\ell$-adic residue $\eta$ and uses it to construct a
-degree $\ell$ extension $K_1$. This last step can be repeated several
-times, to obtain an extension of degree $\ell^i$ of $K_0$. Finally it
-takes the trace of a random element of $K_1$ down to $\F_{p^\ell}$ and
-computes its minimal polynomial over $\F_p$, which is very likely to
-be a defining polynomial for $\F_{p^\ell}$. Unless $K_0$ equals $F_p$,
-Shoup's construction has quadratic complexity in $\ell$ \todo{Maybe
-  this should be made more precise, with a discussion on modular
-  composition}.  Couveignes and Lercier give an alternative
-construction with complexity subquadratic in
-$\ell$~\cite{couveignes+lercier11}; we will discuss it in
-Section~\ref{sec:fibers}.
+\paragraph*{\bf Applications}
+A variety of computations in number theory and algebraic geometry
+requires frequently constructing new extension fields and moving
+elements from one to the other. Examples of these algorithms
+are~\cite{df10} \todo{cite more}. Our construction makes them feasible
+for much larger sizes than it was previously possible.
 
 
-%%%
+%% For any $n \ge 1$, the field $\F_{q^n}$ can be constructed as the
+%% splitting field of any irreducible polynomial of degree $n$ in
+%% $\F_q[X]$. There are about $q^n/n$ such irreducible
+%% polynomials~\cite[Corollary~7.\S2.2]{ireland1990classical}, giving as
+%% many different ways of representing $\F_{q^d}$. There is no canonical
+%% way of establishing isomorphisms between them, since a field with
+%% $q^n$ elements has $n$ automorphisms fixing $\F_q$. For the same
+%% reasons, when $n$ divides $n'$, there is no canonical embedding 
+%% of $\F_{q^n}$ into $\F_{q^{n'}}$.
 
-\section{The canonical tower}
+If $L/K$ is a field extension, we write $\Tr_{L/K}$, $\Norm_{L/K}$ and
+$\Gal_{L/K}$ for the trace, the norm and the Galois group of the
+extension, respectively. When the field $L$ is clear from the context,
+we simply write $\Tr_K$ and $\Norm_K$, and when the field $K$ is clear
+too, we may write $\Tr$ and $\Norm$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{XXX's towers}
 \label{sec:LDtower}
 
-Shoup's construction is non-deterministic, and it is shown that any
-degree $\ell$ irreducible polynomial can be obtained that way. We now
-describe a deterministic variant of Shoup's construction given by
-Lenstra and De Smit~\cite{lenstra+desmit08-stdmodels}.
+Let $\ell,p$ be odd primes, with $\ell \ne p$, and let $q$ be a power
+of $p$. In this section, we discuss a construction of the $\ell$-adic
+tower over $\F_q$ inspired by previous work of
+Shoup~\cite{Shoup90,shoup94}, Lenstra-De
+Smit~\cite{lenstra+desmit08-stdmodels} and
+Couveignes-Lercier~\cite{couveignes+lercier11}.
 
-\begin{figure}
+We start by constructing an extension $\K_0 = \F_q[Y_0]/\langle P_0
+\rangle$, such that the residue class $y_0$ of $Y_0$ is a non
+$\ell$-adic residue in $\K_0$ (we discuss this in more detail in the
+first subsection), and we let $r$ be the degree of $P_0$.
+
+By~\cite[Th.~VI.9.1]{lang}, for $i\ge 1$, the polynomial
+$Y_i^{\ell^i}-y_0$ is irreducible in $\K_0[Y_i]$, so that $\K_i=
+\K_0[Y_i]/\langle Y_i^{\ell^i}-y_0\rangle$ is a field with $q^{r
+  \ell^i}$ elements.  If we let $y_i$ be the residue class of $Y_i$ in
+$\K_i$, these fields are naturally embedded in one another by the
+isomorphism $\K_{i+1} \simeq \K_i[Y_{i+1}]/\langle
+Y_{i+1}^\ell-y_i\rangle$; in particular, the relation
+$y_{i+1}^\ell=y_i$ holds.
+
+In order to build $\F_{q^{\ell^i}}$, we apply a descent process, for
+which we follow~\cite[Th.~2.1]{Shoup90}. For $i \ge 0$, let $x_i$ be
+the trace of $y_i$ over a subfield of index $r$:
+\begin{equation}\label{eq-def:xi}
+x_i = \sum_{j = 0}^{r-1} y_i^{q^{\ell^i j}}.  
+\end{equation}
+Then, the reference above proves that
+$\F_q(x_i)=\F_{q^{\ell^i}}$, so that the minimal polynomials
+ of $x_1,x_2,\dots$ for the family of irreducible polynomials
+$Q_i$ we are interested in. This situation is depicted in
+Figure~\ref{fig:ladic}.
+
+\begin{figure}[h]
   \centering
-  \begin{tikzpicture}[node distance=1.4cm]
-    \node(Q){$\Q$};
-    \node(Q0)[above left of=Q]{$\Q(\zeta_\ell)$};
-    \node(K1)[above right of=Q]{$K_1$};
-    \node(Q1)[above right of=Q0]{$\Q(\zeta_{\ell^2})$};
-    \node(K2)[above right of=K1]{$K_2$};
-    \node(Q2)[above right of=Q1]{$\Q(\zeta_{\ell^3})$};
-    \node(Koo)[above right of=K2]{$\qquad \Q^{(\ell)} = \Q_\ell^\Delta$};
-    \node(Qoo)[above right of=Q2]{$\Q(\zeta_\ell,\zeta_{\ell^2},\dots)\qquad$};
-    \draw (Q) edge node[auto]{\scriptsize$\ell-1$} (Q0)
+  \begin{tikzpicture}[node distance=1.6cm]
+    \node(Q){$\F_q$};
+    \node(Q0)[above left of=Q]{$\K_0=\F_q(y_0)$};
+    \node(K1)[above right of=Q]{$\F_{q^\ell}=\F_q(x_1)$};
+    \node(Q1)[above right of=Q0]{$\K_1=\K_0(y_1)$};
+    \node(K2)[above right of=K1]{$\F_{q^{\ell^2}}=\F_q(x_2)$};
+    \node(Q2)[above right of=Q1]{$\K_2=\K_1(y_2)$};
+    \node(Koo)[above right of=K2]{$\quad \F_q^{(\ell)}$};
+    \node(Qoo)[above right of=Q2]{$\quad\K_0^{(\ell)}$};
+    \draw (Q) edge node[auto]{\scriptsize$r$} (Q0)
               edge node[auto,swap]{\scriptsize$\ell$} (K1)
-          (K1) edge node[auto,swap]{\scriptsize$\ell-1$} (Q1)
+          (K1) edge node[auto]{\scriptsize$r$} (Q1)
                edge node[auto,swap]{\scriptsize$\ell$} (K2)
-          (Q1) edge node[auto,swap]{\scriptsize$\ell$} (Q0)
-          (Q2) edge node[auto]{\scriptsize$\ell-1$} (K2)
-               edge node[auto,swap]{\scriptsize$\ell$} (Q1)
+          (Q1) edge node[auto]{\scriptsize$\ell$} (Q0)
+          (Q2) edge node[auto,swap]{\scriptsize$r$} (K2)
+               edge node[auto]{\scriptsize$\ell$} (Q1)
                edge[dashed] (Qoo)
           (Koo) edge[dashed] (K2)
-               edge node[auto,swap]{\scriptsize$\ell-1$} (Qoo);
+               edge node[auto]{\scriptsize$r$} (Qoo);
   \end{tikzpicture}
-  \caption{The $\ell$-adic extension of $\Q$.}
+  \caption{The $\ell$-adic towers over $\F_q$ and $\K_0$.}
   \label{fig:ladic}
 \end{figure}
 
-From now on, let $\ell$ be a prime different from the characteristic
-$p$. For simplicity, we suppose $\ell\ne2$. Let $\zeta_{\ell^i}$ be
-primitive $\ell^i$-th roots of unity, for algorithmic purposes we
-further require that
-$\zeta_{\ell^i}^\ell=\zeta_{\ell^{i-1}}$. Consider the tower of
-extensions of the rationals given by
-\begin{equation*}
-  \Q \subset \Q(\zeta_\ell) \subset \Q(\zeta_{\ell^2}) \subset \cdots,
-\end{equation*}
-its limit is an infinite extension with Galois group isomorphic to
-$\Z_\ell^\ast\isom\Delta\times\Z_\ell$, where $\Delta$ is the torsion
-part of $\Z_\ell^\ast$, a cyclic group of order $\ell-1$. The
-\emph{$\ell$-adic extension of $\Q$} is defined as the subfield fixed
-by $\Delta$:
-\begin{equation}
-  \Q^{(\ell)} = \Q(\zeta_\ell, \zeta_{\ell^2}, \dots)^\Delta,
-\end{equation}
-it is the unique extension of the rationals having $\Z_\ell$ as Galois
-group~\cite{lang1990cyclotomic,washington1997introduction}. The
-construction of $\Q^{(\ell)}$ is summarized in
-Figure~\ref{fig:ladic}. If we replace $\Q$ with a number field, we
-obtain what is called the \emph{canonical $\ell$-adic extension}; its
-Galois group is still $\Z_\ell$, but now there are others with this
-property.
+In this section, we show how to compute the polynomials $Q_i$, the
+polynomials $T_i$ introduced in Eq.~\eqref{eq:QiTi} and how to perform
+lift and push. We will actually consider more general minimal
+polynomials: for $0 \le j < i$, we will let $Q_{i,j} \in
+\F_q(x_j)[X_j]$ be the minimal polynomial of $x_i$ over $\F_q(x_j)$,
+so that $Q_{i,j}$ has degree $\ell^{i-j}$, with in particular
+$Q_{i,0}=Q_i$ and $Q_{i,i-1}=T_{i-1}(x_{i-1},X_i)$.
 
-The cyclotomic extensions used to construct $\Q^{(\ell)}$ are
-integral, thus it makes sense to reduce them modulo $p$. It turns out
-that the reduction modulo $p$ of $\Q^{(\ell)}$ is an $\ell$-adic
-closure of $\F_p$. Using number fields, this can be easily generalized
-to build the $\ell$-adic closure of $\F_q$. We give two examples of
-this construction.
+We first explain the initialization of the process (computing
+$P_0$). Then, we consider two favorable cases, where $\ell$ divides
+respectively $q-1$ and $q+1$, and finally discuss the general case.
 
-\paragraph{$T_1$-type extensions}
-Let $\ell$ be an integer (not necessarily prime) dividing $q-1$. In
-this case the field $\F_q$ contains the primitive $\ell$-th roots of
-unity and the map $x\mapsto x^{\ell}$ is not surjective on
-$\F_q^\ast$. The construction is classical: select a non $\ell$-adic
-residue $\zeta\in\F_q$ and construct $K_1,K_2,\dots$ as the tower of
-extensions defined by the polynomials
-\begin{equation}
-  \label{eq:T1}
-  \left|
-  \begin{array}{rrrrr}
-    X_{i+1}^\ell &- X_i\\
-    &\vdots\\
-    &&X_2^\ell &- X_1\\
-              &&&X_1^\ell &- \zeta.
-  \end{array}
-  \right.
-\end{equation}
 
-Shoup's construction and Lenstra's and De Smit's only differ in the
-way $\zeta$ is selected. Shoup selects a random element of $\F_q$ and
-tests it for non-residuosity; the test can be done in $O(\log q)$
-operations and an element is found after $O(1)$ trials. Lenstra and De
-Smit factor the $\ell$-th cyclotomic polynomial to obtain a root
-$\zeta_0$, then take $\ell$-th roots until a non $\ell$-adic residue
-is found. Compared to Shoup's algorithm this is more expensive
-\todo{how much?}, but it has the benefit of being deterministic if an
-arbitrary ordering is put on the $\ell$-th roots of unity.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\paragraph{$T_2$-type extensions}
-Let now $\ell$ be an odd \todo{isn't $\ell\ne2$ sufficient?} integer
-(not necessarily prime) dividing $q+1$, this generalizes the way
-Lenstra and De Smit handle $\ell=3$. The cyclotomic polynomial
-$\Phi_\ell$ splits into $\euler(\ell)/2$ quadratic factors. Let $P$ be
-one of these factors and let $\zeta_0$ be one of its roots (the choice
-of $P$ can be made canonical by putting an ordering on the
-factors). Then $\Norm(\zeta_0)=\zeta_0^{q+1}=1$ and
-\begin{equation}
-  \label{eq:quad-factor}
-  P(X) = X^2 - X\Tr\zeta_0 + 1
-\end{equation}
-is the defining polynomial of $\F_q(\zeta_0)$. The cyclotomic tower (left
-in Figure~\ref{fig:ladic}) is defined by the equations
-\begin{equation}
-  \label{eq:T2}
-  \left|
-  \begin{array}{rrrrr}
-    \zeta_{i+1}^\ell &- \zeta_i\\
-    &\vdots\\
-    &&\zeta_2^\ell &- \zeta_1\\
-              &&&\zeta_1^\ell &- \zeta_0\\
-              &&&&P(\zeta_0)
-  \end{array}
-  \right.
-\end{equation}
-Its Galois group is isomorphic to $\Z/2\Z\times\Z_\ell$. 
+\subsection{Finding $P_0$}
 
-At this point, Shoup's algorithm would select a random element of
-$\F_q(\zeta_i)$ and take its trace down to a subfield of index
-$2$. Following Lenstra and De Smit, we instead define some specific
-Gauss periods generating the $\ell$-adic tower. These are the
-following traces of the $\zeta_i$'s:
-\begin{equation}
-  \label{eq:T2-gauss-periods}
-  \eta_i = \zeta_i + \zeta_i^{q^{\ell^i}} = \zeta_i + \zeta_i^{-1}.
-\end{equation}
-Then $\bigcup_i\F_q(\eta_i)$ is the $\ell$-adic closure of $\F_q$. By
-Eq.~\eqref{eq:T2-gauss-periods}, the minimal polynomial of $\zeta_i$
-over $\F_q(\eta_i)$ is $X^2 -\eta_iX+1$. By composition, it follows
-that the minimal polynomial of $\zeta_i$ over $\F_q(\eta_{i-j})$ is
-$X^{2\ell^j}-\eta_{i-j}X^{\ell^j}+1$. We deduce that the minimal
-polynomial of $\eta_i$ over $\F_q(\eta_{i-j})$ is $Q_{i,j}$, where
-\begin{equation}
-  \label{eq:T2-relpols}
-  Q_{i,j}(Y)^2 = \mathrm{Res}_X(X^{2\ell^j}-\eta_{i-j}X^{\ell^j}+1,\; X^2-YX+1).
-\end{equation}
-Indeed, by the well known properties of the resultant,
-\begin{multline*}
-  Q_{i,j}(Y)^2 = \prod_{\sigma\in\Gal_{\F_q(\zeta_i)/\F_q(\eta_{i-j})}}
-  (\zeta_i^2 - Y\zeta_i + 1)^\sigma =\\
+To determine $P_0$, two constructions will be used. In both cases, we
+start from the $\ell$-th cyclotomic polynomial $\Cyc_\ell \in
+\Z[X_0]$. The first step consists in factoring $\Cyc_\ell$ over
+$\F_q[X_0]$: by~\cite[XXX]{shoup94}, this takes an expected $O(\dots)$
+operations in $\F_q$.
+
+Over $\F_q[X_0]$, $\Cyc_\ell$ splits into irreducible factors of the
+same degree $r$, where $r$ is the order of $q$ in $\Z/\ell\Z$ (so $r$
+divides $\ell-1$); let $F_0$ be one of these factors. By construction,
+there exist non $\ell$-adic residues in $\F_q[X_0]/\langle F_0
+\rangle$. Once such a non-residue $\eta$ is found, we simply let $P_0$
+be its minimal polynomial over $\F_q$ (which still has degree $r$);
+given $\eta$, computing $P_0$ takes $O(\dots)$ operations in $\F_q$.
+
+To find $\eta$, Shoup's approach consists in picking it at random: we
+expect to find a non $\ell$-adic residue after an expected $O(1)$
+trials, and each trial takes $O(\dots)$ operations in $\F_q$.
+
+An alternative, proposed by Lenstra and De Smit, is to take iterated
+$\ell$-th roots of $X_0 \bmod F_0$ until we find a non-residue. As
+stated in~\cite{lenstra+desmit08-stdmodels}, this requires to take
+$\kappa$ successive $\ell$-th roots modulo $F_0$ until hitting a
+non-residue $\eta$, where $\kappa$ is the $\ell$-adic valuation of
+$(q^{\ell-1}-1)/\ell$. Note that in this case, $\eta$ is a root of
+unity of order $\ell^{\kappa+1}$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{$T_1$-type extensions}\label{ssec:T1}
+
+In this subsection, we consider the simplest case, where $\ell$
+divides $q-1$. In this case, $\Phi_\ell$ splits into linear factors
+over $\F_q$ (that is, $r=1$). The polynomial $P_0$ is of the form
+$Y_0-\eta$, where $\eta$ is a non $\ell$-adic residue in $\F_q$. In
+this case, we simply find $\eta$ by random trial in $\F_q$, as no gain
+is to be found from the more specific choice used by Lenstra-De Smit.
+
+In this situation, no descent is required. For $i \ge 0$, we have
+$\K_i=\F_{q^{\ell^i}}$ and $x_i=y_i$; the families of polynomials we
+obtain are
+$$Q_i=X_i^{\ell^i}-\eta \quad\text{and}\quad T_i=X_{i+1}^\ell-X_i.$$
+Lifting amounts to taking $F = \sum_{0 \le j < \ell^{i+1}} f_j
+x_{i+1}^j$ and rewriting it as a bivariate polynomial in
+$x_i,x_{i+1}$, using the rule
+$$x_{i+1}^j = x_i^{\,j {\rm~div~} \ell} x_{i+1}^{\,j \bmod \ell}.$$
+Pushing does the converse operation, using the rule
+$$x_i^e x_{i+1}^f = x_{i+1}^{e \ell + f}.$$ Thus, both operations
+involve only exponent arithmetic, and no operation in $\F_q$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{$T_2$-type extensions}
+
+Next, we consider the case where $\ell$ divides $q+1$, so that
+$\Phi_\ell$ splits into quadratic factors over $\F_q$ (that is,
+$r=2$). In this case, we use Lenstra and De Smit's construction of
+$P_0$; it leads in particular to the following useful property.
+
+\begin{lemma}
+  For $i \ge 0$, $x_i = y_i +y_i^{-1}$.
+\end{lemma}
+\begin{proof}
+  By definition, $x_i=y_i+y^{q^{\ell^i}}$. Recall that in the
+  Lenstra-De Smit construction, $y_0$ has order $\ell^{\kappa+1}$,
+  where $\kappa$ is the $\ell$-adic valuation of
+  $(q^{\ell-1}-1)/\ell$. Thus, $y_i$ has order $\ell^{i+\kappa+1}$, so
+  to conclude, it is enough to prove that $\ell^{i+\kappa+1}$ divides
+  $q^{\ell^i}+1$.
+
+  Because $\ell$ divides $q+1$, a quick induction shows that $q+1$ and
+  $q^{2n}-1$ have the same $\ell$-adic valuation, for all positive
+  integers $n$. In particular, $\kappa$ is the $\ell$-adic valuation
+  of $(q+1)/\ell$, so that $\ell^{\kappa+1}$ divides $q+1$, and another
+  induction on $i$ finishes the proof of the lemma.
+\end{proof}
+
+
+\begin{corollary}
+  For $1 \le j < i$, $Q_{i,j} \in \F_q(x_{j})[X_i]$ satisfies
+  \begin{equation*}
+    \label{eq:T2-relpols}
+    Q_{i,j}(X_i)^2 = \mathrm{Res}_{Y_i}(Y_i^{2\ell^j}-x_{j}Y_i^{\ell^j}+1,\; Y_i^2-X_i Y_i+1).
+  \end{equation*}
+\end{corollary}
+\begin{proof}
+  The previous lemma shows that the minimal polynomial of $y_i$ over
+  $\F_q(x_i)$ is $Y_i^2 -x_i Y_i +1$. By composition, it follows that
+  the minimal polynomial of $y_i$ over $\F_q(x_{j})$ is
+  $Y_i^{2\ell^j}-x_{j} Y_i^{\ell^j}+1$. Eliminating $Y_i$ between
+  these two polynomials will give the required relation between
+  $x_{j}$ and $x_i$. Explicitly, the resultant above 
+  is equal to
+\begin{align*}
+   \prod_{\sigma\in\Gal_{\K_i/\F_q(x_{j})}}
+  (y_i^2 - X_i y_i + 1)^\sigma \\
   % 
-  \Norm_{\F_q(\eta_{i-j})}(\zeta_i) \prod_{\sigma\in\Gal_{\F_q(\zeta_i)/\F_q(\eta_{i-j})}} 
-  (\zeta_i + \zeta_i^{-1} - Y)^\sigma =\\
+  =\Norm_{\K_i/\F_q(x_{j})}(y_i) \prod_{\sigma\in\Gal_{\K_i/\F_q(x_{j})}} 
+  (y_i + y_i^{-1} - X_i)^\sigma \\
   % 
-  \left(\prod_{\sigma\in\Gal_{\F_q(\zeta_i)/\F_q(\eta_{i-j})}/\langle\tau\rangle}
-    (\eta_i - Y)^\sigma\right)^2 =\\
+  =\left(\prod_{\sigma\in\Gal_{\K_i/\F_q(x_{j})}/\langle\tau\rangle}
+    (x_i - X_i)^\sigma\right)^2 \\
   % 
-  \left(\prod_{\sigma\in\Gal_{\F_q(\eta_i)/\F_q(\eta_{i-j})}}
-    (\eta_i - Y)^\sigma\right)^2,
-\end{multline*}
+  =\left(\prod_{\sigma\in\Gal_{\F_q(x_i)/\F_q(x_{j})}}
+    (x_i - X_i)^\sigma\right)^2 =Q_{i,j}(X_i)^2,
+\end{align*}
 where the third equality is true because
-$\Norm_{\F_q(\eta_{i-j})}(\zeta_i)=1$, as seen from the minimal
-polynomial of $\zeta_i$, and where $\tau$ is the element of
-$\Gal_{\F_q(\zeta_i)/\F_q(\eta_{i-j})}$ such that
-$\tau:\zeta_i\mapsto\zeta_i^{-1}$.
+$\Norm_{\K_i/\F_q(x_{j})}(y_i)=1$, as seen from the minimal polynomial of
+$y_i$, and where $\tau$ is the element of
+$\Gal_{\K_i/\F_q(x_{j})}$ such that $\tau:y_i\mapsto y_i^{-1}$.
+\end{proof}
 
-As evident from the formula, the polynomials $Q_{i,j}$ depend on
-$\eta_{i-j}$ and have the same form for any $i$. To explicitly compute
-their general shape, we just need to compute
-\begin{equation}
-  Q_j(Y, z) = \sqrt{\mathrm{Res}_X(X^{2\ell^j}-zX^{\ell^j}+1, X^2-YX+1)}.
-\end{equation}
-Let $\zeta$ and $\zeta^{-1}$ be the two roots of $X^2-YX+1$, by direct
-calculation we find
-\begin{equation}
-  Q_j = \zeta^{\ell^j} + \zeta^{-\ell^j} - z.
-\end{equation}
-The factor $p_{\ell^j}=\zeta^{\ell^j} + \zeta^{-\ell^j}$ is the $\ell^j$-th power sum
-of $X^2-YX+1$, thus, using Newton's identities,
+As evident from the formula, given a field $\K$ and $z \in \K$, we
+just need to show how to compute
+\begin{equation*}
+  Q(X) = \sqrt{\mathrm{Res}_Y(Y^{2 n}-z Y^n+1, Y^2-XY+1)}.
+\end{equation*}
+Let $\zeta$ and $\zeta^{-1}$ be the two roots of $Y^2-XY+1$ over an
+algebraic closure of $\K(X)$. By a direct calculation, we find
+\begin{equation*}
+  Q(X) = \zeta^n + \zeta^{-n} - z.
+\end{equation*}
+As a result, $Q$ can be computed in $O(\Mult(n))$ operations in $\K$,
+using repeated squaring modulo $Y^2-XY+1$. In particular, taking
+$n=\ell^i$ and returning to our initial problem, $Q_i$ can be computed
+in time $O(\Mult(\ell^i))$. Taking $n=\ell$, we see that the
+polynomials $T_i$ all take the same form, and each of them can be
+computed in time $O(\Mult(\ell))$.
+
+We now present a better solution, valid in large enough
+characteristic. For $n \in \N$, the term $P_{n}=\zeta^{n} +
+\zeta^{-n}$ is the $n$-th power sum of $Y^2-XY+1$, thus, using
+Newton's identities,
 \begin{equation}
   \label{eq:simple}
   \begin{aligned}
-    p_0 &= 2,\\
-    p_1 &= Y,\\
-    p_{\ell+1} &= Yp_{\ell} - p_{\ell-1}.
+    P_0 &= 2,\\
+    P_1 &= X,\\
+    P_{n+1} &= X P_{n} - P_{n-1}.
   \end{aligned}
 \end{equation}
-From Eq.~\eqref{eq:simple}, writing $p_\ell = \sum_i
-c_{\ell,i}Y^{\ell-i}$, we obtain the relation
+Writing $P_n = \sum_i c_{n,i}X^{n-i}$, we deduce the relation
 \begin{equation}
-  c_{\ell,i} = c_{\ell-1,i} - c_{\ell-2,i-2}.
+  c_{n,i} = c_{n-1,i} - c_{n-2,i-2}.
 \end{equation}
-We arrange these coefficients like in Pascal's triangle:
-\begin{equation}
-  \begin{tabular}{*{8}{c@{}}}
-    &&&2\\
-    &&1&&0\\
-    &1&&0&&-2\\
-    1&&0&&-3&&0
-  \end{tabular}
-\end{equation}
-It is then evident that every second column is identically zero, and
-that signs alternate in odd columns. We remove the zero columns and
-take absolute values, i.e., we set $b_{n,k}=\lvert c_{n+k,2k}\rvert$, so
-that the new coefficients satisfy the relation
-\begin{equation}
+%% We arrange these coefficients like in Pascal's triangle:
+%% \begin{equation}
+%%   \begin{tabular}{*{8}{c@{}}}
+%%     &&&2\\
+%%     &&1&&0\\
+%%     &1&&0&&-2\\
+%%     1&&0&&-3&&0
+%%   \end{tabular}
+%% \end{equation}
+%% It is then evident that every second column is identically zero, and
+%% that signs alternate in odd columns. 
+Removing the odd values of $i$ and taking absolute values, i.e.,
+setting $b_{n,k}=\lvert c_{n+k,2k}\rvert$, the new coefficients
+satisfy the relation
+\begin{equation*}
   b_{n,k} = b_{n-1,k} + b_{n-1,k-1},
-\end{equation}
+\end{equation*}
 which is the same as Pascal's relation. Indeed, we obtain the
-$(1,2)$-Pascal triangle, also called Lucas' triangle~\cite{benjamin10}:
-\begin{equation}
+$(1,2)$-Pascal triangle, also called Lucas'
+triangle~\cite{benjamin10}:
+\begin{equation*}
   \begin{tabular}{*{8}{c@{}}}
     &&&2\\
     &&1&&2\\
     &1&&3&&2\\
     1&&4&&5&&2
   \end{tabular}
-\end{equation}
+\end{equation*}
 A special case of this fact was already proven by Gauss, and the
-general proof is in~\cite[Proposition~1]{gurak06}.  It is well known
-that the coefficients of Lucas' triangle are related to those of
-Pascal's by
+general proof is in~\cite[Prop.~1]{gurak06}. It is well known that
+the coefficients of Lucas' triangle are related to those of Pascal's
+by
 \begin{equation}
   \label{eq:lucas-tri}
   b_{n,k} = \binom{n}{k} + \binom{n-1}{k-1} = \frac{n+k}{n}\binom{n}{k}.
 \end{equation}
-One remarkable property of the Lucas triangle is that the
-anti-diagonals sum up to the Lucas numbers:
-\begin{equation}
-  \sum_{k\ge0} b_{n-k,k} = \sum_{k\ge0} \lvert c_{n,2k}\rvert = L_n.
-\end{equation}
-A funny consequence of this property is the following equality on
-complex numbers
-\begin{equation}
-  \label{eq:lucas-fun}
-  p_\ell(i) = \sum_{k\ge0} c_{\ell,k}i^{\ell-k} = i^\ell L_\ell.
-\end{equation}
 By using Eq.~\eqref{eq:lucas-tri} and the sign alternation property,
 we obtain 
 \begin{gather}
-  c_{\ell,2k} = (-1)^kb_{\ell-k,k} = (-1)^k\frac{\ell}{\ell-k}\binom{\ell-k}{k},\\
+  c_{n,2k} = (-1)^kb_{n-k,k} = (-1)^k\frac{n}{n-k}\binom{n-k}{k},\\
   \label{eq:lucas-recurrence}
-  \frac{c_{\ell,2k+2}}{c_{\ell,2k}} = 
-  -\frac{(\ell-2k)(\ell-2k-1)}{(\ell-k-1)(k+1)}.
+  \frac{c_{n,2k+2}}{c_{n,2k}} = 
+  -\frac{(n-2k)(n-2k-1)}{(n-k-1)(k+1)}.
 \end{gather}
+Provided all denominators are invertible,
 Eq.~\eqref{eq:lucas-recurrence} gives a formula to compute all the
-coefficients of $Q_{i,j}$ using $O(\ell)$ operations in $\Z$. By
-performing the same computation in the ring of $p$-adic integers with
-just one digit of floating precision, it is possible to compute
-$Q_{i,j}\bmod p$ using $O(\ell)$ operations in $\F_p$. Of special
-interest to us are the polynomials $Q_{i,i}$, defining each level of
-the tower over the base field $\F_q$, and the polynomials $Q_{i,1}$,
-defining each level over the previous one. We will come back to the
-importance of these polynomials in Section~\ref{sec:lift-push}.
+coefficients of $Q_{i}$ using $O(\ell^{i})$ operations in $\F_p$, and
+gives similarly the coefficients of $T_i$ in $O(\ell)$ operations.
+
+%% Eq.~\eqref{eq:lucas-recurrence} gives a formula to compute all the
+%% coefficients of $Q_{i,j}$ using $O(\ell^{j-i})$ operations in $\F_p$. By
+%% performing the same computation in the ring of $p$-adic integers with
+%% just one digit of floating precision, it is possible to compute
+%% $Q_{i,j}\bmod p$ using $O(\ell)$ operations in $\F_p$.
+
+%% One remarkable property of the Lucas triangle is that the
+%% anti-diagonals sum up to the Lucas numbers:
+%% \begin{equation}
+%%   \sum_{k\ge0} b_{n-k,k} = \sum_{k\ge0} \lvert c_{n,2k}\rvert = L_n.
+%% \end{equation}
+%% A funny consequence of this property is the following equality on
+%% complex numbers
+%% \begin{equation}
+%%   \label{eq:lucas-fun}
+%%   p_\ell(i) = \sum_{k\ge0} c_{\ell,k}i^{\ell-k} = i^\ell L_\ell.
+%% \end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{The general case}
+
+Finally, we discuss the general situation, where we do not make any
+assumption on the behavior of $\Phi_\ell$ in $\F_q[X]$.  Since we are
+not able to exploit the more specific Lenstra-De Smit construction in
+this case, we use Shoup's approach, picking the initial non
+$\ell$-adic residue $\eta$ at random.
+
+Because $r=[\K_0 : \F_q]$ divides $\ell-1$, it is coprime with
+$\ell$. Thus, $Q_i$ remains the minimal polynomial of $x_i$ over
+$\K_0$, and more generally $Q_{i,j}$ remains the minimal polynomial of
+$x_i$ over $\K_{j}$; this will allow us to replace $\F_q$ by $\K_0$ as
+our base field. We will measure all costs by counting operations in
+$\K_0$, and we will deduce the cost over $\F_q$ by adding a factor
+$O(\Mult(r)\log(r))$ to account for the cost of arithmetic in $\K_0$.
+
+For $i \ge 0$, since $\K_i=\K_0[Y_i]/\langle Y_i^{\ell^i}-y_0\rangle$,
+we represent the elements of $\K_i$ on the basis $\{y_i^e \mid 0 \le e
+< \ell^i\}$; then, all arithmetic operations in $\K_i$ can be done in
+$O(\Mult(\ell^i)\log(\ell^i))$ operations in $\K_0$. Note that $x_i$
+is written on this basis as
+\begin{equation}\label{eq-def:xiyi}
+x_i = \sum_{j = 0}^{r-1} y_i^{q^{\ell^i j} \bmod \ell^i}
+y_0^{q^{\ell^i j} {\rm~div~} \ell^i}. 
+\end{equation}
+
+Our strategy is to show how to convert between two univariate bases of
+$\K_i$, $\{y_i^e \mid 0 \le e < \ell^i\}$ and $\{x_i^e \mid 0 \le e <
+\ell^i\}$. In other words, we show how to apply the isomorphism
+$$\Psi_i: \K_i=\K_0[Y_i]/\langle Y_i^{\ell^i}-y_0\rangle \to
+\K_0[X_i]/\langle Q_{i,0}\rangle$$ and its inverse; we will compute
+the required polynomials $Q_{i,0}$ and $Q_{i,i-1}$ as a byproduct. In
+a second time, we will use $\Psi_i$ to perform push and lift between
+the monomial basis in $x_i$ and the bivariate basis in
+$(x_{i-1},x_i)$.
+
+We proceed step-by-step, factoring $\Psi_i$ into elementary
+isomorphisms
+$$\Psi_{i,j}: \K_j[X_i]/\langle Q_{i,j}\rangle \to
+\K_{j-1}[X_i]/\langle Q_{i,j-1}\rangle,$$ for $j=i,\dots,1$.  To start
+the process, with $j=i$, we let $Q_{i,i}=X_i-x_i \in \K_i[X_i]$,
+so that $\K_i=\K_i[X_i]/\langle Q_{i,i} \rangle$.
+
+Let $j \le i$ and suppose that $Q_{i,j}$ is known. We are going to
+factor $\Psi_{i,j}$ further as $\Phi''_{i,j} \circ \Phi'_{i,j} \circ
+\Phi_{i,j}$. First, we introduce the isomorphism
+$$\varphi_j: \K_j \to \K_{j-1}[Y_j]/\langle Y_j^\ell-y_{j-1}\rangle.$$
+The forward direction is a push from the monomial basis in $y_j$ to
+the bivariate basis in $(y_{j-1},y_j)$ and the inverse is a lift; none
+of them involves any arithmetic operation, as was pointed out in
+Subsection~\ref{ssec:T1}.  Then, we deduce the isomorphism
+$$\Phi_{i,j}: \K_j[X_i]/\langle Q_{i,j} \rangle \to
+\K_{j-1}[Y_j,X_i]/\langle Y_j^\ell-y_{j-1}, Q^\star_{i,j}\rangle,$$
+where $Q^\star_{i,j}$ is obtained by applying $\varphi_j$ to all
+coefficients of $Q_{i,j}$. Since $\Phi_{i,j}$ consists in a
+coefficient-wise application of $\varphi_j$, applying it or its
+inverse costs no arithmetic operations.
+
+Next, changing the order of the variables $Y_j$ and $X_i$, we deduce
+that there exists $S_{i,j}$ in $\K_{j-1}[X_j]$ such that we have an
+isomorphism
+\begin{multline*}
+\Phi'_{i,j}: \K_{j-1}[Y_j,X_i]/\langle Y_j^\ell-y_{j-1}, Q^\star_{i,j}\rangle
+\to\\ \K_{j-1}[X_i, Y_j]/\langle Q_{i,j-1}, Y_j-S_{i,j}\rangle;
+\end{multline*}
+where $\deg(Q^\star_{i,j},X_i)=\ell^{i-j}$ and
+$\deg(Q_{i,j-1},X_i)=\ell^{i-j+1}$. This conversion is less obvious
+than the previous one.
+\begin{lemma}
+  Given $Q^\star_{i,j}$, one can compute $Q_{i,j-1}$ and $S_{i,j}$
+  using $O(\Mult(\ell^{i+1})\log(\ell))$ operations in $\K_0$.
+  Once this is done, we can apply $\Phi'_{i,j}$ and its inverse 
+  using $O(\Mult(\ell^{i+1}))$ operations in $\K_0$.
+\end{lemma}
+\begin{proof}
+  We obtain $Q_{i,j-1}$ and $S_{i,j}$ from the resultant and degree-1
+  subresultant of $Y_j-y_{j-1}$ and $Q^\star_{i,j}$ with respect to
+  $Y_j$, computed over the polynomial ring $\K_{j-1}[X_i]$. This is
+  done using Reischert's algorithm~\cite{Reischert97}. The direct
+  analysis would yield a cost of
+  $O(\Mult(\ell^{j-1})\Mult(\ell)\Mult(\ell^{i-j+1})\log(\ell))$
+  operations in $\K_0$, accounting for respectively the cost of
+  arithmetic in $\K_{j-1}$, the cost of the half-gcd algorithm in
+  $Y_j$, and the cost of polynomial arithmetic in $X_i$. Using
+  Kronecker's substitution to reduce all operations to trivariate
+  arithmetic in $Y_{j-1},Y_j,X_i$ yields the claimed bound.
+
+  Applying $\Phi'_{i,j}$ amounts to taking a polynomial $A(Y_j,X_i)$ 
+  reduced modulo $\langle Y_j^\ell-y_{j-1}, Q^\star_{i,j}\rangle$
+  and reducing it modulo $\langle Q_{i,j-1}, Y_j-S_{i,j}\rangle$. This
+  is done by evaluating $Y_j$ at $S_{i,j}$, doing all operations
+  modulo $Q_{i,j-1}$. Using Horner's scheme, this takes $O(\ell)$ 
+  operations $(+,\times)$ in $\K_{j-1}[X_i]/\langle Q_{i,j-1}\rangle$,
+  so the complexity claim follows.
+
+  In the converse direction, we start from $A(X_i)$ reduced modulo
+  $Q_{i,j-1}$; we have to reduce it modulo $\langle Y_j^\ell-y_{j-1},
+  Q^\star_{i,j}\rangle$. This is done by applying the fast Euclidean
+  division algorithm with coefficients in $\K_{j-1}[Y_j]/\langle
+  Y_j^\ell-y_{j-1}\rangle$, for a cost of $O(\Mult(\ell^{i+1}))$
+  operations in $\K_0$.
+\end{proof}
+
+The last isomorphism $\Phi''_{i,j}$ is trivial:
+$$\Phi''_{i,j}: \K_{j-1}[X_i, Y_j]/\langle Q_{i,j-1}, Y_j-S_{i,j}\rangle
+\to \K_{j-1}[X_i]/\langle Q_{i,j-1}\rangle$$
+forgets the variable $Y_j$; it requires no arithmetic operation.
+
+\medskip
+
+Taking $j=i,\dots,1$ allows us to compute $Q_{i,i-1}$ and $Q_{i,0}$
+for $O(i\Mult(\ell^{i+1})\log(\ell))$ operations in $\K_0$. Composing
+the maps $\Psi_{i,j}$, we deduce further that we can apply $\Psi_i$ or
+its inverse for $O(i\Mult(\ell^{i+1}))$ operations in $\K_0$.  
+
+We claim that we can then perform push and lift between the monomial
+basis in $x_i$ and the bivariate basis in $(x_{i-1},x_i)$ for the same
+cost. Let us for instance explain how to lift.
+
+We start from $A$ written on the bivariate basis in $(x_{i-1},x_i)$;
+that is, $A$ is in $\K_0[X_{i-1},X_i]/\langle Q_{i-1},
+T_{i-1}\rangle$. Apply $\Psi_{i-1}$ to its coefficients in
+$x_i^0,\dots,x_i^{\ell-1}$, so as to rewrite $A$ as an element of
+$$\K_0[Y_{i-1},X_i]/\langle Y_{i-1}^{\ell^{i-1}}-y_{i-2},
+T_{i-1}\rangle = \K_{i-1}[X_i]/\langle Q_{i,i-1} \rangle.$$ Applying
+$\Psi_{i,i}^{-1}$ gives us the image of $A$ in $\K_i$, and applying
+$\Psi_i$ finally brings it to $\K_0[X_i]/\langle Q_{i}\rangle$.
 
 
 %%%
@@ -1050,15 +1250,7 @@ $P=Q[f,g]$.
 
 %%%
 
-\section{The general case}
-\label{sec:general}
-
-Composita, general LD-towers, other algebraic tori, higher dimensional
-fibers...
-
-%%%
-
-\section{Implementation and complexity considerations}
+\section{Implementation}
 \label{sec:impl}
 
 Sage implementation and timings.
@@ -1068,6 +1260,7 @@ Sage implementation and timings.
 \section{Aknowledgements}
 De Feo would like to thank Antoine Joux.
 
+\scriptsize
 \bibliographystyle{abbrv}
 \bibliography{defeo}
 \end{document}
@@ -1082,4 +1275,7 @@ De Feo would like to thank Antoine Joux.
 %
 % LocalWords:  Isogeny abelian isogenies hyperelliptic supersingular Frobenius
 % LocalWords:  isogenous embeddings Vélu
+
+
+
 
