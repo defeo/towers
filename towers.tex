@@ -67,8 +67,8 @@ fields.
 The system implemented in Magma, as described in the original paper,
 uses linear algebra to describe the embeddings of finite fields. From
 a complexity point of view, this is far from optimal: one may hope to
-compute and apply the morphisms in quasi-linear time in the degree
-of the extension, but this is usually out of reach of plain linear
+compute and apply the morphisms in quasi-linear time in the degree of
+the extension, but this is usually out of reach of plain linear
 algebra techniques. Even worse, the quadratic memory requirements make
 the system unsuitable for embeddings of large degree
 extensions. Although the Magma core has evolved since the publication
@@ -87,9 +87,9 @@ $$
 \begin{array}{c|cccc}
   \text{Condition} & \text{Initialization} & Q_i, T_i & \text{Lift, push}\\
   \hline \hline
-  q = 1 \bmod \ell & O_e(\Mult(\ell) + \log(q))  & O(1) & O(1) \\
-  q = -1 \bmod \ell & O_e(\Mult(\ell) \log(\ell q)\log(q)) & O(\Mult(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \\
-  - & O_e (\ell^2+\Mult(\ell) \log(q)) & O(i\Mult(\ell^{i+1})\Mult(\ell)\log(\ell)^2) & O(i \Mult(\ell^{i+1})\Mult(\ell)\log(\ell))
+  q = 1 \bmod \ell & O_e(\Mult(\ell) + \log(q))  & O(\ell^i) & O(\ell^i) \\
+  q = -1 \bmod \ell & O_e(\Mult(\ell) \log(\ell q)\log(q)) & O(\ell^i) & O(\Mult(\ell^i) \log(\ell^i)) \\
+  - & O_e (\ell^2+\Mult(\ell) \log(q)) & O(i^2\Mult(\ell^{i+1})\Mult(\ell)\log(\ell)^2) & O(i \Mult(\ell^{i+1})\Mult(\ell)\log(\ell))
 \end{array}
 $$
 \label{table:main}
@@ -119,7 +119,7 @@ $\F_q$, as there is an isomorphism
 where the tensor products are over $\F_q$; we will briefly mention
 below the algorithmic counterpart of this equality.
 
-In this paper, we give algorithms that allow us to ``compute'' in the
+Our contribution is algorithms that allow us to ``compute'' in the
 first levels of $\ell$-adic towers (in a sense defined hereafter); at
 level $i$, our goal is to be able to perform all basic operations in
 quasi-linear time in the extension degree $\ell^i$.  We do not discuss
@@ -137,8 +137,8 @@ also~\cite{DoSc12}, which reused these ideas in the case $\ell=2$): we
 construct families of irreducible polynomials with special properties,
 then give algorithms that exploit the special form of those
 polynomials to apply the embeddings. Because they are treated in the
-references~\cite{df+schost12,DoSc12}, we exclude the cases $\ell=p$
-and $\ell=2$.
+references~\cite{df+schost12,DoSc12}, {\em we exclude the cases $\ell=p$
+and $\ell=2$}.
 
 The field $\F_{q^{\ell^i}}$ will be represented as a univariate
 quotient ring $\F_q[X_i]/\langle Q_i\rangle$, for some irreducible
@@ -166,7 +166,7 @@ embedding is done by applying repeatedly this elementary
 operation. Following again~\cite{df+schost12}, we introduce two
 slightly more general operations, {\em lift} and {\em push}.
 
-To motivate them, remark that for $i \ge 1$, $\F_{q^{\ell^{i}}}$ has
+To motivate them, remark that for $i \ge 2$, $\F_{q^{\ell^{i}}}$ has
 two natural bases as a vector space over $\F_q$. The first one is via
 the monomial basis $\uu_{i}$ seen above, corresponding to the
 univariate model $\F_q[X_{i}]/ \langle Q_{i} \rangle$. The second one
@@ -191,8 +191,8 @@ details here, but we refer the reader
 to~\cite{df+schost12,DoSc12,LeSc12} for examples such as the
 computation of relative traces, norms or characteristic polynomials,
 and applications to solving Artin-Schreier or quadratic equations,
-given in~\cite{df+schost12,DoSc12} for respectively $\ell=p$ and
-$\ell=2$.
+given in~\cite{df+schost12} and~\cite{DoSc12} for respectively
+$\ell=p$ and $\ell=2$.
 
 Table~\ref{table:main} summarizes the main results in this paper.
 Under different kinds of assumptions, it gives costs for initializing
@@ -201,7 +201,7 @@ from~Eq.\eqref{eq:QiTi}, and performing lift and push; the notation
 $O_e(\ )$ indicates probabilistic algorithms with expected running
 time. In all cases, we obtain algorithms that are close to being
 linear-time in $\ell^i$, up to sometimes the loss of a factor
-polynomial in $\ell$. Except for the simple case where $q=1 \bmod
+polynomial in $\ell$. Except for the (very simple) case where $q=1 \bmod
 \ell$, these results are new, to the best of our knowledge.
 
 These results are obtained from two different constructions: the first
@@ -216,14 +216,14 @@ them here and give more details in the further sections.
 
 Lenstra and De Smit~\cite{lenstra+desmit08-stdmodels} address
 questions similar to ours, the construction of the $\ell$-adic closure
-of $\F_q$ (and then of its algebraic closure), but with a different
+of $\F_q$, and then of its algebraic closure, but with a different
 purpose (standardizing the construction). The resulting algorithms run
 in polynomial time, but (implicitly) rely on linear algebra techniques
-and the data of multiplication tables, so quasi-linear time is not
+and the use of multiplication tables, so quasi-linear time is not
 directly reachable.
 References~\cite{Shoup90,shoup94,couveignes+lercier11} discuss a
-related problem, the construction of irreducible polynomials of a
-given degree over $\F_q$; thus, the question of applying embeddings
+related problem, the construction of irreducible polynomials of
+prescribed degree over $\F_q$; the question of applying embeddings
 between the levels of the tower is not present there.
 
 To conclude the introduction, let us mention a few applications of our
@@ -237,14 +237,14 @@ problems are~\cite{df10,GaSc12}, both in relation to torsion subgroups
 of Jacobians of curves. Our construction makes such computations
 feasible for much larger sizes than was previously possible.
 
-However, the main question remains of course the cost of computing in
-arbitrary extensions. As showed by Eq.~\eqref{eq:tensor}, this boils
-down to the study of $\ell$-adic towers, as done in the present paper,
-together with algorithms for computing in \emph{composita}.
-References~\cite{Shoup90,shoup94,couveignes+lercier11} deal with this
-issue for the related problem of computing irreducible polynomials; a
-natural follow-up to the present work is to study the cost of embeddings
-and similar change of bases in this more general context.
+The main question remains of course the cost of computing in arbitrary
+extensions. As showed by Eq.~\eqref{eq:tensor}, this boils down to the
+study of $\ell$-adic towers, as done in this paper, together with
+algorithms for computing in \emph{composita}.
+References~\cite{Shoup90,shoup94,couveignes+lercier11} deal with
+related questions for the problem of computing irreducible polynomials;
+a natural follow-up to the present work is to study the cost of
+embeddings and similar change of bases in this more general context.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -282,7 +282,9 @@ x_i = \sum_{j = 0}^{r-1} y_i^{q^{\ell^i j}}.
 \end{equation}
 Then,~\cite[Th.~2.1]{Shoup90} proves that $\F_q(x_i)=\F_{q^{\ell^i}}$;
 in other words, we arrive at the situation depicted in
-Figure~\ref{fig:ladic}.
+Figure~\ref{fig:ladic}. In particular, the minimal polynomials of
+$x_1,x_2,\dots$ form the family of irreducible polynomials $Q_i$ we
+are interested in.
 
 \begin{figure}[h]
   \centering
@@ -310,11 +312,9 @@ Figure~\ref{fig:ladic}.
   \label{fig:ladic}
 \end{figure}
 
-In particular, the minimal polynomials of $x_1,x_2,\dots$ form the
-family of irreducible polynomials $Q_i$ we are interested in.  We will
-show how to compute these polynomials, the polynomials $T_i$
-introduced in Eq.~\eqref{eq:QiTi} and how to perform lift and push.
-To this effect, we will actually consider more general minimal
+We will show how to compute the polynomials $Q_i$, the polynomials
+$T_i$ introduced in Eq.~\eqref{eq:QiTi} and how to perform lift and
+push.  To this effect, we will define more general minimal
 polynomials: for $0 \le j \le i$, we will let $Q_{i,j} \in
 \F_q(x_j)[X_j]$ be the minimal polynomial of $x_i$ over $\F_q(x_j)$,
 so that $Q_{i,j}$ has degree $\ell^{i-j}$, with in particular
@@ -328,22 +328,25 @@ algorithms. Our results for the second case are close to, but distinct
 from, previous work of Gurak~\cite{gurak06}; the algorithms are
 slightly slower than in the first case. Our results in the general
 case are yet slower, but they are still quasi-linear in $\ell^i$, up
-to the loss of a factor polynomial in $\ell$. The
-references~\cite{Shoup90,shoup94} already consider the computation of
-$Q_i$ in this case, with a running time quadratic in $\ell^i$.
+to the loss of a factor polynomial in $\ell$. 
 
-Note that for $\ell=3$, we are always in one the first two cases.  For
-this choice of $\ell$, Couveignes and Lercier obtain
-in~\cite[\S~2.4]{couveignes+lercier11} algorithms to compute $Q_i$ in
-time $O(3^{i(1+\varepsilon)} \log(q))$, for any $\varepsilon > 0$,
-{\em in a boolean model}, that is, counting bit operations; their
-algorithm relies on a previous result by Kedlaya and
-Umans~\cite{KeUm11}.
+To our knowledge, the construction we use first appears
+in~\cite{Shoup90,shoup94}, which show how to compute $Q_i$ in time
+quadratic in $\ell^i$~\cite[Th.~11]{shoup94}.  Using {\em modular
+  composition} techniques~\cite[Ch.~12]{vzGG}, this quadratic behavior
+could be improved to get an exponent in $[1.5, 2]$, up to an extra
+cost polynomial in $\ell$.  Remark that for $\ell=3$ (where we are in
+one the first two cases), Couveignes and Lercier mention such an idea
+in~\cite[\S~2.4]{couveignes+lercier11}: using a previous result by
+Kedlaya and Umans~\cite{KeUm11} for modular composition {\em in a
+  boolean model} (where we count bit operations), they derive a cost
+of the form $O(3^{i(1+\varepsilon)} \log(q))$ bit operations for any
+$\varepsilon > 0$.
 
 In this section, and in the rest of this paper, if $L/K$ is a field
 extension, we write $\Tr_{L/K}$, $\Norm_{L/K}$ and $\Gal_{L/K}$ for
-the trace, norm and Galois group of the extension.
-
+the trace, norm and Galois group of the extension. Recall also that
+the notation $O_e(\ )$ indicates an {\em expected} running time.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -352,8 +355,8 @@ the trace, norm and Galois group of the extension.
 To determine $P_0$, two constructions will be used. In both cases, we
 start from the $\ell$-th cyclotomic polynomial $\Cyc_\ell \in
 \Z[X_0]$. The first step consists in factoring $\Cyc_\ell$ over
-$\F_q[X_0]$: by~\cite[Th.~9]{shoup94}, this takes an expected
-$O(\Mult(\ell)\log(\ell q))$ operations in $\F_q$.
+$\F_q[X_0]$: by~\cite[Th.~9]{shoup94}, this takes
+$O_e(\Mult(\ell)\log(\ell q))$ operations in $\F_q$.
 
 Over $\F_q[X_0]$, $\Cyc_\ell$ splits into irreducible factors of the
 same degree $r$, where $r$ is the order of $q$ in $\Z/\ell\Z$ (so $r$
@@ -366,18 +369,18 @@ given $\eta$, computing $P_0$ takes $O(r^2)$ operations in $\F_q$.
 To find $\eta$, the approach in~\cite{Shoup90,
   shoup94,couveignes+lercier11} consists in picking it at random: we
 expect to find a non-residue after $O(1)$ trials;
-by~\cite[Lemma~15]{shoup94}, each takes an expected
-$O(\Mult(\ell)\log(r)+\Mult(r)\log(\ell)\log(r)+\Mult(r)\log(q))$
+by~\cite[Lemma~15]{shoup94}, each takes
+$O_e(\Mult(\ell)\log(r)+\Mult(r)\log(\ell)\log(r)+\Mult(r)\log(q))$
 operations in $\F_q$
 
-An alternative, due to Lenstra and De Smit, is to take iterated
-$\ell$-th roots of $X_0 \bmod F_0$ until we find a non-residue. As
-stated in~\cite{lenstra+desmit08-stdmodels}, this requires to take
-$\kappa$ successive $\ell$-th roots modulo $F_0$ until hitting a
-non-residue $\eta$, where $\kappa$ is the $\ell$-adic valuation of
-$(q^{\ell-1}-1)/\ell$. Using a root-finding algorithm for the
-polynomial $Y^\ell-\eta$, each root extraction takes an expected
-$O(\Mult(\ell)\log(\ell q))$ operations modulo
+An alternative idea, due to Lenstra and De Smit, is to take iterated
+$\ell$-th roots of $X_0 \bmod F_0$ until we find a non-residue.  Non
+$\ell$-adic residues have order a multiple of $\ell^\kappa$, where
+$\kappa$ is the $\ell$-adic valuation of $(q^r-1)$. Because $X_0 \bmod
+F_0$ has order $\ell$, we take $\kappa-1$ successive $\ell$-th roots
+modulo $F_0$ until hitting a non-residue $\eta$. Using a root-finding
+algorithm for the polynomial $Y^\ell-\eta$, each root extraction takes
+$O_e(\Mult(\ell)\log(\ell q))$ operations modulo
 $F_0$~\cite[Ch~14]{vzGG}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -393,8 +396,8 @@ is, $r=1$). The polynomial $P_0$ is of the form $Y_0-\eta$, where
 $\eta$ is a non $\ell$-adic residue in $\F_q$. In this case, we simply
 find $\eta$ by random trial in $\F_q$, as no gain is to be found from
 the more specific choice used by Lenstra-De Smit. Since we can bypass
-the factorization of $\Phi_\ell$, the cost of initialization is an
-expected $O(\Mult(\ell)+\log(q))$ operations in $\F_q$.
+the factorization of $\Phi_\ell$, the cost of initialization is
+$O_e(\Mult(\ell)+\log(q))$ operations in $\F_q$.
 
 Then, no descent is required. For $i \ge 0$, we have
 $\K_i=\F_{q^{\ell^i}}$ and $x_i=y_i$; the families of polynomials we
@@ -415,26 +418,25 @@ use only exponent arithmetic, and no operation in~$\F_q$.
 Next, we consider the case where $\ell$ divides $q+1$, so that
 $\Phi_\ell$ splits into quadratic factors over $\F_q$ (that is,
 $r=2$). In this case, we use Lenstra and De Smit's construction of
-$P_0$; since $r=2$, and using a bound on $\kappa$ given in the proof
-of the following lemma, we deduce that the initialization takes an
-expected $O(\Mult(\ell)\log(\ell q)\log(q))$ operations in $\F_q$.
+$P_0$; since $r=2$, and using the bound $\kappa=O(\log(q))$ given in
+the proof of the following lemma, we deduce that the initialization
+takes $O_e(\Mult(\ell)\log(\ell q)\log(q))$ operations in $\F_q$.
 
 \begin{lemma}
   For $i \ge 0$, $x_i = y_i +y_i^{-1}$.
 \end{lemma}
 \begin{proof}
-  By definition, $x_i=y_i+y^{q^{\ell^i}}$. Note that in the
-  Lenstra-De Smit construction, $y_0$ has order $\ell^{\kappa+1}$,
-  where $\kappa$ is the $\ell$-adic valuation of
-  $(q^{\ell-1}-1)/\ell$. Thus, $y_i$ has order $\ell^{i+\kappa+1}$, so
-  to conclude, it is enough to prove that $\ell^{i+\kappa+1}$ divides
-  $q^{\ell^i}+1$.
+  By definition, $x_i=y_i+y^{q^{\ell^i}}$. Note that in the Lenstra-De
+  Smit construction, $y_0$ has order $\ell^{\kappa}$, where $\kappa$
+  is the $\ell$-adic valuation of $q^r-1$. Thus, $y_i$ has order
+  $\ell^{i+\kappa}$, so to conclude, it is enough to prove that
+  $\ell^{i+\kappa}$ divides $q^{\ell^i}+1$.
 
-  Because $\ell$ divides $q+1$, a quick induction shows that $q+1$ and
-  $q^{2n}-1$ have the same $\ell$-adic valuation, for all positive
-  integers $n$. In particular, $\kappa$ is the $\ell$-adic valuation
-  of $(q+1)/\ell$, so that $\ell^{\kappa+1}$ divides $q+1$, and another
-  induction on $i$ finishes the proof of the lemma.
+  Because $\ell$ divides $q+1$, $q+1$ and $q^{2n}-1$ have the same
+  $\ell$-adic valuation for all positive integers $n$ not divisible by
+  $\ell$. In particular, $\kappa$ is the $\ell$-adic valuation of
+  $q+1$, so that $\ell^\kappa$ divides $q+1$, and an induction on $i$
+  finishes the proof.
 \end{proof}
 
 From this, we will show how to compute the polynomials $Q_{i,j}$, and
@@ -489,14 +491,11 @@ algebraic closure of $\K(X)$. By a direct calculation, we find
 As a result, $Q$ can be computed in $O(\Mult(n))$ operations in $\K$,
 using repeated squaring modulo $Y^2-XY+1$. In particular, taking
 $n=\ell^i$ and returning to our initial problem, $Q_i$ can be computed
-in time $O(\Mult(\ell^i))$. Taking $n=\ell$, we see that the
-polynomials $T_i$ all take the same form; $T_i$ can be computed in
-time $O(\Mult(\ell^i))$.
+in time $O(\Mult(\ell^i))$. 
 
-We now present a better solution, valid in large enough
-characteristic. For $n \in \N$, the term $P_{n}=\zeta^{n} +
-\zeta^{-n}$ is the $n$-th power sum of $Y^2-XY+1$, thus, using
-Newton's identities,
+We now present a better solution. For $n \in \N$, the term
+$P_{n}=\zeta^{n} + \zeta^{-n}$ is the $n$-th power sum of $Y^2-XY+1$,
+thus, using Newton's identities,
 \begin{equation}
   \label{eq:simple}
   \begin{aligned}
@@ -520,27 +519,25 @@ Writing $P_n = \sum_i c_{n,i}X^{n-i}$, we deduce the relation
 %% \end{equation}
 %% It is then evident that every second column is identically zero, and
 %% that signs alternate in odd columns. 
-Removing the odd values of $i$ and taking absolute values, i.e.,
-setting $b_{n,k}=\lvert c_{n+k,2k}\rvert$, the new coefficients
-satisfy the relation
+Removing the odd values of $i$ and taking absolute values, the new
+coefficients $b_{n,k}=\lvert c_{n+k,2k}\rvert$ satisfy the relation
 \begin{equation*}
   b_{n,k} = b_{n-1,k} + b_{n-1,k-1},
 \end{equation*}
 which is the same as Pascal's relation. Indeed, we obtain the
 $(1,2)$-Pascal triangle, also called Lucas'
 triangle~\cite{benjamin10}:
-\begin{equation*}
-  \begin{tabular}{*{8}{c@{}}}
-    &&&2\\
-    &&1&&2\\
-    &1&&3&&2\\
-    1&&4&&5&&2
-  \end{tabular}
-\end{equation*}
-A special case of this fact was already proven by Gauss, and the
-general proof is in~\cite[Prop.~1]{gurak06}. It is well known that
-the coefficients of Lucas' triangle are related to those of Pascal's
-by
+%% \begin{equation*}
+%%   \begin{tabular}{*{8}{c@{}}}
+%%     &&&2\\
+%%     &&1&&2\\
+%%     &1&&3&&2\\
+%%     1&&4&&5&&2
+%%   \end{tabular}
+%% \end{equation*}
+a special case of this fact was proven by Gauss, and the general proof
+is in~\cite[Prop.~1]{gurak06}. As is well-known, the coefficients of
+Lucas' triangle are related to those of Pascal's by
 \begin{equation}
   \label{eq:lucas-tri}
   b_{n,k} = \binom{n}{k} + \binom{n-1}{k-1} = \frac{n+k}{n}\binom{n}{k}.
@@ -553,10 +550,11 @@ we obtain
   \frac{c_{n,2k+2}}{c_{n,2k}} = 
   -\frac{(n-2k)(n-2k-1)}{(n-k-1)(k+1)}.
 \end{gather}
-Provided all denominators are invertible,
-Eq.~\eqref{eq:lucas-recurrence} gives a formula to compute all the
-coefficients of $Q_{i}$ using $O(\ell^{i})$ operations in $\F_p$, and
-similarly for $T_i$.
+This gives a formula to compute all the coefficients of $Q_{i}$ using
+$O(\ell^{i})$ operations in $\F_p$, and similarly for $T_i$ (since we know
+the results are the image mod $p$ of integers, we compute 
+the $c_{n,2k}$ using multiplications and divisions in $\Q_p$ with
+relative precision 1).
 
 %% Eq.~\eqref{eq:lucas-recurrence} gives a formula to compute all the
 %% coefficients of $Q_{i,j}$ using $O(\ell^{j-i})$ operations in $\F_p$. By
@@ -583,11 +581,9 @@ similarly for $T_i$.
 Finally, we discuss the general situation, where we do not make any
 assumption on the behavior of $\Phi_\ell$ in $\F_q[X]$. The results
 below complete the third row of Table~\ref{table:main}, using the
-bound $r=O(\ell)$.
-
-Since we are not able to exploit the more specific Lenstra-De Smit
-construction in this case, we use Shoup's approach, picking the
-initial non $\ell$-adic residue $\eta$ at random. 
+bound $r=O(\ell)$. Since we are not able to exploit the more specific
+Lenstra-De Smit construction in this case, we use Shoup's approach,
+picking a non $\ell$-adic residue at random.
 
 Because $r=[\K_0 : \F_q]$ divides $\ell-1$, it is coprime with
 $\ell$. Thus, $Q_i$ remains the minimal polynomial of $x_i$ over
@@ -599,14 +595,13 @@ $O(\Mult(r)\log(r))$ to account for the cost of arithmetic in $\K_0$.
 
 For $i \ge 0$, since $\K_i=\K_0[Y_i]/\langle Y_i^{\ell^i}-y_0\rangle$,
 we represent the elements of $\K_i$ on the basis $\{y_i^e \mid 0 \le e
-< \ell^i\}$; then, all arithmetic operations in $\K_i$ can be done in
-$O(\Mult(\ell^i)\log(\ell^i))$ operations in $\K_0$. Note that $x_i$
-is written on this basis as
+< \ell^i\}$; for instance, $x_i$ is written on this basis as
 \begin{equation}\label{eq-def:xiyi}
 x_i = \sum_{j = 0}^{r-1} y_i^{q^{\ell^i j} \bmod \ell^i}
 y_0^{q^{\ell^i j} {\rm~div~} \ell^i}. 
 \end{equation}
-
+%% Operations $\{+,-,\times,\div\}$ in $\K_i$ take
+%% $O(\Mult(\ell^i)\log(\ell^i))$ operations in $\K_0$.
 Our strategy is to show how to convert between two univariate bases of
 $\K_i$, $\{y_i^e \mid 0 \le e < \ell^i\}$ and $\{x_i^e \mid 0 \le e <
 \ell^i\}$. In other words, we show how to apply the isomorphism
@@ -630,8 +625,8 @@ factor $\Psi_{i,j}$ further as $\Phi''_{i,j} \circ \Phi'_{i,j} \circ
 $$\varphi_j: \K_j \to \K_{j-1}[Y_j]/\langle Y_j^\ell-y_{j-1}\rangle.$$
 The forward direction is a push from the monomial basis in $y_j$ to
 the bivariate basis in $(y_{j-1},y_j)$ and the inverse is a lift; none
-of them involves any arithmetic operation, as was pointed out in
-Subsection~\ref{ssec:T1}.  Then, we deduce the isomorphism
+of them involves any arithmetic operation (see
+Subsection~\ref{ssec:T1}).  Then, we deduce the isomorphism
 $$\Phi_{i,j}: \K_j[X_i]/\langle Q_{i,j} \rangle \to
 \K_{j-1}[Y_j,X_i]/\langle Y_j^\ell-y_{j-1}, Q^\star_{i,j}\rangle,$$
 where $Q^\star_{i,j}$ is obtained by applying $\varphi_j$ to all
@@ -651,7 +646,7 @@ $\deg(Q_{i,j-1},X_i)=\ell^{i-j+1}$. This conversion is less obvious
 than the previous one.
 \begin{lemma}
   Given $Q^\star_{i,j}$, one can compute $Q_{i,j-1}$ and $S_{i,j}$
-  using $O(\Mult(\ell^{i+1})\log(\ell))$ operations in $\K_0$.
+  using $O(i\Mult(\ell^{i+1})\log(\ell))$ operations in $\K_0$.
   Once this is done, we can apply $\Phi'_{i,j}$ and its inverse 
   using $O(\Mult(\ell^{i+1}))$ operations in $\K_0$.
 \end{lemma}
@@ -659,14 +654,11 @@ than the previous one.
   We obtain $Q_{i,j-1}$ and $S_{i,j}$ from the resultant and degree-1
   subresultant of $Y_j-y_{j-1}$ and $Q^\star_{i,j}$ with respect to
   $Y_j$, computed over the polynomial ring $\K_{j-1}[X_i]$. This is
-  done using Reischert's algorithm~\cite{Reischert97}. The direct
-  analysis would yield a cost of
-  $O(\Mult(\ell^{j-1})\Mult(\ell)\Mult(\ell^{i-j+1})\log(\ell))$
-  operations in $\K_0$, accounting for respectively the cost of
-  arithmetic in $\K_{j-1}$, the cost of the half-gcd algorithm in
-  $Y_j$, and the cost of polynomial arithmetic in $X_i$. Using
-  Kronecker's substitution to reduce all operations to trivariate
-  arithmetic in $Y_{j-1},Y_j,X_i$ yields the claimed bound.
+  done by the algorithms of~\cite{Reischert97,LiRo01}, using
+  $O(\Mult(\ell^{i+1})\log(\ell))$ operations in $\K_0$. To obtain
+  $S_{i,j}$, we invert the leading coefficient of the degree-1
+  subresultant modulo the resultant $Q_{i,j-1}$; this takes
+  $O(\Mult(\ell^{i})\log(\ell^i))$ operations in $\K_0$.
 
   Applying $\Phi'_{i,j}$ amounts to taking a polynomial $A(Y_j,X_i)$ 
   reduced modulo $\langle Y_j^\ell-y_{j-1}, Q^\star_{i,j}\rangle$
@@ -692,7 +684,7 @@ forgets the variable $Y_j$; it requires no arithmetic operation.
 \medskip
 
 Taking $j=i,\dots,1$ allows us to compute $Q_{i,i-1}$ and $Q_{i,0}$
-for $O(i\Mult(\ell^{i+1})\log(\ell))$ operations in $\K_0$. Composing
+for $O(i^2\Mult(\ell^{i+1})\log(\ell))$ operations in $\K_0$. Composing
 the maps $\Psi_{i,j}$, we deduce further that we can apply $\Psi_i$ or
 its inverse for $O(i\Mult(\ell^{i+1}))$ operations in $\K_0$.  
 
