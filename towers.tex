@@ -371,7 +371,7 @@ To find $\eta$, the approach in~\cite{Shoup90,
 expect to find a non-residue after $O(1)$ trials;
 by~\cite[Lemma~15]{shoup94}, each takes
 $O_e(\Mult(\ell)\log(r)+\Mult(r)\log(\ell)\log(r)+\Mult(r)\log(q))$
-operations in $\F_q$
+operations in $\F_q$.
 
 An alternative idea, due to Lenstra and De Smit, is to take iterated
 $\ell$-th roots of $X_0 \bmod F_0$ until we find a non-residue.  Non
@@ -426,7 +426,7 @@ takes $O_e(\Mult(\ell)\log(\ell q)\log(q))$ operations in $\F_q$.
   For $i \ge 0$, $x_i = y_i +y_i^{-1}$.
 \end{lemma}
 \begin{proof}
-  By definition, $x_i=y_i+y^{q^{\ell^i}}$. Note that in the Lenstra-De
+  By definition, $x_i=y_i+y_i^{q^{\ell^i}}$. Note that in the Lenstra-De
   Smit construction, $y_0$ has order $\ell^{\kappa}$, where $\kappa$
   is the $\ell$-adic valuation of $q^r-1$. Thus, $y_i$ has order
   $\ell^{i+\kappa}$, so to conclude, it is enough to prove that
