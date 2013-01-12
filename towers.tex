@@ -765,8 +765,7 @@ $\mathbb{G}_m^{\euler(n)}$ over the algebraic
 closure~\cite{rubin-silverberg+crypto03,rubin+silverberg03,voskresenskii98}.
 
 The construction of Section~\ref{ssec:T2} is obtained by considering
-the torus $T_2$. We suppose for the rest of this section that that
-$p\ne2$.
+the torus $T_2$.
 
 \begin{lemma}
   Let $x_i$ and $y_i$ be defined as in Section~\ref{ssec:T2}. The
@@ -774,25 +773,50 @@ $p\ne2$.
   \emph{Pell conic}
   \begin{equation}
     \label{eq:Pell}
-    C \;:\; \alpha^2 - 4z_i^2\beta^2 = 4,
+    C \;:\; 
+    \begin{cases}
+      \alpha^2 - \Delta\beta^2 = 4 &\text{if $p\ne2$,}\\
+      \alpha^2\Delta + \alpha\beta + \beta^2 = 1 &\text{if $p=2$,}
+    \end{cases}
   \end{equation}
-  where $z_i = y_i - y_i^{-1}=\sqrt{x_i^2-4}$. Multiplication in $T_2$
-  induces a group law on $C$: its neutral element is $(2,0)$, and the
-  sum of two points is defined by
+  where
+  \begin{equation}
+    \Delta =
+    \begin{cases}
+      4x_i^2-16 & \text{if $p\ne 2$,}\\
+      1/x_i^2   & \text{if $p=2$.}
+    \end{cases}
+  \end{equation}
+  Multiplication in $T_2$ induces a group law on $C$. The neutral
+  element is $(2,0)$ if $p\ne2$ or $(0,1)$ if $p=2$. The sum of two
+  points $P=(\alpha,\beta)$ and $Q=(\alpha',\beta')$ is defined
+  by
   \begin{equation}
     \label{eq:Pell-add}
-    (\alpha,\beta)\oplus(\alpha',\beta') =
-    \left(\frac{\alpha\alpha' + 4z_i^2\beta\beta'}{2},\; \frac{\alpha\beta' + \alpha'\beta}{2}\right).
+    P\oplus Q =
+    \begin{cases}
+      \left(\frac{\alpha\alpha' + 4z_i^2\beta\beta'}{2},\; \frac{\alpha\beta' + \alpha'\beta}{2}\right) &
+      \text{if $p\ne2$,}\\
+      \left(\alpha\alpha' + \alpha\beta' + \alpha'\beta,\; \alpha\alpha'\Delta + \beta\beta'\right) &
+      \text{if $p=2$.}
+    \end{cases}
   \end{equation}
 \end{lemma}
 \begin{proof}
-  Lemma~\ref{th:T2-norm} shows that $\F_q(y_i)=\F_q(z_i)$. Since
-  $p\ne2$, $(1/2, z_i)$ is a vector space basis of $\F_q(y_i)$ over
-  $\F_q(x_i)$.  By virtue of Eq.~\eqref{eq:Tn}, an element
-  $\alpha/2+\beta z_i$ belongs to $T_2$ if and only if
-  $\Norm(\alpha/2+\beta z_i)=1$, which is equivalent to
-  Eq.~\eqref{eq:Pell}.  The group law is obtained by direct
-  calculation.
+  Let $B$ be the vector space basis of $F_q(y_i)$ over $\F_q(x_i)$
+  defined as follows:
+  \begin{equation*}
+    B = (b_0, b_1) =
+    \begin{cases}
+      (1/2, y_i - y_i^{-1}) = (1/2, \sqrt{\Delta}/2) & \text{if $p\ne2$,}\\
+      (y_i/x_i, 1) & \text{if $p=2$.}
+    \end{cases}
+  \end{equation*}
+  
+  By virtue of Eq.~\eqref{eq:Tn}, an element $\alpha b_0 + \beta b_1$
+  belongs to $T_2$ if and only if $\Norm(\alpha b_0+\beta b_1)=1$,
+  which is equivalent to Eq.~\eqref{eq:Pell}.  The group law is
+  obtained by direct calculation.
 \end{proof}
 
 Pell conics are a widely studied topic. They have applications in
@@ -807,7 +831,11 @@ $(\alpha,\beta)$.
   degree $n$, given by the rational maps
   \begin{equation}
     \label{eq:Pell-rec}
-    [n](\alpha,\beta) = \bigr(P_n(\alpha), \beta R_n(\alpha)\bigl),
+    [n](\alpha,\beta) = 
+    \begin{cases}
+      \bigr(P_n(\alpha), \beta R_n(\alpha)\bigl) & \text{if $p\ne2$,}\\
+      \bigr(P_n(\alpha), \beta R_n(\alpha) + R_{n-1}(\alpha)\bigl) & \text{if $p=2$.}      
+    \end{cases}
   \end{equation}
   where $P_n$ is defined as in Eq.~\eqref{eq:simple}, and $R_n$ is
   defined by
@@ -850,9 +878,29 @@ $(\alpha,\beta)$.
 \end{proof}
 
 Observe that the theorem above implies Corollary~\ref{th:T2-resultant}
-by choosing $y_0 = x_0/2+z_0/2$ as starting point $P$. So, this
-construction yields the same tower as in Sec.~\ref{ssec:T2}, except
-for the initialization point $y_0$.
+by choosing $y_0$ as starting point $P$. So, this construction yields
+the same tower as in Sec.~\ref{ssec:T2}, except for the initialization
+point.
+
+\begin{lemma}
+  \label{th:montgomery}
+  Let $P=(\alpha,\beta)$ be a point on $C$. For any $n$, the
+  $\alpha$-coordinate of $[\pm n]P$ can be computed without knowledge of
+  $\beta$ using $O(\log n)$ operations in $\F_q$.
+\end{lemma}
+\begin{proof}
+  Observe that if $n=2$, the $\alpha$-coordinate of $[\pm 2]P$ is
+  $\alpha^2-2$ (for any $p$).  Let $P'=(\alpha,\beta)$, and let
+  $\gamma$ be the $\alpha$-coordinate of $P\ominus P'$, by direct
+  computation we find that the $\alpha$-coordinate of $P\oplus P'$ is
+  $\alpha\alpha'-\gamma$ (for any $p$); this formula is called a
+  \emph{differential addition}.
+
+  In conclusion $O(1)$ operations are needed for a doubling or a
+  differential addition. To compute the $\alpha$-coordinate of $[\pm
+  n]P$, we use the ladder algorithm of~\cite{montgomery}, requiring
+  $O(\log n)$ doublings and differential additions.
+\end{proof}
 
 \begin{proposition}
   The $\alpha$ coordinate of a point $P\in C/\F_q$ satisfying the
@@ -861,21 +909,21 @@ for the initialization point $y_0$.
 \end{proposition}
 \begin{proof}
   We randomly select $\alpha\in\F_q$ and test that it belongs to
-  $C$. This amounts to testing that $\alpha^2-4$ is a quadratic
-  non-residue in $\F_q$, a task that can be accomplished with $O(\log
-  q)$ operations.
+  $C$. If $p\ne2$, this amounts to testing that $\alpha^2-4$ is a
+  quadratic non-residue in $\F_q$, a task that can be accomplished
+  with $O(\log q)$ operations. If $p=2$, by Artin-Schreier theory,
+  this is equivalent to $\Tr_{\F_q/\F_2}(\Delta+1/\alpha^2)=0$; with a
+  naive algorithm, the trace can be computed using $O(\log q)$
+  operations in $\F_q$.
 
   Then we check that the order of $P$ is divisible by $\ell^\kappa$ by
-  verifying that $[(q+1)/\ell]P\ne (2,0)$. Using
-  Eq.~\eqref{eq:Pell-add} would require computing the
-  $\beta$-coordinate of $P$, but a straightforward adaptation of the
-  ladder algorithm of~\cite{montgomery} allows us to compute the
-  $\alpha$-coordinate of $[n]P$ without knowing $\beta$, in $O(\log
-  n)$ operations.
+  verifying that $[(q+1)/\ell]P$ is not the group identity. By
+  Lemma~\ref{th:montgomery}, this computation requires $O(\log q)$
+  operations.
 
   About half of the points of $\F_q$ are quadratic non-residues, and
   about $1-1/\ell$ of them are the abscissas of points with the
-  required order, thus we expect to find $\alpha$ after $O(1)$ trials.
+  required order, thus we expect to find $\alpha$ after $O_e(1)$ trials.
 \end{proof}
 
 It is natural to ask whether a similar construction could be applied
