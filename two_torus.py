@@ -44,18 +44,38 @@ def _torsion_poly(ell, mod=None):
     return P(list(reversed(t))).shift(ell % 2 - 1)
 
 
+# Montgomery ladder for Pell conics
+def _pellmul(x, n):
+    # The zero point and ours
+    A, B = 2, x
+    for c in reversed(n.digits(2)):
+        if c == 0:
+            A, B = A**2 - 2, A*B - x
+        else:
+            A, B = A*B - x, B**2 - 2
+    return A
+
+
 class Tower:
     def __init__(self, K, ell, name, debug=False):
         """
         Initialize the ell-adic extension tower of K.
         """
-        if not K.is_finite() and not K.is_prime_field():
-            raise RuntimeError('Only works for prime fields.')
+        if not K.is_finite():
+            raise RuntimeError('The field must be finite.')
+        if  not K.is_prime_field():
+            raise NotImplementedError('Only works for prime fields.')
         if (K.characteristic() + 1) % ell != 0:
             raise RuntimeError('The degree must divide ' +
                                str(K.characteristic() + 1) + '.')
         if ell % 2 == 0:
             raise RuntimeError('The degree must be odd.')
+
+        # Find an element of maximal order on the Pell conic
+        eta = K(1)
+        o = (K.characteristic() + 1) // ell
+        while (eta**2 - 4).is_square() or _pellmul(eta, o) == 2:
+            eta = K.random_element()
 
         self._base = K
         self._degree = ell
@@ -63,7 +83,7 @@ class Tower:
         self._t = _torsion_poly(ell, K.characteristic())
         self._levels = [K]
         self._minpolys = [None]
-        self._eta = cyclotomic_polynomial(ell).factor_mod(K.characteristic())[0][0][1]
+        self._eta = eta
         self._debug = debug
 
     def __getitem__(self, i):
