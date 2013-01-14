@@ -6,6 +6,7 @@ from sage.rings.arith import CRT, factor
 from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
 from sage.misc.functional import cyclotomic_polynomial
 from itertools import izip_longest
+from de_compose import *
 
 def _torsion_poly(ell, mod=None):
     """
@@ -61,21 +62,23 @@ class Tower:
         """
         Initialize the ell-adic extension tower of K.
         """
+        p = K.characteristic()
+
         if not K.is_finite():
             raise RuntimeError('The field must be finite.')
         if  not K.is_prime_field():
             raise NotImplementedError('Only works for prime fields.')
-        if (K.characteristic() + 1) % ell != 0:
-            raise RuntimeError('The degree must divide ' +
-                               str(K.characteristic() + 1) + '.')
+        if (p + 1) % ell != 0:
+            raise RuntimeError('The degree must divide %d.' % (p + 1))
         if ell % 2 == 0:
             raise RuntimeError('The degree must be odd.')
 
         # Find an element of maximal order on the Pell conic
         eta = K(1)
-        o = (K.characteristic() + 1) // ell
-        while (eta**2 - 4).is_square() or _pellmul(eta, o) == 2:
-            eta = K.random_element()
+        if p != 2:
+            o = (p + 1) // ell
+            while (eta**2 - 4).is_square() or _pellmul(eta, o) == 2:
+                eta = K.random_element()
 
         self._base = K
         self._degree = ell
@@ -106,32 +109,17 @@ class Tower:
                check_irreducible=self._debug)
         self._levels.append(K)
 
-    def _push_down(self, x):
+    def _push(self, x):
         f = self._t
         P = f.parent(x.polynomial())
         level = x.parent().degree().valuation(self._degree)
 
-        def decompose(P, f):
-            if P.degree() < f.degree() * 2:
-                return P.quo_rem(f)
-            else:
-                return sum((g.quo_rem(f) for g in decompose(P, f**2)), ())
-
-        return [self[level-1](list(reversed(c)))
+        return [self[level-1](list(c))
                 for c in izip_longest(*decompose(P, f))]
 
-    def _lift_up(self, xs):
+    def _lift(self, xs):
         f = self._t
-        Ps = list(izip_longest(*map(lambda x:x.polynomial(), xs)))
+        Ps = map(f.parent().__call__, izip_longest(*map(lambda x:x.polynomial(), xs)))
         level = xs[0].parent().degree().valuation(self._degree)
-
-        def compose(Ps, f):
-            if len(Ps) == 0:
-                return f.parent()(0)
-            elif len(Ps) == 1:
-                return f.parent()(Ps[0])
-            else:
-                g = f**2
-                return compose(Ps[::2], g) + f*compose(Ps[1::2], g)
 
         return self[level+1](compose(Ps, f))
