@@ -87,8 +87,8 @@ $$
 \begin{array}{c|cccc}
   \text{Condition} & \text{Initialization} & Q_i, T_i & \text{Lift, push}\\
   \hline \hline
-  q = 1 \bmod \ell & O_e(\Mult(\ell) + \log(q))  & O(\ell^i) & O(\ell^i) \\
-  q = -1 \bmod \ell & O_e(\Mult(\ell) \log(\ell q)\log(q)) & O(\ell^i) & O(\Mult(\ell^i) \log(\ell^i)) \\
+  q = 1 \bmod \ell & O_e(\log(q))  & O(\ell^i) & O(\ell^i) \\
+  q = -1 \bmod \ell & O_e(\log(q)) & O(\ell^i) & O(\Mult(\ell^i) \log(\ell^i)) \\
   - & O_e (\ell^2+\Mult(\ell) \log(q)) & O(i^2\Mult(\ell^{i+1})\Mult(\ell)\log(\ell)^2) & O(i \Mult(\ell^{i+1})\Mult(\ell)\log(\ell))
 \end{array}
 $$
@@ -352,36 +352,28 @@ the notation $O_e(\ )$ indicates an {\em expected} running time.
 
 \subsection{Finding $P_0$}
 
-To determine $P_0$, two constructions will be used. In both cases, we
-start from the $\ell$-th cyclotomic polynomial $\Cyc_\ell \in
-\Z[X_0]$. The first step consists in factoring $\Cyc_\ell$ over
-$\F_q[X_0]$: by~\cite[Th.~9]{shoup94}, this takes
-$O_e(\Mult(\ell)\log(\ell q))$ operations in $\F_q$.
+To determine $P_0$, we compute the $\ell$-th cyclotomic polynomial
+$\Cyc_\ell \in \Z[X_0]$ and factor it over $\F_q[X_0]$:
+by~\cite[Th.~9]{shoup94}, this takes $O_e(\Mult(\ell)\log(\ell q))$
+operations in $\F_q$.
 
 Over $\F_q[X_0]$, $\Cyc_\ell$ splits into irreducible factors of the
 same degree $r$, where $r$ is the order of $q$ in $\Z/\ell\Z$ (so $r$
 divides $\ell-1$); let $F_0$ be one of these factors. By construction,
 there exist non $\ell$-adic residues in $\F_q[X_0]/\langle F_0
-\rangle$. Once such a non-residue $\eta$ is found, we simply let $P_0$
+\rangle$. Once such a non-residue $y_0$ is found, we simply let $P_0$
 be its minimal polynomial over $\F_q$ (which still has degree $r$);
-given $\eta$, computing $P_0$ takes $O(r^2)$ operations in $\F_q$.
+given $y_0$, computing $P_0$ takes $O(r^2)$ operations in $\F_q$.
 
-To find $\eta$, the approach in~\cite{Shoup90,
-  shoup94,couveignes+lercier11} consists in picking it at random: we
-expect to find a non-residue after $O(1)$ trials;
-by~\cite[Lemma~15]{shoup94}, each takes
+Following~\cite{Shoup90,shoup94,couveignes+lercier11}, we find $y_0$
+by picking it at random: we expect to find a non-residue after $O(1)$
+trials; by~\cite[Lemma~15]{shoup94}, each takes
 $O_e(\Mult(\ell)\log(r)+\Mult(r)\log(\ell)\log(r)+\Mult(r)\log(q))$
-operations in $\F_q$.
-
-An alternative idea, due to Lenstra and De Smit, is to take iterated
-$\ell$-th roots of $X_0 \bmod F_0$ until we find a non-residue.  Non
-$\ell$-adic residues have order a multiple of $\ell^\kappa$, where
-$\kappa$ is the $\ell$-adic valuation of $(q^r-1)$. Because $X_0 \bmod
-F_0$ has order $\ell$, we take $\kappa-1$ successive $\ell$-th roots
-modulo $F_0$ until hitting a non-residue $\eta$. Using a root-finding
-algorithm for the polynomial $Y^\ell-\eta$, each root extraction takes
-$O_e(\Mult(\ell)\log(\ell q))$ operations modulo
-$F_0$~\cite[Ch~14]{vzGG}.
+operations in $\F_q$. An alternative idea, due to Lenstra and De Smit,
+is to take iterated $\ell$-th roots of $X_0 \bmod F_0$ until we find a
+non-residue.  Their approach allows for constructing the towers in a
+canonical way, but its complexity is worse, thus we will not consider
+it.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -392,19 +384,17 @@ divides $q-1$; the (classical) facts below give the first row of
 Table~\ref{table:main}.
 
 In this case, $\Phi_\ell$ splits into linear factors over $\F_q$ (that
-is, $r=1$). The polynomial $P_0$ is of the form $Y_0-\eta$, where
-$\eta$ is a non $\ell$-adic residue in $\F_q$. In this case, we simply
-find $\eta$ by random trial in $\F_q$, as no gain is to be found from
-the more specific choice used by Lenstra-De Smit. Since we can bypass
+is, $r=1$). The polynomial $P_0$ is of the form $Y_0-y_0$, where
+$y_0$ is a non $\ell$-adic residue in $\F_q$.  Since we can bypass
 the factorization of $\Phi_\ell$, the cost of initialization is
-$O_e(\Mult(\ell)+\log(q))$ operations in $\F_q$.
+$O_e(\log(q))$ operations in $\F_q$.
 
 Then, no descent is required. For $i \ge 0$, we have
 $\K_i=\F_{q^{\ell^i}}$ and $x_i=y_i$; the families of polynomials we
 obtain are
 \begin{equation}
   \label{eq:T1}
-  Q_i=X_i^{\ell^i}-\eta \quad\text{and}\quad T_i=X_{i}^\ell-X_{i-1}.
+  Q_i=X_i^{\ell^i}-y_0 \quad\text{and}\quad T_i=X_{i}^\ell-X_{i-1}.
 \end{equation}
 Lifting amounts to taking $F = \sum_{0 \le j < \ell^{i+1}} f_j
 x_{i+1}^j$ and rewriting it as a bivariate polynomial in
@@ -421,167 +411,59 @@ use only exponent arithmetic, and no operation in~$\F_q$.
 
 Next, we consider the case where $\ell$ divides $q+1$, so that
 $\Phi_\ell$ splits into quadratic factors over $\F_q$ (that is,
-$r=2$). In this case, we use Lenstra and De Smit's construction of
-$P_0$; since $r=2$, and using the bound $\kappa=O(\log(q))$ given in
-the proof of the following lemma, we deduce that the initialization
-takes $O_e(\Mult(\ell)\log(\ell q)\log(q))$ operations in $\F_q$.
+$r=2$). In addition to the previous assumptions, we require that $y_0$
+has norm $1$ over $\F_q$. We can immediately give an expression for
+the polynomials $Q_{i,j}$.
 
-\begin{lemma}
-  \label{th:T2-norm}
-  For $i \ge 0$, $x_i = y_i +y_i^{-1}$.
-\end{lemma}
-\begin{proof}
-  By definition, $x_i=y_i+y_i^{q^{\ell^i}}$. Note that in the Lenstra-De
-  Smit construction, $y_0$ has order $\ell^{\kappa}$, where $\kappa$
-  is the $\ell$-adic valuation of $q^r-1$. Thus, $y_i$ has order
-  $\ell^{i+\kappa}$, so to conclude, it is enough to prove that
-  $\ell^{i+\kappa}$ divides $q^{\ell^i}+1$.
-
-  Because $\ell$ divides $q+1$, $q+1$ and $q^{2n}-1$ have the same
-  $\ell$-adic valuation for all positive integers $n$ not divisible by
-  $\ell$. In particular, $\kappa$ is the $\ell$-adic valuation of
-  $q+1$, so that $\ell^\kappa$ divides $q+1$, and an induction on $i$
-  finishes the proof.
-\end{proof}
-
-From this, we will show how to compute the polynomials $Q_{i,j}$, and
-in particular $Q_{i,0}=Q_i$ and $Q_{i,i-1}=T_i(x_{i-1},X_i)$; we leave
-the algorithms for lift and push to Section~\ref{sec:lift-push}.
-
-
-\begin{corollary}
+\begin{proposition}
   \label{th:T2-resultant}
   For $1 \le j < i$, $Q_{i,j} \in \F_q(x_{j})[X_i]$ satisfies
-  \begin{equation*}
+  \begin{equation}
     \label{eq:T2-relpols}
+    Q_{i,j}(X_i) = Y^{\ell^{i-j}} + Y^{-\ell^{i-j}} - x_j \mod Y^2-X_iY+1
+  \end{equation}
+\end{proposition}
+\begin{proof}
+  By hypothesis, $\Norm_{\K_0/\F_q}(y_0)=1$. Hence,
+  $\Norm_{\K_i/\F_q(x_i)}(y_i)$ is an $\ell^i$-th root of unity. But $\ell$
+  does not divide $q-1$, so $1$ is the only such root in $\F_q$, and
+  by induction on $i$ it also is the only root in $\F_q(x_i)$.
+
+  Hence, the minimal polynomial of $y_i$ over $\F_q(x_i)$ is $Y_i^2
+  -x_i Y_i +1$.  By composition, it follows that the minimal
+  polynomial of $y_i$ over $\F_q(x_{j})$ is $Y_i^{2\ell^{i-j}}-x_{j}
+  Y_i^{\ell^{i-j}}+1$. Eliminating $Y_i$ between these two polynomials
+  gives the following relation between $x_{j}$ and $x_i$:
+  \begin{equation*}
     Q_{i,j}(X_i)^2 = \mathrm{Res}_{Y_i}(Y_i^{2\ell^{i-j}}-x_{j}Y_i^{\ell^{i-j}}+1,\; Y_i^2-X_i Y_i+1).
   \end{equation*}
-\end{corollary}
-\begin{proof}
-  The previous lemma shows that the minimal polynomial of $y_i$ over
-  $\F_q(x_i)$ is $Y_i^2 -x_i Y_i +1$. By composition, it follows that
-  the minimal polynomial of $y_i$ over $\F_q(x_{j})$ is
-  $Y_i^{2\ell^{i-j}}-x_{j} Y_i^{\ell^{i-j}}+1$. Eliminating $Y_i$ between
-  these two polynomials will give the required relation between
-  $x_{j}$ and $x_i$. Explicitly, the resultant above 
-  is equal to
-\begin{align*}
-   \prod_{\sigma\in\Gal_{\K_i/\F_q(x_{j})}}
-  (y_i^2 - X_i y_i + 1)^\sigma \\
-  % 
-  =\Norm_{\K_i/\F_q(x_{j})}(y_i) \prod_{\sigma\in\Gal_{\K_i/\F_q(x_{j})}} 
-  (y_i + y_i^{-1} - X_i)^\sigma \\
-  % 
-  =\left(\prod_{\sigma\in\Gal_{\K_i/\F_q(x_{j})}/\langle\tau\rangle}
-    (x_i - X_i)^\sigma\right)^2 \\
-  % 
-  =\left(\prod_{\sigma\in\Gal_{\F_q(x_i)/\F_q(x_{j})}}
-    (x_i - X_i)^\sigma\right)^2 =Q_{i,j}(X_i)^2,
-\end{align*}
-where the third equality is true because
-$\Norm_{\K_i/\F_q(x_{j})}(y_i)=1$, as seen from the minimal polynomial of
-$y_i$, and where $\tau$ is the element of
-$\Gal_{\K_i/\F_q(x_{j})}$ such that $\tau:y_i\mapsto y_i^{-1}$.
+  Eq.~\eqref{eq:T2-relpols}.
+  % Explicitly, the resultant above is equal to
+  % \begin{align*}
+  %   \prod_{\sigma\in\Gal_{\K_i/\F_q(x_{j})}}
+  %   (y_i^2 - X_i y_i + 1)^\sigma \\
+  %   % 
+  %   =\Norm_{\K_i/\F_q(x_{j})}(y_i) \prod_{\sigma\in\Gal_{\K_i/\F_q(x_{j})}} 
+  %   (y_i + y_i^{-1} - X_i)^\sigma \\
+  %   % 
+  %   =\left(\prod_{\sigma\in\Gal_{\K_i/\F_q(x_{j})}/\langle\tau\rangle}
+  %     (x_i - X_i)^\sigma\right)^2 \\
+  %   % 
+  %   =\left(\prod_{\sigma\in\Gal_{\F_q(x_i)/\F_q(x_{j})}}
+  %     (x_i - X_i)^\sigma\right)^2 =Q_{i,j}(X_i)^2,
+  % \end{align*}
+  % where the third equality is true because
+  % $\Norm_{\K_i/\F_q(x_{j})}(y_i)=1$, as seen from the minimal polynomial of
+  % $y_i$, and where $\tau$ is the element of
+  % $\Gal_{\K_i/\F_q(x_{j})}$ such that $\tau:y_i\mapsto y_i^{-1}$.
+  By direct calculation, this is equivalent to
 \end{proof}
 
-Thus, given a field $\K$, $z \in \K$ and $n \in \N$, we just need to
-show how to compute
-\begin{equation*}
-  Q(X) = \sqrt{\mathrm{Res}_Y(Y^{2 n}-z Y^n+1, Y^2-XY+1)}.
-\end{equation*}
-Let $\zeta$ and $\zeta^{-1}$ be the two roots of $Y^2-XY+1$ over an
-algebraic closure of $\K(X)$. By a direct calculation, we find
-\begin{equation}
-  \label{eq:T2-minpols}
-  Q(X) = \zeta^n + \zeta^{-n} - z.
-\end{equation}
-As a result, $Q$ can be computed in $O(\Mult(n))$ operations in $\K$,
-using repeated squaring modulo $Y^2-XY+1$. In particular, taking
-$n=\ell^i$ and returning to our initial problem, $Q_i$ can be computed
-in time $O(\Mult(\ell^i))$. 
-
-We now present a better solution. For $n \in \N$, the term
-$P_{n}=\zeta^{n} + \zeta^{-n}$ is the $n$-th power sum of $Y^2-XY+1$,
-thus, using Newton's identities,
-\begin{equation}
-  \label{eq:simple}
-  \begin{aligned}
-    P_0 &= 2,\\
-    P_1 &= X,\\
-    P_{n+1} &= X P_{n} - P_{n-1}.
-  \end{aligned}
-\end{equation}
-Writing $P_n = \sum_i c_{n,i}X^{n-i}$, we deduce the relation
-\begin{equation}
-  c_{n,i} = c_{n-1,i} - c_{n-2,i-2}.
-\end{equation}
-%% We arrange these coefficients like in Pascal's triangle:
-%% \begin{equation}
-%%   \begin{tabular}{*{8}{c@{}}}
-%%     &&&2\\
-%%     &&1&&0\\
-%%     &1&&0&&-2\\
-%%     1&&0&&-3&&0
-%%   \end{tabular}
-%% \end{equation}
-%% It is then evident that every second column is identically zero, and
-%% that signs alternate in odd columns. 
-Removing the odd values of $i$ and taking absolute values, the new
-coefficients $b_{n,k}=\lvert c_{n+k,2k}\rvert$ satisfy the relation
-\begin{equation*}
-  b_{n,k} = b_{n-1,k} + b_{n-1,k-1},
-\end{equation*}
-which is the same as Pascal's relation. Indeed, we obtain the
-$(1,2)$-Pascal triangle, also called Lucas'
-triangle~\cite{benjamin10}:
-%% \begin{equation*}
-%%   \begin{tabular}{*{8}{c@{}}}
-%%     &&&2\\
-%%     &&1&&2\\
-%%     &1&&3&&2\\
-%%     1&&4&&5&&2
-%%   \end{tabular}
-%% \end{equation*}
-a special case of this fact was proven by Gauss, and the general proof
-is in~\cite[Prop.~1]{gurak06}. As is well-known, the coefficients of
-Lucas' triangle are related to those of Pascal's by
-\begin{equation}
-  \label{eq:lucas-tri}
-  b_{n,k} = \binom{n}{k} + \binom{n-1}{k-1} = \frac{n+k}{n}\binom{n}{k}.
-\end{equation}
-By using Eq.~\eqref{eq:lucas-tri} and the sign alternation property,
-we obtain 
-\begin{gather}
-  c_{n,2k} = (-1)^kb_{n-k,k} = (-1)^k\frac{n}{n-k}\binom{n-k}{k},\\
-  \label{eq:lucas-recurrence}
-  \frac{c_{n,2k+2}}{c_{n,2k}} = 
-  -\frac{(n-2k)(n-2k-1)}{(n-k-1)(k+1)}.
-\end{gather}
-This gives a formula to compute all the coefficients of $Q_{i}$ using
-$O(\ell^{i})$ operations in $\F_p$, and similarly for $T_i$ (since we know
-the results are the image mod $p$ of integers, we compute 
-the $c_{n,2k}$ using multiplications and divisions in $\Q_p$ with
-relative precision 1).
-
-%% Eq.~\eqref{eq:lucas-recurrence} gives a formula to compute all the
-%% coefficients of $Q_{i,j}$ using $O(\ell^{j-i})$ operations in $\F_p$. By
-%% performing the same computation in the ring of $p$-adic integers with
-%% just one digit of floating precision, it is possible to compute
-%% $Q_{i,j}\bmod p$ using $O(\ell)$ operations in $\F_p$.
-
-%% One remarkable property of the Lucas triangle is that the
-%% anti-diagonals sum up to the Lucas numbers:
-%% \begin{equation}
-%%   \sum_{k\ge0} b_{n-k,k} = \sum_{k\ge0} \lvert c_{n,2k}\rvert = L_n.
-%% \end{equation}
-%% A funny consequence of this property is the following equality on
-%% complex numbers
-%% \begin{equation}
-%%   \label{eq:lucas-fun}
-%%   p_\ell(i) = \sum_{k\ge0} c_{\ell,k}i^{\ell-k} = i^\ell L_\ell.
-%% \end{equation}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+This proposition allows us to compute $Q_{i,j}$ in time
+$O(\Mult(\ell^{i-j}))$. In Section~\ref{ssec:fibers-T2}, we will use
+arithmetic geometry to give a better algorithm, and to efficiently
+find a $y_0$ satisfying the hypotheses. We leave the algorithms for
+lift and push to Section~\ref{sec:lift-push}.
 
 \subsection{The general case}
 
@@ -744,7 +626,7 @@ indefinitely, the sequence of extensions makes an $\ell$-adic tower over $\F_q$.
 
 
 \subsection{Towers from algebraic tori}
-
+\label{ssec:fibers-T2}
 In~\cite{couveignes+lercier11}, Couveignes and Lercier explain how
 their idea yields the tower of Section~\ref{ssec:T1}. Consider the
 multiplicative group $\mathbb{G}_m/\F_q$, it is an algebraic group of
@@ -753,11 +635,12 @@ by $\phi:X\mapsto X^\ell$ is a degree $\ell$ algebraic endomorphism of
 $\mathbb{G}_m$, surjective over the algebraic closure.
 
 Suppose that $\ell$ divides $q-1$, and let $\eta$ be a non $\ell$-adic
-residue in $\F_q$. For any $i>0$, the fibers $\phi^{-i}(\eta)$ consist
-of $\ell^i$ elements of $\bar{\F}_q$, and the function
-$X^{\ell^i}-\eta$ vanishes on them. We have already discussed in
-Section~\ref{sec:LDtower} how to compute in the $\ell$-adic tower
-defined by the polynomials $X_i^{\ell^i}-\eta$.
+residue in $\F_q$ ($\eta$ plays here the same role as $y_0$ in
+Section~\ref{sec:LDtower}). For any $i>0$, the fibers
+$\phi^{-i}(\eta)$ consist of $\ell^i$ elements of $\bar{\F}_q$, and
+the function $X^{\ell^i}-\eta$ vanishes on them. We have already
+discussed in Section~\ref{sec:LDtower} how to compute in the
+$\ell$-adic tower defined by the polynomials $X_i^{\ell^i}-\eta$.
 
 More generally, let $\F_{q^n}/\F_q$ be a finite extension, we define
 its \emph{maximal torus} as
@@ -770,148 +653,222 @@ This is a multiplicative subgroup of $\F_q^\ast$, and, by Weil
 descent, an algebraic group over $\F_q$. It has dimension $\euler(n)$,
 cardinality $\Phi_n(q)$, and is isomorphic to
 $\mathbb{G}_m^{\euler(n)}$ over the algebraic
-closure~\cite{rubin-silverberg+crypto03,rubin+silverberg03,voskresenskii98}.
+closure~\cite{rubin+silverberg03,voskresenskii98}.
 
 The construction of Section~\ref{ssec:T2} is obtained by considering
-the torus $T_2$.
+the torus $T_2$. This will allow us to fill some entries in
+Table~\ref{table:main}.
 
 \begin{lemma}
-  Let $x_i$ and $y_i$ be defined as in Section~\ref{ssec:T2}. The
-  maximal torus $T_2$ of $\F_q(y_i)/\F_q(x_i)$ is isomorphic to the
+  Let $\Delta\in\F_q$ be a quadratic non-residue if $p\ne2$, or such
+  that $\Tr_{\F_q/\F_2}\Delta=1$ otherwise. Let $\delta=\sqrt{\Delta}$
+  or $\delta^2+\delta=\Delta$ accordingly. The
+  maximal torus $T_2$ of $\F_q(\delta)/\F_q$ is isomorphic to the
   \emph{Pell conic}
   \begin{equation}
     \label{eq:Pell}
     C \;:\; 
     \begin{cases}
-      \alpha^2 - \Delta\beta^2 = 4 &\text{if $p\ne2$,}\\
-      \alpha^2\Delta + \alpha\beta + \beta^2 = 1 &\text{if $p=2$,}
-    \end{cases}
-  \end{equation}
-  where
-  \begin{equation}
-    \Delta =
-    \begin{cases}
-      4x_i^2-16 & \text{if $p\ne 2$,}\\
-      1/x_i^2   & \text{if $p=2$.}
+      x^2 - \Delta y^2 = 4 &\text{if $p\ne2$,}\\
+      x^2\Delta + xy + y^2 = 1 &\text{if $p=2$.}
     \end{cases}
   \end{equation}
   Multiplication in $T_2$ induces a group law on $C$. The neutral
   element is $(2,0)$ if $p\ne2$ or $(0,1)$ if $p=2$. The sum of two
-  points $P=(\alpha,\beta)$ and $Q=(\alpha',\beta')$ is defined
+  points $P=(x_1,y_1)$ and $Q=(x_2,y_2)$ is defined
   by
-  \begin{equation}
-    \label{eq:Pell-add}
+  \begin{equation*}
     P\oplus Q =
     \begin{cases}
-      \left(\frac{\alpha\alpha' + 4z_i^2\beta\beta'}{2},\; \frac{\alpha\beta' + \alpha'\beta}{2}\right) &
+      \displaystyle
+      \left(\frac{x_1x_2 + \Delta y_1y_2}{2},\; \frac{x_1y_2 + x_2y_1}{2}\right) &
       \text{if $p\ne2$,}\\
-      \left(\alpha\alpha' + \alpha\beta' + \alpha'\beta,\; \alpha\alpha'\Delta + \beta\beta'\right) &
+      \left(x_1x_2 + x_1y_2 + x_2y_1,\; x_1x_2\Delta + y_1y_2\right) &
       \text{if $p=2$.}
     \end{cases}
-  \end{equation}
+  \end{equation*}
 \end{lemma}
 \begin{proof}
-  Let $B$ be the vector space basis of $F_q(y_i)$ over $\F_q(x_i)$
-  defined as follows:
-  \begin{equation*}
-    B = (b_0, b_1) =
-    \begin{cases}
-      (1/2, y_i - y_i^{-1}) = (1/2, \sqrt{\Delta}/2) & \text{if $p\ne2$,}\\
-      (y_i/x_i, 1) & \text{if $p=2$.}
-    \end{cases}
-  \end{equation*}
-  
-  By virtue of Eq.~\eqref{eq:Tn}, an element $\alpha b_0 + \beta b_1$
-  belongs to $T_2$ if and only if $\Norm(\alpha b_0+\beta b_1)=1$,
-  which is equivalent to Eq.~\eqref{eq:Pell}.  The group law is
-  obtained by direct calculation.
+  The isomorphism follows by Weil descent with respect to the basis
+  $(1/2,\delta/2)$ if $p\ne2$, or $(\delta,1)$ if $p=2$. Indeed, by
+  virtue of Eq.~\eqref{eq:Tn}, an element $(x,y)$ of $\F_q(\delta)$
+  belongs to $T_2$ if and only if its norm over $\F_q$ is $1$.
+
+  Let $\sigma$ be the generator of $\Gal_{\F_q(\delta)/\F_q}$. For
+  $p=2$, clearly $\delta^\sigma=-\delta$. For $p\ne2$, by
+  Artin-Schreier theory
+  $\Tr_{\F_q(\delta)/\F_q}(\delta)=\Tr_{\F_q/\F_2}\Delta=1$, hence
+  $\delta^\sigma=1+\delta$. In both cases, Eq.~\eqref{eq:Pell}
+  follows.
+
+  The group law is obtained by direct calculation.
 \end{proof}
 
-Pell conics are a widely studied topic. They have applications in
-primality proving and
-factorization~\cite{lemmermeyer03,hambleton12}. As customary, we
-denote by $[n](\alpha,\beta)$ the $n$-th scalar multiple of a point
-$(\alpha,\beta)$.
+Pell conics are a well understood object. They have applications in
+primality proving, factorization~\cite{lemmermeyer03,hambleton12} and
+cryptography~\cite{rubin-silverberg+crypto03}. As customary, we denote
+by $[n](x,y)$ the $n$-th scalar multiple of a point
+$(x,y)$.
 
-\begin{proposition}
+\begin{lemma}
   \label{th:T2-divpol}
   Suppose $(n,p)=1$, then $[n]$ is a separable endomorphism of $C$ of
   degree $n$, given by the rational maps
   \begin{equation}
     \label{eq:Pell-rec}
-    [n](\alpha,\beta) = 
+    [n](x,y) = 
     \begin{cases}
-      \bigr(P_n(\alpha), \beta R_n(\alpha)\bigl) & \text{if $p\ne2$,}\\
-      \bigr(P_n(\alpha), \beta R_n(\alpha) + R_{n-1}(\alpha)\bigl) & \text{if $p=2$.}      
+      \bigr(P_n(x), y R_n(x)\bigl) & \text{if $p\ne2$,}\\
+      \bigr(P_n(x), y R_n(x) + R_{n-1}(x)\bigl) & \text{if $p=2$.}      
     \end{cases}
   \end{equation}
-  where $P_n$ is defined as in Eq.~\eqref{eq:simple}, and $R_n$ is
-  defined by
-  \begin{equation}
-    \label{eq:fibonacci}
-    \begin{aligned}
-      R_0 &= 0,\\
-      R_1 &= 1,\\
-      R_{n+1} &= XR_{n} - R_{n-1} = P_n + R_{n-1}.
-    \end{aligned}
-  \end{equation}
-\end{proposition}
+  where $P_n$ and $R_n$ are defined by the initial values
+  \begin{align*}
+    P_0 &= 2,\qquad P_1=X,\\
+    R_0 &= 0,\qquad R_1=1,
+  \end{align*}
+  and by the same recurrence $u_{n+1} = Xu_{n} - u_{n-1}$.
+\end{lemma}
 \begin{proof}
   We know that $C\isom\mathbb{G}_m$, thus $C[n]\isom\Z/n\Z$ and $[n]$
   is separable of degree $n$. Eq.~\eqref{eq:Pell-rec} is shown by
-  induction using Eq.~\eqref{eq:Pell-add}.
+  induction using Eq.~\eqref{eq:Pell} and the group law.
 \end{proof}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 \begin{theorem}
   \label{th:T2-irred}
-  Let $P=(\alpha,\beta)$ be a point on $C/\F_q$ of order
-  divisible by $\ell^\kappa$, where $\kappa$ is the $\ell$-adic
-  valuation of $q+1$.  For any $i>0$, the polynomials
-  $P_{\ell^i}-\alpha$ are irreducible.
+  Let $\eta\in\F_q(\delta)$ be a non $\ell$-adic residue in $T_2$,
+  corresponding to a point $P=(\alpha,\beta)$ of $C/\F_q$. For any
+  $i>0$, the polynomials $P_{\ell^i}-\alpha$ are irreducible; their
+  roots are the abscissas of the $\ell^i$-th roots of $\eta$.
 \end{theorem}
 \begin{proof}
-  Let $Q$ be a point such that $[\ell^i]Q=P$. By definition, $Q$ has
-  order divisible by $\ell^{i+\kappa}$, hence,
-  by~\cite[Th.~VI.9.1]{lang}, it is defined in
-  $\F_{q^{\ell^i}}$. Hence, by Prop.~\ref{th:T2-divpol}, the fiber
-  $[\ell^i]^{-1}(P)$ is irreducible over $\F_q$ and contains $\ell^i$
-  points.
+  By~\cite[Th.~VI.9.1]{lang}, the polynomial $X^{\ell^i}-\eta$ is
+  irreducible. Its roots form fiber $[\ell^i]^{-1}(P)$, and the Galois
+  group of $\F_{q^{\ell^i}}/\F_q$ acts transitively on them.
 
-  We project this fiber onto the $\alpha$-coordinate. By
-  Eq.~\eqref{eq:Pell-add}, two points of $C$ have the same
-  $\alpha$-coordinate if and only if they are opposite. But
-  $\kappa\ge1$, thus $P\ne-P$, hence all the points in
-  $[\ell^i]^{-1}(P)$ have distinct $\alpha$-coordinates. We deduce
-  that $P_{\ell^i}-\alpha$ is separable and, thus, irreducible.
+  Two points of $C$ have the same abscissa if and only if they are
+  opposite. But $\eta\ne\eta^{-1}$, hence all the points in
+  $[\ell^i]^{-1}(P)$ have distinct abscissa, and the Galois group of
+  $\F_{q^{\ell^i}}/\F_q$ acts transitively on them.  
+
+  By Lemma~\ref{th:T2-divpol}, $P_{\ell^i}-\alpha$ vanishes on the
+  abscissas of $[\ell^i]^{-1}(P)$ and is thus irreducible.
 \end{proof}
 
-Observe that the theorem above implies Corollary~\ref{th:T2-resultant}
-by choosing $y_0$ as starting point $P$. So, this construction yields
-the same tower as in Sec.~\ref{ssec:T2}, except for the initialization
-point.
+We can now apply our results to the computation of the polynomials
+$Q_i$ and $T_i$ of Section~\ref{ssec:T2}.
+
+\begin{corollary}
+  The polynomials $Q_{i,j}$ of Prop.~\ref{th:T2-resultant}
+  satisfy
+  \begin{equation*}
+    Q_{i,j}(X_i) = P_{\ell^{i-j}}(X_i) - x_j.
+  \end{equation*}
+\end{corollary}
+\begin{proof}
+  We have already shown that $\Norm_{\K_j/\F_q(x_j)}(y_j)=1$ for any
+  $j$, thus $y_j$ is a non $\ell$-adic residue in
+  $T_2/\F_q(x_j)$. Independently of the characteristic and of the
+  element $\Delta\in\F_q(x_j)$ chosen, the abscissa of the image of
+  $y_j$ in $C/\F_q(x_j)$ is $\Tr_{\K_j/\F_q(x_j)}y_j=x_j$. The
+  statement follows from the previous theorem.
+\end{proof}
+
+\begin{corollary}
+  The polynomials $Q_{i,j}$ can be computed using $O(\ell^{i-j})$
+  operations.
+\end{corollary}
+\begin{proof}
+  From the previous corollary, it is enough to compute $P_n$ using
+  $O(n)$ operations. We write $P_n = \sum_i c_{n,i}X^{n-i}$, and deduce the
+  relation
+  \begin{equation}
+    c_{n,i} = c_{n-1,i} - c_{n-2,i-2}.
+  \end{equation}
+  %% We arrange these coefficients like in Pascal's triangle:
+  %% \begin{equation}
+  %%   \begin{tabular}{*{8}{c@{}}}
+  %%     &&&2\\
+  %%     &&1&&0\\
+  %%     &1&&0&&-2\\
+  %%     1&&0&&-3&&0
+  %%   \end{tabular}
+  %% \end{equation}
+  %% It is then evident that every second column is identically zero, and
+  %% that signs alternate in odd columns. 
+  From the initialization of $P_n$, it is immediate that $c_{n,i}=0$
+  for $i$ odd, and that signs alternate for $i$ even. We remove the
+  odd values of $i$ and take absolute values; the new coefficients
+  $b_{n,k}=\lvert c_{n+k,2k}\rvert$ satisfy the relation
+  \begin{equation*}
+    b_{n,k} = b_{n-1,k} + b_{n-1,k-1},
+  \end{equation*}
+  which is the same as Pascal's relation. Indeed, we obtain the
+  $(1,2)$-Pascal triangle, also called Lucas'
+  triangle~\cite{benjamin10}.
+  %% \begin{equation*}
+  %%   \begin{tabular}{*{8}{c@{}}}
+  %%     &&&2\\
+  %%     &&1&&2\\
+  %%     &1&&3&&2\\
+  %%     1&&4&&5&&2
+  %%   \end{tabular}
+  %% \end{equation*}
+  In the same way, we can prove that the even coefficients of $R_n$
+  correspond to the anti-diagonals of Pascal's triangle with
+  alternating signs.
+  
+  As is well-known, the coefficients of
+  Lucas' triangle are related to those of Pascal's by
+  \begin{equation}
+    \label{eq:lucas-tri}
+    b_{n,k} = \binom{n}{k} + \binom{n-1}{k-1} = \frac{n+k}{n}\binom{n}{k}.
+  \end{equation}
+  By using Eq.~\eqref{eq:lucas-tri} and the sign alternation property,
+  we obtain 
+  \begin{equation*}
+    %c_{n,2k} = (-1)^kb_{n-k,k} = (-1)^k\frac{n}{n-k}\binom{n-k}{k},\\
+    \frac{c_{n,2k+2}}{c_{n,2k}} = 
+    -\frac{(n-2k)(n-2k-1)}{(n-k-1)(k+1)}.
+  \end{equation*}
+  The last equation gives the formula to compute all the coefficients
+  of $P_n$ using $O(n)$ operations in $\F_p$ (since we know the
+  results are the image mod $p$ of integers, we compute the $c_{n,2k}$
+  using multiplications and divisions in $\Q_p$ with relative
+  precision 1).
+\end{proof}
+
+We are left with the problem of finding the non $\ell$-adic residue
+$\eta$ to initialize the tower. As before, this will be done by random
+sampling and testing.
 
 \begin{lemma}
   \label{th:montgomery}
-  Let $P=(\alpha,\beta)$ be a point on $C$. For any $n$, the
-  $\alpha$-coordinate of $[\pm n]P$ can be computed without knowledge of
-  $\beta$ using $O(\log n)$ operations in $\F_q$.
+  Let $P=(\alpha,\beta)$ be a point on $C$. For any $n$, the abscissa of $[\pm
+  n]P$ can be computed without knowledge of its ordinate using $O(\log
+  n)$ operations in $\F_q$.
 \end{lemma}
 \begin{proof}
-  Observe that if $n=2$, the $\alpha$-coordinate of $[\pm 2]P$ is
-  $\alpha^2-2$ (for any $p$).  Let $P'=(\alpha,\beta)$, and let
-  $\gamma$ be the $\alpha$-coordinate of $P\ominus P'$, by direct
-  computation we find that the $\alpha$-coordinate of $P\oplus P'$ is
-  $\alpha\alpha'-\gamma$ (for any $p$); this formula is called a
-  \emph{differential addition}.
+  Observe that if $n=2$, the abscissa of $[\pm 2]P$ is $\alpha^2-2$
+  (for any $p$).  Let $P'=(\alpha',\beta')$, and let $\gamma$ be the
+  abscissa of $P\ominus P'$. by direct computation we find that the
+  abscissa of $P\oplus P'$ is $\alpha\alpha'-\gamma$ (for any $p$);
+  this formula is called a \emph{differential addition}.
 
   In conclusion $O(1)$ operations are needed for a doubling or a
-  differential addition. To compute the $\alpha$-coordinate of $[\pm
-  n]P$, we use the ladder algorithm of~\cite{montgomery}, requiring
-  $O(\log n)$ doublings and differential additions.
+  differential addition. To compute the abscissa of $[\pm n]P$, we use
+  the ladder algorithm of~\cite{montgomery}, requiring $O(\log n)$
+  doublings and differential additions.
 \end{proof}
 
 \begin{proposition}
-  The $\alpha$ coordinate of a point $P\in C/\F_q$ satisfying the
+  The abscissa of a point $P\in C/\F_q$ satisfying the
   conditions of Theorem~\ref{th:T2-irred} can be found using $O_e(\log
   q)$ operations in $\F_q$.
 \end{proposition}
@@ -919,19 +876,20 @@ point.
   We randomly select $\alpha\in\F_q$ and test that it belongs to
   $C$. If $p\ne2$, this amounts to testing that $\alpha^2-4$ is a
   quadratic non-residue in $\F_q$, a task that can be accomplished
-  with $O(\log q)$ operations. If $p=2$, by Artin-Schreier theory,
-  this is equivalent to $\Tr_{\F_q/\F_2}(\Delta+1/\alpha^2)=0$; with a
+  with $O(\log q)$ operations. If $p=2$, by Artin-Schreier theory
+  this is equivalent to $\Tr_{\F_q/\F_2}(1/\alpha^2)=1$. With a
   naive algorithm, the trace can be computed using $O(\log q)$
   operations in $\F_q$.
 
-  Then we check that the order of $P$ is divisible by $\ell^\kappa$ by
-  verifying that $[(q+1)/\ell]P$ is not the group identity. By
+  Then we check that $P$ is a non $\ell$-adic residue by verifying
+  that $[(q+1)/\ell]P$ is not the group identity. By
   Lemma~\ref{th:montgomery}, this computation requires $O(\log q)$
   operations.
 
   About half of the points of $\F_q$ are quadratic non-residues, and
   about $1-1/\ell$ of them are the abscissas of points with the
-  required order, thus we expect to find $\alpha$ after $O_e(1)$ trials.
+  required order, thus we expect to find the required element after
+  $O_e(1)$ trials.
 \end{proof}
 
 It is natural to ask whether a similar construction could be applied
@@ -941,11 +899,11 @@ problems. First, multiplication by $\ell$ is now a degree
 $\ell^{\euler(r)}$ map, thus its fibers have too many points and are
 not going to be irreducible in general. Second, it is an open question
 whether $T_r$ can be parameterized using $\euler(r)$ coordinates; but
-even assuming it can be, we are still faced with the problem of
-projecting a set embedded in a $\euler(r)$-dimensional space onto a
-linear form, a task not known to be computable in quasi-linear
-time. Studying this problem is another natural follow-up to the
-present work.
+even assuming it can be, we are still faced with the computation of a
+univariate annihilating polynomial for a set embedded in a
+$\euler(r)$-dimensional space, a problem not known to be computable in
+quasi-linear time. Studying this generalization is another natural
+follow-up to the present work.
 
 
 \subsection{Towers from elliptic curves}
