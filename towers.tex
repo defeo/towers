@@ -89,7 +89,8 @@ $$
   \hline \hline
   q = 1 \bmod \ell & O_e(\log(q))  & O(\ell^i) & O(\ell^i) \\
   q = -1 \bmod \ell & O_e(\log(q)) & O(\ell^i) & O(\Mult(\ell^i) \log(\ell^i)) \\
-  - & O_e (\ell^2+\Mult(\ell) \log(q)) & O(i^2\Mult(\ell^{i+1})\Mult(\ell)\log(\ell)^2) & O(i \Mult(\ell^{i+1})\Mult(\ell)\log(\ell))
+  - & O_e (\ell^2+\Mult(\ell) \log(q)) & O(i^2\Mult(\ell^{i+1})\Mult(\ell)\log(\ell)^2) & O(i \Mult(\ell^{i+1})\Mult(\ell)\log(\ell))\\
+  \ell \ll q^{1/4} & ?? & O(\Mult(\ell^i) \log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) 
 \end{array}
 $$
 \label{table:main}
@@ -437,7 +438,6 @@ the polynomials $Q_{i,j}$.
   \begin{equation*}
     Q_{i,j}(X_i)^2 = \mathrm{Res}_{Y_i}(Y_i^{2\ell^{i-j}}-x_{j}Y_i^{\ell^{i-j}}+1,\; Y_i^2-X_i Y_i+1).
   \end{equation*}
-  Eq.~\eqref{eq:T2-relpols}.
   % Explicitly, the resultant above is equal to
   % \begin{align*}
   %   \prod_{\sigma\in\Gal_{\K_i/\F_q(x_{j})}}
@@ -457,6 +457,7 @@ the polynomials $Q_{i,j}$.
   % $y_i$, and where $\tau$ is the element of
   % $\Gal_{\K_i/\F_q(x_{j})}$ such that $\tau:y_i\mapsto y_i^{-1}$.
   By direct calculation, this is equivalent to
+  Eq.~\eqref{eq:T2-relpols}.
 \end{proof}
 
 This proposition allows us to compute $Q_{i,j}$ in time
@@ -749,8 +750,8 @@ $(x,y)$.
 \end{theorem}
 \begin{proof}
   By~\cite[Th.~VI.9.1]{lang}, the polynomial $X^{\ell^i}-\eta$ is
-  irreducible. Its roots form fiber $[\ell^i]^{-1}(P)$, and the Galois
-  group of $\F_{q^{\ell^i}}/\F_q$ acts transitively on them.
+  irreducible. Its roots form the fiber $[\ell^i]^{-1}(P)$, and the
+  Galois group of $\F_{q^{\ell^i}}/\F_q$ acts transitively on them.
 
   Two points of $C$ have the same abscissa if and only if they are
   opposite. But $\eta\ne\eta^{-1}$, hence all the points in
@@ -786,8 +787,8 @@ $Q_i$ and $T_i$ of Section~\ref{ssec:T2}.
 \end{corollary}
 \begin{proof}
   From the previous corollary, it is enough to compute $P_n$ using
-  $O(n)$ operations. We write $P_n = \sum_i c_{n,i}X^{n-i}$, and deduce the
-  relation
+  $O(n)$ operations. We write $P_n = \sum_i c_{n,i}X^{n-i}$, from
+  Lemma~\ref{th:T2-divpol} we deduce that
   \begin{equation}
     c_{n,i} = c_{n-1,i} - c_{n-2,i-2}.
   \end{equation}
@@ -964,14 +965,13 @@ locus
   \quad\text{with $a,b\in\F_q$},
 \end{equation}
 plus one point at infinity. Under the former assumptions on $\ell$,
-there exists $e\ge1$ such that the $\ell$-Sylow subgroups of
-$E_i/\F_q$ are isomorphic to $\Z/\ell^e\Z$ for any $i$. We denote by
-$H_0$ the unique subgroup of $E_0/\F_q$ of order $\ell$, and by
-$\phi_0$ the unique isogeny whose kernel is $H_0$; we then label $E_1$
-the image curve of $\phi_0$. We go on denoting by $H_i$ the unique
-subgroup of $E_i/\F_q$ of order $\ell$, and by $\phi_i:E_i\to E_{i+1}$
-the unique isogeny with kernel $H_i$, until we get back to the
-starting point.
+there exists $e\ge1$ such that the $\ell$-torsion group of $E_i/\F_q$
+is isomorphic to $\Z/\ell^e\Z$ for any $i$. We denote by $H_0$ the
+unique subgroup of $E_0/\F_q$ of order $\ell$, and by $\phi_0$ the
+unique isogeny whose kernel is $H_0$; we then label $E_1$ the image
+curve of $\phi_0$. We go on denoting by $H_i$ the unique subgroup of
+$E_i/\F_q$ of order $\ell$, and by $\phi_i:E_i\to E_{i+1}$ the unique
+isogeny with kernel $H_i$, until we get back to the starting point.
 
 Vélu's formulas~\cite{velu71} allow us to express the isogenies
 $\phi_i$ as rational fractions
@@ -983,58 +983,37 @@ $\phi_i$ as rational fractions
 \end{equation}
 where $g_i$ is the square polynomial of degree $\ell-1$ vanishing on
 the abscissas of the affine points of $H_i$, and $f_i$ is a polynomial
-of degree $\ell$. Algorithmically, Vélu isogenies can be computed
-using $O(\Mult(\ell))$ operations in $\F_q$. 
+of degree $\ell$.
 
 In what follows, the index $i$ in $\phi_i$, $f_i$, $g_i$ and $E_i$ is
 to be understood modulo the length of the cycle. This is a slight
 abuse, because of some subtleties linked to Vélu's formulas and the
 way we consider curves up to isomorphism, but it does not hide any
-theoretical or computational difficulty.  For an arbitrary $i$, let
-$P$ be a point on $E_{i+1}$ of order divisible by $\ell^e$, Couveignes
-and Lercier show that its fiber by $\phi_i$ is irreducible of
-cardinality $\ell$. If the order of $P$ is not $2$, all the abscissas
-of its fiber are distinct; hence, if $\eta$ is the abscissa of $P$,
-the polynomial
-\begin{equation}
-  \label{eq:isog-fiber}
-  f_i(X) - g_i(X)\eta
-\end{equation}
-is irreducible of degree $\ell$. They also show that, under the same
-assumption on $\eta$, the system of equations
-\begin{equation}
-  \label{eq:elliptic}
-  \left|
-  \begin{aligned}
-    \textstyle
-    \frac{f_{i-j}}{g_{i-j}}(X_{j+1}) = X_j\quad\\
-    \vdots\qquad\\
-    \textstyle
-    \frac{f_{i-1}}{g_{i-1}}(X_2) &= X_1\\
-              &\textstyle\frac{f_i}{g_i}(X_1) &= \eta
-  \end{aligned}
-  \right.
-\end{equation}
-defines an $\ell$-adic closure of $\F_q$. By composing the relations,
-we have that
-\begin{equation}
-  \label{eq:elliptic-uni}
-  \frac{f_i}{g_i}\left(\frac{f_{i-1}}{g_{i-1}}\left(\cdots\frac{f_{i-j}}{g_{i-j}}(X)\right)\right) = \eta
-\end{equation}
-defines an extension of $\F_q$ of degree $\ell^{j+1}$. In the next
-section we show how to compute this relation efficiently.
+theoretical or computational difficulty.  
 
-\begin{corollary}
-  \sloppy
-  Let $y$ be the generator of $\F_{p^{\ell^i}}$ over
-  $\F_{p^{\ell^{i-1}}}$. Its minimal polynomial over $\F_p$ can be
-  computed using $O(\Mult(\ell^i)\log\ell^i)$ operations in $k$.
+\begin{theorem}[{\cite[Section~4]{couveignes+lercier11}}]
+  Under the former assumptions, let $E_i[\ell^e]\isom\Z/\ell\Z$,
+  let $P$ a point of $E_i$ of order divisible by $\ell^e$, and let
+  $\psi=\phi_{i-1}\circ\phi_{i-2}\circ\cdots\circ\phi_{j}$. The fiber
+  $\psi^{-1}(P)$ is irreducible and has cardinality $\ell^{i-j}$.
+\end{theorem}
+
+\begin{corollary}[{\cite[Section~4]{couveignes+lercier11}}]
+  Let $\eta\in\F_q$ be the abscissa of a point of $E_0$ of order
+  $\ell^e\ne 2$. The polynomials
+  \begin{align*}
+    T_0 &= f_{-1}(X_0) - \eta g_{-1}(X_0),\\
+    T_i &= f_{-i-1}(X_i) - X_{i-1} g_{-i-1}(X_i)
+  \end{align*}
+  define an $\ell$-adic closure of $\F_q$.
 \end{corollary}
-\begin{proof}
-  The composition can be computed using
-  Algorithm~\ref{alg:compose}. The complexity bound is proved in
-  Theorem~\ref{th:compose}.
-\end{proof}
+
+Using Vélu's formulas, the polynomials $T_i$ can be computed using
+$O(\Mult(\ell))$ operations in $\F_q$. The minimal polynomials $Q_i$
+of $X_i$ over $\F_q$ can be computed by composing the isogenies
+$\phi_{-1},\dots,\phi_{-i-1}$ using Algorithm~\ref{alg:compose}. This
+requires $O(\Mult(\ell^i)\log(\ell^i))$ operations as proved in the
+next section.
 
 \begin{remark}
   \label{rk:cycle}
