@@ -371,7 +371,7 @@ To find $\eta$, the approach in~\cite{Shoup90,
 expect to find a non-residue after $O(1)$ trials;
 by~\cite[Lemma~15]{shoup94}, each takes
 $O_e(\Mult(\ell)\log(r)+\Mult(r)\log(\ell)\log(r)+\Mult(r)\log(q))$
-operations in $\F_q$
+operations in $\F_q$.
 
 An alternative idea, due to Lenstra and De Smit, is to take iterated
 $\ell$-th roots of $X_0 \bmod F_0$ until we find a non-residue.  Non
@@ -431,7 +431,7 @@ takes $O_e(\Mult(\ell)\log(\ell q)\log(q))$ operations in $\F_q$.
   For $i \ge 0$, $x_i = y_i +y_i^{-1}$.
 \end{lemma}
 \begin{proof}
-  By definition, $x_i=y_i+y^{q^{\ell^i}}$. Note that in the Lenstra-De
+  By definition, $x_i=y_i+y_i^{q^{\ell^i}}$. Note that in the Lenstra-De
   Smit construction, $y_0$ has order $\ell^{\kappa}$, where $\kappa$
   is the $\ell$-adic valuation of $q^r-1$. Thus, $y_i$ has order
   $\ell^{i+\kappa}$, so to conclude, it is enough to prove that
@@ -454,14 +454,14 @@ the algorithms for lift and push to Section~\ref{sec:lift-push}.
   For $1 \le j < i$, $Q_{i,j} \in \F_q(x_{j})[X_i]$ satisfies
   \begin{equation*}
     \label{eq:T2-relpols}
-    Q_{i,j}(X_i)^2 = \mathrm{Res}_{Y_i}(Y_i^{2\ell^j}-x_{j}Y_i^{\ell^j}+1,\; Y_i^2-X_i Y_i+1).
+    Q_{i,j}(X_i)^2 = \mathrm{Res}_{Y_i}(Y_i^{2\ell^{i-j}}-x_{j}Y_i^{\ell^{i-j}}+1,\; Y_i^2-X_i Y_i+1).
   \end{equation*}
 \end{corollary}
 \begin{proof}
   The previous lemma shows that the minimal polynomial of $y_i$ over
   $\F_q(x_i)$ is $Y_i^2 -x_i Y_i +1$. By composition, it follows that
   the minimal polynomial of $y_i$ over $\F_q(x_{j})$ is
-  $Y_i^{2\ell^j}-x_{j} Y_i^{\ell^j}+1$. Eliminating $Y_i$ between
+  $Y_i^{2\ell^{i-j}}-x_{j} Y_i^{\ell^{i-j}}+1$. Eliminating $Y_i$ between
   these two polynomials will give the required relation between
   $x_{j}$ and $x_i$. Explicitly, the resultant above 
   is equal to
