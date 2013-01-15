@@ -1103,233 +1103,204 @@ section we show how to compute this relation efficiently.
   \end{enumerate}
 \end{remark}
 
-%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Lifting and pushing}
 \label{sec:lift-push}
 
-All the previous constructions of $\ell$-adic towers based on
-irreducible fibers share a common structure that allows us to treat
-lifting and pushing in a unified way. Arguably, this structure is
-likely to be common to any construction based on irreducible fibers of
-one-dimensional objects.
+The previous constructions of $\ell$-adic towers based on irreducible
+fibers share a common structure that allows us to treat lifting and
+pushing in a unified way. Renaming the variables $(X_{i-1},X_i)$ as
+$(X,Y)$, the polynomials $(Q_{i-1},Q_i,T_i)$ as $(R,S,T)$, the
+extension at level $i$ is described as
+$$\F_q[Y]/ \langle S(Y) \rangle \quad\text{and}\quad \F_q[X,Y]/\langle
+R(X), T(X,Y) \rangle,$$ with $R$ of degree $\ell^{i-1}$, $S$ of degree
+$\ell^i$, and where $T(X,Y)$ has the form $f(Y)-X g(Y)$, with $\deg(f)
+=\ell$, $\deg(g) < \ell$ and $\gcd(f,g)=1$; possibly, $g=1$. In all
+this section, $f$, $g$ and their degree $\ell$ are fixed.
 
-According to Eqs.~\eqref{eq:T1}, \eqref{eq:T2-minpols}
-and~\eqref{eq:elliptic}, the polynomials $Q_{i-1}$ are equivalent to
-the relation
-\begin{equation}
-  \label{eq:level-i}
-  \frac{F_{i-1}(x_{i-1})}{G_{i-1}(x_{i-1})} = \eta,
-\end{equation}
-where $F$ is a polynomial of degree $\ell^{i-1}$, $G$ is a polynomial
-of degree less than $\ell^{i-1}$ (eventually, $G=1$), and $\eta$ is an
-element of $\F_q$. Similarly, the polynomials $T_i$ are equivalent to
-the relation
-\begin{equation}
-  \label{eq:level-i+1}
-  \frac{f_i(x_i)}{g_i(x_i)} = x_{i-1},
-\end{equation}
-where $f$ is a polynomial of degree $\ell$, and $g$ is a polynomial of
-degree less than $\ell$ (eventually, $g=1$).  Using these relations,
-lift and push reduce to composition and decomposition of rational
-fractions, as we show next.
+%% According to Eqs.~\eqref{eq:T1}, \eqref{eq:T2-minpols}
+%% and~\eqref{eq:elliptic}, the polynomials $Q_{i-1}$ are equivalent to
+%% the relation
+%% \begin{equation}
+%%   \label{eq:level-i}
+%%   \frac{F_{i-1}(x_{i-1})}{G_{i-1}(x_{i-1})} = \eta,
+%% \end{equation}
+%% where $F$ is a polynomial of degree $\ell^{i-1}$, $G$ is a polynomial
+%% of degree less than $\ell^{i-1}$ (eventually, $G=1$), and $\eta$ is an
+%% element of $\F_q$. Similarly, the polynomials $T_i$ are equivalent to
+%% the relation
+%% \begin{equation}
+%%   \label{eq:level-i+1}
+%%   \frac{f_i(x_i)}{g_i(x_i)} = x_{i-1},
+%% \end{equation}
+%% where $f$ is a polynomial of degree $\ell$, and $g$ is a polynomial of
+%% degree less than $\ell$ (eventually, $g=1$).  
+
+Lift is the conversion from the bivariate basis associated to the
+right-hand side to the univariate basis associated to the left-hand side;
+push is the inverse. Using the special shape of the polynomial $T$,
+they reduce to composition and decomposition of rational functions, as
+we show next. These results fill in all missing entries in the lift / push 
+column of Table~\ref{table:main}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Lifting}
-We are faced with the following problem. We have polynomials $P$, $f$
-and $g$ with coefficients in a field $k$, and we want to compute the
-composition $P(f/g)$.
 
-\begin{definition}
-  Let $P,f,g$ be polynomials, we denote by $P[f,g]$ the numerator of
-  $P(f/g)$, so that
-  \begin{equation}
-    P\left(\frac{f}{g}\right) = \frac{g^nP(f/g)}{g^n} = \frac{P[f,g]}{g^n}.
-  \end{equation}
-  If $P=\sum_0^np_iX^i$, then
-  \begin{equation}
-    P[f,g] = \sum_{i=0}^n  p_if^ig^{n-i}.
-  \end{equation}
-\end{definition}
+Let $P$ be in $\F_q[X,Y]$ and $n$ be in $\N$. with $\deg(P,X)< n$. We
+define $P[f,g,n]$ as
+$$P[f,g,n] = g^{n-1} P\left (\frac fg, Y\right) \in \F_q[X,Y].$$ If
+$P=\sum_{i=0}^{n-1} p_i(Y) X^i$, then $P[f,g,n] = \sum_{i=0}^{n-1}
+p_if^ig^{n-1-i}$.  We first give an algorithm to compute this
+expression, then show how to relate it to lifting; when $g=1$,
+Algorithm~\ref{alg:compose} reduces to a well known algorithm for
+polynomial composition~\cite[Ex.~9.20]{vzGG}.
 
 \begin{algorithm}[t]
   \caption{Compose}
   \label{alg:compose}
   \begin{algorithmic}[1]
-    \REQUIRE $P\in k[Y][X]$, $f,g\in k[Y]$;
-    \STATE $n \la \deg_X P$;
-    \IF {$n = 0$}
-    \ENSURE $P$
+    \REQUIRE $P\in \F_q[X,Y]$, $f,g\in \F_q[Y]$, $n\in\N$
+    \IF {$n = 1$} 
+    \RETURN $P$
     \ELSE
-    \STATE $m \la \lceil n/2\rceil$;
-    \STATE Let $P_0,P_1$ be such that $P = P_0 + X^mP_1$;
-    \STATE $Q_0 \la$ Compose($P_0, f, g$);
-    \STATE $Q_1 \la$ Compose($P_1, f, g$);
-    \STATE \label{alg:compose:res}
-    $Q \la Q_0g^{n-m+1} + Q_1f^m$;
-    \ENSURE $Q$.
+    \STATE $m \la \lceil n/2\rceil$
+    \STATE Let $P_0,P_1$ be such that $P = P_0 + X^mP_1$
+    \STATE $Q_0 \la$ Compose($P_0, f, g, m$)
+    \STATE $Q_1 \la$ Compose($P_1, f, g, n-m$)
+    \STATE $Q \la Q_0g^{n-m} + Q_1f^m$  \label{alg:compose:res}
+    \RETURN $Q$
     \ENDIF
   \end{algorithmic}
 \end{algorithm}
 
 \begin{theorem}
   \label{th:compose}
-  On input $P,f,g$, Algorithm~\ref{alg:compose} computes the
-  polynomial $P[f,g]$. If $n=\deg_XP$, $\ell=\max(\deg f, \deg g)$ and
-  $\deg_YP\in O(\ell)$, it computes its output using $O(\Mult(\ell
-  n)\log n)$ operations in $k$.
+  On input $P,f,g,n$, with $\deg(P,X)<n$ and $\deg(P,Y) < \ell$,
+  Algorithm~\ref{alg:compose} computes $Q=P[f,g,n]$ using $O(\Mult(\ell
+  n)\log(n))$ operations in $\F_q$.
 \end{theorem}
 \begin{proof}
-  If $n=0$, the theorem is obvious. Suppose $n>0$, then $P_0$ and
-  $P_1$ have degree $m-1$ and $n-m$ respectively. By induction
-  hypothesis,
-  \begin{equation}
+  If $n=1$, the theorem is obvious. Suppose $n>1$, then $P_0$ and
+  $P_1$ have degrees less than respectively $m$ and $n-m$
+  respectively. By induction hypothesis,
+  \begin{equation*}
     \begin{aligned}
-      Q_0 &= P_0[f,g] = \sum_{i=0}^{m-1}p_if^ig^{m-1-i},\\
-      Q_1 &= P_1[f,g] = \sum_{i=0}^{n-m}p_{i+m}f^ig^{n-m-i}.   
+      Q_0 &= P_0[f,g,m] = \sum_{i=0}^{m-1}p_if^ig^{m-1-i},\\
+      Q_1 &= P_1[f,g,n-m] = \sum_{i=0}^{n-m-1}p_{i+m}f^ig^{n-m-1-i}.   
     \end{aligned}
-  \end{equation}
+  \end{equation*}
   Hence,
-  \begin{equation}
-    Q = \sum_{i=0}^{m-1}p_if^ig^{n-i} +
-    \sum_{i=0}^{n-m}p_{i+m}f^{i+m}g^{n-m-i} =
-    P[f,g].
-  \end{equation}
-
+  \begin{equation*}
+    Q = \sum_{i=0}^{m-1}p_if^ig^{n-1-i} +
+    \sum_{i=0}^{n-m-1}p_{i+m}f^{i+m}g^{n-m-1-i} =
+    P[f,g,n].
+  \end{equation*}
   The only step that requires a computation is
   Step~\ref{alg:compose:res}, costing $O(\Mult(\ell n))$ operations in
-  $k$. The recursion has depth $\log n$, hence the overall complexity
-  is $O(\Mult(\ell n)\log n)$.  Observe that, when $g=1$,
-  Algorithm~\ref{alg:compose} reduces to a well known algorithm for
-  polynomial composition~\cite[Ex.~9.20]{vzGG}.
+  $\F_q$. The recursion has depth $\log(n)$, hence the overall
+  complexity is $O(\Mult(\ell n)\log(n))$.
 \end{proof}
 
 \begin{corollary}
-  Let $\alpha\in\F_q(x_i)$ be represented on the basis $\bb_i$.
-  We can \emph{lift} $\alpha$ to the basis $\uu_i$ using
-  $O(\Mult(\ell^i)\log\ell^i)$ operations in $\F_q$.
+  At level $i$, one can perform the lift operation using
+  $O(\Mult(\ell^i)\log(\ell^i))$ operations in $\F_q$.
 \end{corollary}
 \begin{proof}
-  $\alpha$ is represented by a bivariate polynomial $A(x_i,x_{i-1})$ with
-  $\deg_{x_i}A<\ell$ and $\deg_{x_{i-1}}A<\ell^{i-1}$.  We compute the univariate
-  polynomials $A[f_i,g_i]$ and $g_i^n$, using $O(\Mult(\ell^i)\log\ell^i)$
-  operations in $\F_q$. We interpret $A[f_i,g_i](x_i)$ and $g_i^n(x_i)$ as
-  elements of $\F_q(x_i)$ written in the basis $\uu_i$. Then the
-  lift of $\alpha$ is $A[f_i,g_i](x_i)/g_i^n(x_i)$. The inversion of $g_i^n(x_i)$
-  is computed using $O(\Mult(\ell^i)\log\ell^i)$ operations.
+  We start from element $\alpha$ written on the bivariate basis, that
+  is, represented as $A(X,Y)$ with $\deg(A,X)<n=\ell^{i-1}$ and
+  $\deg(A,Y)<\ell$ (note that $\ell n =\ell^i$).  We compute the
+  univariate polynomials $A^\star=A[f,g,n]$ and $\gamma=g^{n-1}$ using
+  $O(\Mult(\ell^i)\log(\ell^i))$ operations in $\F_q$; then the lift
+  of $\alpha$ is $A^\star/\gamma$ modulo $S$. The inverse of $\gamma$
+  is computed using $O(\Mult(\ell n)\log(\ell n))$ operations, and the
+  multiplication adds an extra $O(\Mult(\ell n))$.
 \end{proof}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \subsection{Pushing}
-We now have the inverse problem. We are given polynomials $P$, $f$ and
-$g$, with coefficients in a field $k$, and such that $(f,g)=1$. Using
-the same notation as before, we want to compute a decomposition
-$P=Q[f,g]$.
+
+We first deal with the inverse of the question dealt with in
+Theorem~\ref{th:compose}: starting from $Q \in \F_q[Y]$, reconstruct
+$P \in \F_q[X,Y]$ such that $Q=P[f,g,n]$. When $g=1$,
+Algorithm~\ref{alg:decompose} reduces to Algorithm~9.14
+of~\cite{vzGG}.
 
 \begin{algorithm}[t]
   \caption{Decompose}
   \label{alg:decompose}
   \begin{algorithmic}[1]
-    \REQUIRE $P,f,g\in k[Y]$ s.t. $\deg g<\deg f$ and $(f,g)=1$;
-    \REQUIRE $n\in\N$;
-    \IF {$n=0$}
-    \ENSURE $P$
-    \ELSE
-    \STATE $m \la \lceil n/2 \rceil$;
-    \STATE \label{alg:decompose:xgcd}
-    Compute $u, v$ such that $uf^m + vg^m = 1$;
-    \STATE $r \la 0$;
-    \IF {$\deg P \ge \deg f^m + \deg g^m$}
-    \STATE \label{alg:decompose:div}
-    $q,\; P \la P \div f^m,\; P \bmod f^m$;
-    \ENDIF
-    \STATE \label{alg:decompose:split}
-    $P_0,\; P_1 \la Pv \bmod f^m,\; q + (Pu \bmod g^m)$;
-    \STATE $Q_0 \la$ Decompose($P_0, f, g, n-m$);
-    \STATE $Q_1 \la$ Decompose($P_1, f, g, n-m$);
-    \ENSURE $Q_0 + X^mQ_1$.
+    \REQUIRE $Q,f,g,h\in \F_q[Y]$, $n \in \N$ 
+    \IF {$n=1$} 
+    \RETURN $Q$
+    \ELSE 
+    \STATE $m \la \lceil n/2 \rceil$ 
+    \STATE $u \la 1/ g^{n-m}\bmod f^m$ \label{alg:decompose:xgcd} 
+    \STATE $Q_0 \la Q u \bmod f^m$ 
+    \STATE $Q_1 \la (Q-Q_0 g^{n-m}) {\rm~div~} f^m$ 
+    \STATE $P_0 \la$ Decompose($Q_0, f, g, h, m$) 
+    \STATE $P_1 \la$ Decompose($Q_1, f, g, h, n-m$) 
+    \RETURN $P_0 + X^m P_1$ 
     \ENDIF
   \end{algorithmic}
 \end{algorithm}
 
 \begin{theorem}
-  On input $P,f,g,n$, Algorithm~\ref{alg:decompose} computes a
-  polynomial $Q\in k[Y][X]$ such that $\deg_X Q=n$ and $P=Q[f,g]$.
-
-  Let $\ell=\deg f$. If $\deg P < \ell(n+1)$, then $\deg_Y Q<\ell$. In
-  this case, the output is computed using $O(\Mult(\ell n)\log \ell
-  n)$ operations in $k$.
+  On input $Q,f,g,h,n$, with $\deg(Q) < \ell n$ and $h = 1/g \bmod f$,
+  Algorithm~\ref{alg:decompose} computes a polynomial $P\in \F_q[X,Y]$
+  such that $\deg(P,X)<n$, $\deg(P,Y) <\ell$ and $Q=P[f,g,n]$ using
+  $O(\Mult(\ell n)\log(n))$ operations in $\F_q$.
 \end{theorem}
 \begin{proof}
-  If $n=0$ the statement is obvious. In particular, if $\deg P <
-  \ell$, the output trivially satisfies $\deg_YQ<\ell$.
-
-  Let $n>0$, then $m>0$. We prove the theorem by induction. The
-  polynomials $P_0$ and $P_1$ computed in
-  Step~\ref{alg:decompose:split} verify
-  \begin{equation}
+  We prove the theorem by induction. If $n=1$, the statement is
+  obvious, so let $n> 1$. The polynomials $Q_0$ and $Q_1$ verify $Q =
+  Q_0g^{n-m} + Q_1f^m.$ By construction, $Q_0$ has degree less than $\ell
+  m$. Since $\deg(g) < \ell$, this implies that $Q_0 g^{n-m}$ has
+  degree less than $\ell n$; thus, $Q_1$ has degree less than $\ell
+  (n-m)$. By induction, $P_0$ and $P_1$ have degree less than $m$,
+  resp. $n-m$ in $X$, and less than  $\ell$ in $Y$, and
+  \begin{equation*}
     \begin{aligned}
-      P &\equiv P_0g^m \mod f^m,\\
-      P &\equiv P_1f^m \mod g^m.
+      Q_0 &= P_0[f,g,m] = \sum_{i=0}^{m-1} p_{0,i}f^ig^{m-1-i},\\
+      Q_1 &= P_1[f,g,n-m] = \sum_{i=0}^{n-m-1} p_{1,i}f^ig^{n-m-1-i}.
     \end{aligned}
-  \end{equation}
-  Comparing degrees and using the Chinese remainder theorem, we
-  conclude that
-  \begin{equation}
-    P = P_0g^m + P_1f^m.
-  \end{equation}
-  We necessarily have $n-m<n$, hence, by induction hypothesis, $Q_0$
-  and $Q_1$ have degree $n-m$ and are such that
-  \begin{equation}
-    \begin{aligned}
-      P_0 &= Q_0[f,g] = \sum_{i=0}^{n-m} q_{0,i}f^ig^{n-m-i},\\
-      P_1 &= Q_1[f,g] = \sum_{i=0}^{n-m} q_{1,i}f^ig^{n-m-i}.
-    \end{aligned}
-  \end{equation}
-  Hence, $Q=Q_0+X^mQ_1$ has degree $n$ and is such that
-  \begin{multline}
-    Q[f,g] = \sum_{i=0}^{n-m}q_{0,i}f^ig^{n-i} + 
-    \sum_{i=m}^nq_{1,i-m}f^ig^{n-i} =\\
-    Q_0[f,g]g^m + Q_1[f,g]f^m = P.
-  \end{multline}
-
-  If $\deg P < \ell (n+1)$, both $P_0$ and $P_1$ have degree less than
-  $\ell(n-m+1)$. Then, by induction hypothesis, $\deg q_{0,i}<\ell$
-  and $\deg q_{1,i}<\ell$ for any $i$. We deduce that
-  $\deg_YQ<\ell$. Observe that, when $g=1$,
-  Algorithm~\ref{alg:decompose} reduces to Algorithm~9.14
-  of~\cite{vzGG}.
-
-  Finally we analyze the complexity of the algorithm on input $P, f,
-  g, n$, under the constraints on the degrees specified
-  above. Step~\ref{alg:decompose:xgcd} is dominated by the extended
-  Euclidean algorithm, which costs $O(\Mult(\ell n)\log \ell n)$
-  operations in $k$. Although Algorithm~\ref{alg:decompose} is
-  recursive, this step is independent of $P$, thus it can be done just
-  once for every $m$, before running the rest of the algorithm. The
-  dominant cost is the one of the highest power $m$, contributing
-  $O(\Mult(\ell n)\log \ell n)$ to the overall complexity. This
-  precomputation saves a logarithmic factor.
-
-  We are left with the contribution of Steps~\ref{alg:decompose:div}
-  and~\ref{alg:decompose:split}, costing $O(\Mult(\ell n))$ each. The
-  recursion has depth $\log n$, thus the overall cost is $O(\Mult(\ell
-  n)\log n)$. Hence, the total complexity is dominated by the cost of
-  Step~\ref{alg:decompose:xgcd}.
+  \end{equation*}
+  Hence, $P=P_0+X^mP_1$ has degree less than $n$ in $X$ and less than $\ell$ 
+  in $Y$, and the following proves correctness:
+  \begin{multline*}
+    P[f,g,n] = \sum_{i=0}^{m-1}p_{0,i}f^ig^{n-1-i} + 
+    \sum_{i=m}^{n-1}p_{1,i-m}f^ig^{n-1-i} \\
+    =P_0[f,g,m]g^{n-m} + P_1[f,g,n-m]f^m = Q.
+  \end{multline*}
+  At Step~\ref{alg:decompose:xgcd}, we do as follows: starting from
+  $h=1/g \bmod f$, we deduce $1/g^{n-m} \bmod f$ in time
+  $O(\Mult(\ell)\log(n))$ by binary powering mod $f$. We also compute
+  $g^{n-m}$ in time $O(\Mult(\ell n))$ by binary powering, and we use
+  Newton iteration (starting from $1/g^{n-m} \bmod f$) to deduce
+  $1/g^{n-m} \bmod f^m$ in time $O(\Mult(\ell n))$. All other steps
+  cost $O(\Mult(\ell n))$; the recursion has depth $\log(n)$,
+  so the total cost is $O(\Mult(\ell n)\log(n))$.
 \end{proof}
 
 \begin{corollary}
-  Let $\alpha\in\F_q(x_i)$ be represented on the basis $\uu_i$. We
-  can \emph{push} $\alpha$ to the basis $\bb_i$ using
-  $O(\Mult(\ell^i)\log\ell^i)$ operations in $\F_q$.
+  At level $i$, one can perform the push operation using
+  $O(\Mult(\ell^i)\log(\ell^i))$ operations in $\F_q$.
 \end{corollary}
 \begin{proof}
-  $\alpha$ is represented by a univariate polynomial $A(x_i)$ of degree
-  less than $\ell^i$. We compute $g_i^{\ell^{i-1}-1}$ and $\bar{A}(x_i) =
-  g_i^{\ell^{i-1}-1}(x_i)P(x_i)$ using $O(\Mult(\ell^i))$ operations. Then,
-  we apply Algorithm~\ref{alg:decompose} to $\bar{A}$, $f_i$ and $g_i$,
-  with $n=\ell^{i-1}-1$. The result is a bivariate polynomial $B$,
-  representing $\alpha$ on the basis $\mathbf{B_i}$. The dominant phase
-  is Algorithm~\ref{alg:decompose}, costing
-  $O(\Mult(\ell^i)\log\ell^i))$ operations in $\F_q$.
+  Given $\alpha$ represented by a univariate polynomial $A(Y)$ of
+  degree less than $\ell n$, with $n =\ell^{i-1}$. We compute
+  $g^{n-1}$ and $\bar{A} = g^{n-1} A \bmod S$ using $O(\Mult(\ell^i))$
+  operations. Then, we compute $h=1/g \bmod f$ in time
+  $O(\Mult(\ell)\log(\ell))$ and apply Algorithm~\ref{alg:decompose}
+  to $\bar{A}$, $f$, $g$, $h$ and $n$. The result is a bivariate
+  polynomial $B$, representing $\alpha$ on the bivariate basis. The
+  dominant phase is Algorithm~\ref{alg:decompose}, costing
+  $O(\Mult(\ell^i)\log(\ell^i))$ operations in $\F_q$.
 \end{proof}
 
 %%%
