@@ -90,7 +90,9 @@ $$
   q = 1 \bmod \ell & O_e(\log(q))  & O(\ell^i) & O(\ell^i) \\
   q = -1 \bmod \ell & O_e(\log(q)) & O(\ell^i) & O(\Mult(\ell^i) \log(\ell^i)) \\
   - & O_e (\ell^2+\Mult(\ell) \log(q)) & O(i^2\Mult(\ell^{i+1})\Mult(\ell)\log(\ell)^2) & O(i \Mult(\ell^{i+1})\Mult(\ell)\log(\ell))\\
-  \ell \ll q^{1/4} & ?? & O(\Mult(\ell^i) \log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) 
+  4\ell \le q^{1/4} & O_e(\ell\log^3(q))  & O_e(\ell^2+\Mult(\ell)\log(\ell
+  q)+\Mult(\ell^i)\log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \\
+  4\ell \le q^{1/4} & O_e(\ell\log^3(q) + \Mult(\ell)\sqrt{q}\log(q)) & O_e(\log(q) + \Mult(\ell^i) \log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) 
 \end{array}
 $$
 \label{table:main}
@@ -657,7 +659,7 @@ $\mathbb{G}_m^{\euler(n)}$ over the algebraic
 closure~\cite{rubin+silverberg03,voskresenskii98}.
 
 The construction of Section~\ref{ssec:T2} is obtained by considering
-the torus $T_2$. This will allow us to fill some entries in
+the torus $T_2$. This allows us to fill some entries in
 Table~\ref{table:main}.
 
 \begin{lemma}
@@ -705,11 +707,12 @@ Table~\ref{table:main}.
   The group law is obtained by direct calculation.
 \end{proof}
 
-Pell conics are a well understood object. They have applications in
-primality proving, factorization~\cite{lemmermeyer03,hambleton12} and
+Pell conics are a classic topic in number
+theory\cite{lenstra02-pell}. In computer science, they have
+applications to primality proving,
+factorization~\cite{lemmermeyer03,hambleton12} and
 cryptography~\cite{rubin-silverberg+crypto03}. As customary, we denote
-by $[n](x,y)$ the $n$-th scalar multiple of a point
-$(x,y)$.
+by $[n](x,y)$ the $n$-th scalar multiple of a point $(x,y)$.
 
 \begin{lemma}
   \label{th:T2-divpol}
@@ -743,23 +746,23 @@ $(x,y)$.
 
 \begin{theorem}
   \label{th:T2-irred}
-  Let $\eta\in\F_q(\delta)$ be a non $\ell$-adic residue in $T_2$,
-  corresponding to a point $P=(\alpha,\beta)$ of $C/\F_q$. For any
-  $i>0$, the polynomials $P_{\ell^i}-\alpha$ are irreducible; their
-  roots are the abscissas of the $\ell^i$-th roots of $\eta$.
+  Let $\eta\in\F_q(\delta)$ be a non $\ell$-adic residue in $T_2$, and
+  let $P=(\alpha,\beta)$ be its image in $C/\F_q$. For any $i>0$, the
+  polynomials $P_{\ell^i}-\alpha$ are irreducible. Their roots are the
+  abscissas of the images in $C/\F_{q^{\ell^i}}$ of the $\ell^i$-th
+  roots of $\eta$.
 \end{theorem}
 \begin{proof}
   By~\cite[Th.~VI.9.1]{lang}, the polynomial $X^{\ell^i}-\eta$ is
-  irreducible. Its roots form the fiber $[\ell^i]^{-1}(P)$, and the
-  Galois group of $\F_{q^{\ell^i}}/\F_q$ acts transitively on them.
+  irreducible. Its roots correspond to the fiber $[\ell^i]^{-1}(P)$,
+  and the Galois group of $\F_{q^{\ell^i}}/\F_q$ acts transitively on
+  them.
 
   Two points of $C$ have the same abscissa if and only if they are
   opposite. But $\eta\ne\eta^{-1}$, hence all the points in
-  $[\ell^i]^{-1}(P)$ have distinct abscissa, and the Galois group of
-  $\F_{q^{\ell^i}}/\F_q$ acts transitively on them.  
-
-  By Lemma~\ref{th:T2-divpol}, $P_{\ell^i}-\alpha$ vanishes on the
-  abscissas of $[\ell^i]^{-1}(P)$ and is thus irreducible.
+  $[\ell^i]^{-1}(P)$ have distinct abscissa.  By
+  Lemma~\ref{th:T2-divpol}, $P_{\ell^i}-\alpha$ vanishes precisely on
+  those abscissas and is thus irreducible.
 \end{proof}
 
 We can now apply our results to the computation of the polynomials
@@ -803,10 +806,10 @@ $Q_i$ and $T_i$ of Section~\ref{ssec:T2}.
   %% \end{equation}
   %% It is then evident that every second column is identically zero, and
   %% that signs alternate in odd columns. 
-  From the initialization of $P_n$, it is immediate that $c_{n,i}=0$
-  for $i$ odd, and that signs alternate for $i$ even. We remove the
-  odd values of $i$ and take absolute values; the new coefficients
-  $b_{n,k}=\lvert c_{n+k,2k}\rvert$ satisfy the relation
+  By induction, it is immediate that $c_{n,i}=0$ for $i$ odd, and that
+  signs alternate for $i$ even. We remove the odd coefficients and
+  take absolute values; the new coefficients $b_{n,k}=\lvert
+  c_{n+k,2k}\rvert$ satisfy the relation
   \begin{equation*}
     b_{n,k} = b_{n-1,k} + b_{n-1,k-1},
   \end{equation*}
@@ -822,8 +825,7 @@ $Q_i$ and $T_i$ of Section~\ref{ssec:T2}.
   %%   \end{tabular}
   %% \end{equation*}
   In the same way, we can prove that the even coefficients of $R_n$
-  correspond to the anti-diagonals of Pascal's triangle with
-  alternating signs.
+  are the entries of Pascal's triangle with alternating signs.
   
   As is well-known, the coefficients of
   Lucas' triangle are related to those of Pascal's by
@@ -839,10 +841,10 @@ $Q_i$ and $T_i$ of Section~\ref{ssec:T2}.
     -\frac{(n-2k)(n-2k-1)}{(n-k-1)(k+1)}.
   \end{equation*}
   The last equation gives the formula to compute all the coefficients
-  of $P_n$ using $O(n)$ operations in $\F_p$ (since we know the
-  results are the image mod $p$ of integers, we compute the $c_{n,2k}$
+  of $P_n$ using $O(n)$ operations in $\F_p$. Indeed, since we know
+  the $c_{n,2k}$'s are the image mod $p$ of integers, we compute them
   using multiplications and divisions in $\Q_p$ with relative
-  precision 1).
+  precision 1.
 \end{proof}
 
 We are left with the problem of finding the non $\ell$-adic residue
@@ -851,14 +853,14 @@ sampling and testing.
 
 \begin{lemma}
   \label{th:montgomery}
-  Let $P=(\alpha,\beta)$ be a point on $C$. For any $n$, the abscissa of $[\pm
-  n]P$ can be computed without knowledge of its ordinate using $O(\log
-  n)$ operations in $\F_q$.
+  Let $P=(\alpha,\beta)$ be a point on $C$. For any $n$, there is a
+  formula to compute the abscissa of $[\pm n]P$, using $O(\log n)$
+  operations in $\F_q$, and not involving $\beta$.
 \end{lemma}
 \begin{proof}
   Observe that if $n=2$, the abscissa of $[\pm 2]P$ is $\alpha^2-2$
   (for any $p$).  Let $P'=(\alpha',\beta')$, and let $\gamma$ be the
-  abscissa of $P\ominus P'$. by direct computation we find that the
+  abscissa of $P\ominus P'$. By direct computation we find that the
   abscissa of $P\oplus P'$ is $\alpha\alpha'-\gamma$ (for any $p$);
   this formula is called a \emph{differential addition}.
 
@@ -898,9 +900,10 @@ to any $\ell$. If $r$ is the order of $q$ modulo $\ell$, the natural
 object to look at is $T_r$, but here we are faced with two
 problems. First, multiplication by $\ell$ is now a degree
 $\ell^{\euler(r)}$ map, thus its fibers have too many points and are
-not going to be irreducible in general. Second, it is an open question
-whether $T_r$ can be parameterized using $\euler(r)$ coordinates; but
-even assuming it can be, we are still faced with the computation of a
+not going to be irreducible in general. Instead, isogenies of degree
+$\ell$ should be considered. Second, it is an open question whether
+$T_r$ can be parameterized using $\euler(r)$ coordinates; but even
+assuming it can be, we are still faced with the computation of a
 univariate annihilating polynomial for a set embedded in a
 $\euler(r)$-dimensional space, a problem not known to be computable in
 quasi-linear time. Studying this generalization is another natural
@@ -932,46 +935,63 @@ to~\cite{couveignes+lercier11} for details.
       \draw (E\i) edge[->,bend right=18] node[auto,swap] {\scriptsize$\phi_\i$} (E\j);
     }
   \end{tikzpicture}
-  \caption{An $\ell$-isogeny volcano with the Vélu isogenies
-    represented.}
+  \caption{The isogeny cycle of $E_0$.}
   \label{fig:volcano}
 \end{figure}
 
 Let $\ell$ be a prime different from $p$ and not dividing $q-1$. Let
 $E_0$ be an elliptic curve whose cardinality is a multiple of
 $\ell$. By Hasse's bound, this is only possible if $\ell\le q +
-2\sqrt{q} + 1$. An \emph{isogeny} is an algebraic group morphism
+2\sqrt{q} + 1$.  An \emph{isogeny} is an algebraic group morphism
 between two elliptic curves that is surjective in the algebraic
 closure; it is said to be rational over $\F_q$ if it is invariant
 under the $q$-th power map. A rational isogeny between two curves
 exists if and only if they have the same number of points over
 $\F_q$. The degree of an isogeny is its degree as an algebraic map; an
 isogeny of degree $n$ is separable if and only if $n$ is prime to $p$,
-in which case its kernel contains exactly $n$ points. A connected
-component of the graph whose vertices are elliptic curves up to
-isomorphism and whose edges are rational isogenies of degree $\ell$ is
-called an \emph{$\ell$-isogeny
-  volcano}~\cite{kohel,fouquet+morain02}. It is an undirected graph
-and, in the specific case at hand, it is a cycle.
-Figure~\ref{fig:volcano} shows one such example with one direction
-highlighted. From now on, we denote by $E_0,E_1,\dots$ the curves in
-the same volcano as $E_0$.
+in which case its kernel contains exactly $n$ points.  Because of the
+assumptions on $\ell$, there exist an $e\ge1$ such that, for any curve
+$E$ isogenous to $E_0$, the $\F_q$-rational part of $E[\ell]$ is
+cyclic of order $\ell^e$.
 
-We now make precise the order in which the curves $E_i$ are
-labeled. Suppose that $p\ne2,3$ and let $E_0$ be expressed as the
-locus
+Suppose for simplicity, that $p\ne2,3$ and let $E_0$ be expressed as
+the locus
 \begin{equation}
   E_0 \;:\; y^2 = x^3 + ax + b,
   \quad\text{with $a,b\in\F_q$},
 \end{equation}
-plus one point at infinity. Under the former assumptions on $\ell$,
-there exists $e\ge1$ such that the $\ell$-torsion group of $E_i/\F_q$
-is isomorphic to $\Z/\ell^e\Z$ for any $i$. We denote by $H_0$ the
-unique subgroup of $E_0/\F_q$ of order $\ell$, and by $\phi_0$ the
-unique isogeny whose kernel is $H_0$; we then label $E_1$ the image
-curve of $\phi_0$. We go on denoting by $H_i$ the unique subgroup of
-$E_i/\F_q$ of order $\ell$, and by $\phi_i:E_i\to E_{i+1}$ the unique
-isogeny with kernel $H_i$, until we get back to the starting point.
+plus one point at infinity.  We denote by $H_0$ the unique subgroup of
+$E_0/\F_q$ of order $\ell$, and by $\phi_0$ the unique isogeny whose
+kernel is $H_0$; we then label $E_1$ the image curve of $\phi_0$. We
+go on denoting by $H_i$ the unique subgroup of $E_i/\F_q$ of order
+$\ell$, and by $\phi_i:E_i\to E_{i+1}$ the unique isogeny with kernel
+$H_i$. The construction is depicted in Figure~\ref{fig:volcano}.
+
+\begin{lemma}
+  \label{th:class-number}
+  Let $E_0,E_1,\dots$ be defined as above, there exist $n\in
+  O(\sqrt{q}\log (q))$ such that $E_n$ is isomorphic to $E_0$.
+\end{lemma}
+\begin{proof}
+  It is shown in \cite[Section~4]{couveignes+lercier11} that the
+  isogenies $\phi_i$ are \emph{horizontal} in the sense
+  of~\cite{kohel}, hence they necessarily form a cycle. Let $t$ be the
+  trace of $E_0$, the length of the cycle is bounded by the class
+  number of $\Q[X]/(X^2-tX-q)$, thus by Minkowski's bound it is in
+  $O(\sqrt{q}\log (q))$.
+\end{proof}
+
+In what follows, the index $i$ to be understood modulo the length of
+the cycle. This is a slight abuse, because $E_n$ is isomorphic but not
+equal to $E_0$, but it does not hide any theoretical or computational
+difficulty.
+
+\begin{theorem}[{\cite[Section~4]{couveignes+lercier11}}]
+  Under the former assumptions, let $P$ a point of $E_i$ of order
+  divisible by $\ell^e$, and let
+  $\psi=\phi_{i-1}\circ\phi_{i-2}\circ\cdots\circ\phi_{j}$. The fiber
+  $\psi^{-1}(P)$ is irreducible and has cardinality $\ell^{i-j}$.
+\end{theorem}
 
 Vélu's formulas~\cite{velu71} allow us to express the isogenies
 $\phi_i$ as rational fractions
@@ -985,67 +1005,70 @@ where $g_i$ is the square polynomial of degree $\ell-1$ vanishing on
 the abscissas of the affine points of $H_i$, and $f_i$ is a polynomial
 of degree $\ell$.
 
-In what follows, the index $i$ in $\phi_i$, $f_i$, $g_i$ and $E_i$ is
-to be understood modulo the length of the cycle. This is a slight
-abuse, because of some subtleties linked to Vélu's formulas and the
-way we consider curves up to isomorphism, but it does not hide any
-theoretical or computational difficulty.  
-
-\begin{theorem}[{\cite[Section~4]{couveignes+lercier11}}]
-  Under the former assumptions, let $E_i[\ell^e]\isom\Z/\ell\Z$,
-  let $P$ a point of $E_i$ of order divisible by $\ell^e$, and let
-  $\psi=\phi_{i-1}\circ\phi_{i-2}\circ\cdots\circ\phi_{j}$. The fiber
-  $\psi^{-1}(P)$ is irreducible and has cardinality $\ell^{i-j}$.
-\end{theorem}
-
 \begin{corollary}[{\cite[Section~4]{couveignes+lercier11}}]
   Let $\eta\in\F_q$ be the abscissa of a point of $E_0$ of order
   $\ell^e\ne 2$. The polynomials
   \begin{align*}
-    T_0 &= f_{-1}(X_0) - \eta g_{-1}(X_0),\\
-    T_i &= f_{-i-1}(X_i) - X_{i-1} g_{-i-1}(X_i)
+    T_1 &= f_{-1}(X_1) - \eta g_{-1}(X_1),\\
+    T_i &= f_{-i}(X_i) - X_{i-1} g_{-i}(X_i)
   \end{align*}
-  define an $\ell$-adic closure of $\F_q$.
+  define an $\ell$-adic tower.
 \end{corollary}
 
-Using Vélu's formulas, the polynomials $T_i$ can be computed using
+Using Vélu's formulas, the polynomials $T_i$ can be computed with
 $O(\Mult(\ell))$ operations in $\F_q$. The minimal polynomials $Q_i$
 of $X_i$ over $\F_q$ can be computed by composing the isogenies
 $\phi_{-1},\dots,\phi_{-i-1}$ using Algorithm~\ref{alg:compose}. This
 requires $O(\Mult(\ell^i)\log(\ell^i))$ operations as proved in the
 next section.
 
+\begin{theorem}
+  Suppose $4\ell\le q^{1/4}$, then initializing the $\ell$-adic tower
+  above requires $O_e(\ell\log^3(q))$ operations, and building the
+  $i$-th level requires $O_e(\ell^2+\Mult(\ell)\log(\ell
+  q)+\Mult(\ell^i)\log(\ell^i))$ operations.
+\end{theorem}
+\begin{proof}
+  Let $s$ be a prime, the modular polynomial $\Phi_s$ is the minimal
+  polynomial of the modular function $j(s\tau)$. It is a symmetric
+  bivariate polynomial of degree $s+1$ in each variable. Many
+  computations about isogenies, including point
+  counting~\cite{schoof95}, use it.  We suppose that the modular
+  polynomials $\Phi_\ell\bmod p$ and $\Phi_s\bmod p$ for all the
+  primes $s$ up to $\log(q)$ are precoumputed. This is a strong
+  assumption, but it is often true in practice.
+
+  For the initialization, \cite[Section~4.3]{couveignes+lercier11}
+  shows that if $4\ell\le q^{1/4}$, about $1/2\ell$ of all elliptic
+  curves over $\F_q$ contain a point of $\ell$-torsion. We find $E_0$
+  by taking curves at random and counting their points. This requires
+  $O_e(\ell\log^3(q))$\todo{!!!} using the SEA
+  algorithm~\cite{schoof95}.
+
+  To build the $i$-th level, we first need to find the equation of
+  $E_{-i}$. For this, we evaluate $\Phi_\ell$ at $j(E_{-i+1})$, using
+  $O(\ell^2)$ operations. The resulting polynomial has two roots in
+  $\F_q$, one corresponding to the $j(E_{-i})$, the other to the
+  $j(E_{-i+2})$. We factor it using $O_e(\Mult(\ell)\log(\ell q))$
+  operations~\cite[Ch~14]{vzGG}. Once $E_{-i}$ is known, we find an
+  $\ell$-torsion point using $O_e(\log q)$ operations, and apply
+  Vélu's formulas to compute $\phi_{-i}$. The polynomials $T_i$ and
+  $Q_i$ are computed as explained above using
+  $O(\Mult(\ell^i)\log(\ell^i))$ operations .
+\end{proof}
+
 \begin{remark}
   \label{rk:cycle}
-  There is a major difference between our setting and Couveignes' and
-  Lercier's. Observe that, once a point $P$ of $E_i$ is chosen, the
-  $\ell$-adic tower is constructed by walking \emph{backwards} in the
-  isogeny cycle. The goal of~\cite{couveignes+lercier11}, is to
-  compute an extension of degree $\ell^i$ of $\F_q$ for a certain
-  fixed $i$. Under the former assumptions, using the construction we
-  just presented, this can be done in quasi-linear time in $\ell^i$:
-  apply $i$ times Vélu's formulas, then take the fiber of a point of
-  $E_i$ by the isogenies $\phi_{i-1}, \ldots, \phi_0$. In our case, we
-  are interested in building extensions of degree $\ell^i$
-  \emph{incrementally}, i.e.\ without any \emph{a priori} bound on
-  $i$. We have two ways of doing this:
-  \begin{enumerate}
-  \item Precompute the whole cycle, this can be done using Vélu's
-    formulas only. Assuming the cycle has length $n$, chose a point of
-    $E_0$ and take its fiber by the isogenies $\phi_{n-1}, \ldots,
-    \phi_0, \phi_{n-1}, \ldots$ The length of the isogeny cycle is the
-    order of a certain ideal in the class group of the endomorphism
-    ring of $E_0$, thus it is proportional to $\sqrt{q}$. Hence, this
-    approach has a quasi-linear complexity in $\ell^i$, but an
-    exponential complexity in $\log q$.
-  \item Compute the curves on the isogeny cycle backwards, then apply
-    Vélu's formulas. This can be done incrementally, thus it does not
-    require to precompute the whole isogeny cycle. However, computing
-    $E_{i-1}$ from the knowledge of $E_i$ can only be done by
-    factoring the $\ell$-th \emph{modular polynomial}~\cite{schoof95},
-    a task requiring $O(\ell^3)$ bit operations and $O(\ell^2)$
-    operations in $\F_q$~\cite{sutherland10:modpol}.
-  \end{enumerate}
+  It is worth mentioning an alternative to the last theorem. Instead
+  of computing the cycle step by step, we can compute it entirely
+  during the initialization phase, by using Vélu's formulas alone to
+  compute $E_1,E_2,\dots$ until we hit $E_0$ again. By doing so, we
+  avoid using the modular polynomial $\Phi_\ell$ at each new level. By
+  Lemma~\ref{th:class-number}, this requires
+  $O_e(\ell\sqrt{q}\log(q))$ operations. This is not asymptotically
+  good in $q$, but for practical values of $q$ and $\ell$ the cycle is
+  often small and this approach works well. This is accounted for in
+  the last row of Table~\ref{table:main}.
 \end{remark}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
