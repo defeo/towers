@@ -43,7 +43,10 @@
 
 \maketitle
 \begin{abstract}
-  We build towers.
+  Inspired by previous work of Shoup, Lenstra-De Smit and
+  Couveignes-Lercier, we give fast algorithms to compute in (the first
+  levels of) the $\ell$-adic closure of a finite field. In many cases,
+  our algorithms have quasi-linear complexity.
 \end{abstract}
 \category{F.2.1}{Theory of computation}{Analysis of algorithms and problem complexity}[Computations in finite fields]
 \category{G.4}{Mathematics of computing}{Mathematical software}
@@ -56,29 +59,27 @@
 \label{sec:intro}
 
 Building arbitrary finite extensions of finite fields is a fundamental
-task in any computer algebra system. Many systems are limited to
-construct extensions of prime fields, but there is one notable
-exception: Magma~\cite{MAGMA} has implemented for a long time a
-powerful system of ``compatibly embedded finite
-fields''~\cite{bosma+cannon+steel97}, capable of building extensions
-of any finite field and keeping track of the embeddings between the
-fields.
+task in any computer algebra system. For this task, an especially
+powerful system is the ``compatibly embedded finite fields''
+implemented in Magma~\cite{MAGMA,bosma+cannon+steel97}, capable of
+building extensions of any finite field and keeping track of the
+embeddings between the fields.
 
-The system implemented in Magma, as described in the original paper,
-uses linear algebra to describe the embeddings of finite fields. From
-a complexity point of view, this is far from optimal: one may hope to
-compute and apply the morphisms in quasi-linear time in the degree of
-the extension, but this is usually out of reach of plain linear
-algebra techniques. Even worse, the quadratic memory requirements make
-the system unsuitable for embeddings of large degree
-extensions. Although the Magma core has evolved since the publication
-of the paper, experiments in Section~\ref{sec:impl} show that
-embeddings of large extension fields are still out of reach.
+The system described in~\cite{bosma+cannon+steel97} uses linear
+algebra to describe the embeddings of finite fields. From a complexity
+point of view, this is far from optimal: one may hope to compute and
+apply the morphisms in quasi-linear time in the degree of the
+extension, but this is usually out of reach of linear algebra
+techniques. Even worse, the quadratic memory requirements make the
+system unsuitable for embeddings of large degree extensions. Although
+the Magma core has evolved since the publication of the paper,
+experiments in Section~\ref{sec:impl} show that embeddings of large
+extension fields are still out of reach.
 
 In this paper, we discuss an approach based on polynomial arithmetic
 rather than linear algebra, yielding much better performances. We only
-consider some special cases, but we expect that these results will
-pave the way towards a complete solution.
+consider some special cases, but we expect that they will pave the way
+to a complete solution.
 
 %%%% it feels stupid to put the table here, but I want it on page 2.
 %%%% if I were better at floats, I would know how to put it where it belongs
@@ -100,10 +101,9 @@ $$
 \end{table*}
 
 Let $q$ be a power of a prime $p$, let $\F_q$ be the finite field with
-$q$ elements and let $\ell$ be a new integer. Our main interest in
-this paper is on the algorithmic aspects of the \emph{$\ell$-adic
-  closure} of $\F_q$, which is defined as follows. Fix arbitrary
-embeddings
+$q$ elements and let $\ell$ be a prime. Our main interest in this
+paper is on the algorithmic aspects of the \emph{$\ell$-adic closure}
+of $\F_q$, which is defined as follows. Fix arbitrary embeddings
 \begin{equation*}
   \F_q \subset \F_{q^\ell} \subset \F_{q^{\ell^2}} \subset \cdots;
 \end{equation*}
@@ -112,9 +112,8 @@ then, the $\ell$-adic closure of $\F_q$ is the infinite field defined as
   \F_q^{(\ell)} = \bigcup_{i\ge 0}\F_{q^{\ell^i}}.
 \end{equation*}
 We also call an \emph{$\ell$-adic tower} the sequence of extensions
-$\F_q,\F_{q^\ell},\dots$ An important feature of $\ell$-adic towers is
-that they allow us to build the algebraic closure $\bar{\F}_q$ of
-$\F_q$, as there is an isomorphism
+$\F_q,\F_{q^\ell},\dots$ In particular, they allow us to build the
+algebraic closure $\bar{\F}_q$ of $\F_q$, as there is an isomorphism
 \begin{equation}
   \label{eq:tensor}
   \bar{\F}_q \isom \bigotimes_{\ell\text{ prime}} \F_q^{(\ell)},
@@ -126,8 +125,8 @@ Our contribution is algorithms that allow us to ``compute'' in the
 first levels of $\ell$-adic towers (in a sense defined hereafter); at
 level $i$, our goal is to be able to perform all basic operations in
 quasi-linear time in the extension degree $\ell^i$.  We do not discuss
-the representation of the base field $\F_q$ itself, and we count
-arithmetic operations $\{+,-,\times,\div\}$ in $\F_q$ at unit cost.
+the representation of the base field $\F_q$, and we count 
+operations $\{+,-,\times,\div\}$ in $\F_q$ at unit cost.
 
 %% Since our focus is on the representation of extensions of large
 %% degree, we do not consider issues related to special representations
@@ -152,16 +151,15 @@ basis
   \label{eq:uni-basis1}
   \uu_i = (1,x_{i},x_{i}^2,\ldots,x_{i}^{\ell^{i}-1}).
 \end{equation}
-Using this representation allows us to use asymptotically fast
-algorithms for basic arithmetic operations. Let indeed $\Mult : \N
-\rightarrow \N$ be such that polynomials in $\F_q[X]$ of degree less
-than $n$ can be multiplied in $\Mult(n)$ operations in $\F_q$, under
-the assumptions of~\cite[Ch.~8.3]{vzGG}; using FFT multiplication, one
-can take $\Mult(n)=O(n\log (n) \log\log (n))$. Then, multiplications
-and inversions in $\F_q[X_i]/\langle Q_i \rangle$ can be done in
-respectively $O(\Mult(\ell^i))$ and $O(\Mult(\ell^i)\log(\ell^i))$
-operations in $\F_q$~\cite[Ch.~9-11]{vzGG}. This is almost optimal, as
-both results are quasi-linear in $[\F_{q^{\ell^i}}:\F_q]=\ell^i$.
+Let $\Mult : \N \rightarrow \N$ be such that polynomials in $\F_q[X]$
+of degree less than $n$ can be multiplied in $\Mult(n)$ operations in
+$\F_q$, under the assumptions of~\cite[Ch.~8.3]{vzGG}; using FFT
+multiplication, one can take $\Mult(n)=O(n\log (n) \log\log
+(n))$. Then, multiplications and inversions in $\F_q[X_i]/\langle Q_i
+\rangle$ can be done in respectively $O(\Mult(\ell^i))$ and
+$O(\Mult(\ell^i)\log(\ell^i))$ operations in
+$\F_q$~\cite[Ch.~9-11]{vzGG}. This is almost optimal, as both results
+are quasi-linear in $[\F_{q^{\ell^i}}:\F_q]=\ell^i$.
 
 Computing embeddings requires more work. For this problem, it is
 enough consider a pair of consecutive levels in the tower; any other
@@ -198,36 +196,33 @@ given in~\cite{df+schost12} and~\cite{DoSc12} for respectively
 $\ell=p$ and $\ell=2$.
 
 Table~\ref{table:main} summarizes the main results in this paper.
-Under different kinds of assumptions, it gives costs for initializing
-the construction, building the polynomials $Q_i$ and $T_i$
+Under various assumptions, it gives costs for initializing the
+construction, building the polynomials $Q_i$ and $T_i$
 from~Eq.\eqref{eq:QiTi}, and performing lift and push; the notation
 $O_e(\ )$ indicates probabilistic algorithms with expected running
-time. In all cases, we obtain algorithms that are close to being
-linear-time in $\ell^i$, up to sometimes the loss of a factor
-polynomial in $\ell$. Except for the (very simple) case where $q=1 \bmod
-\ell$, these results are new, to the best of our knowledge.
+time. In all cases, our results are close to being linear-time in
+$\ell^i$, up to sometimes the loss of a factor polynomial in $\ell$.
+Except for the (very simple) case where $q=1 \bmod \ell$, these
+results are new, to the best of our knowledge.
 
-These results are obtained from two different constructions: the first
-one (Section~\ref{sec:LDtower}) uses Kummer theory and descent
-algorithms; the second one (Section~\ref{sec:fibers}) relies on the
-construction of a sequence of fibers of isogenies between elliptic
-curves. Both constructions are inspired by previous results due to
-respectively Shoup~\cite{Shoup90,shoup94} and Lenstra-De
-Smit~\cite{lenstra+desmit08-stdmodels}, and
-Couveignes-Lercier~\cite{couveignes+lercier11}; we briefly discuss
-them here and give more details in the further sections.
+We use two constructions: the first one (Section~\ref{sec:LDtower})
+uses Kummer theory and descent algorithms; the second one
+(Section~\ref{sec:fibers}) relies on the construction of a sequence of
+fibers of isogenies between algebraic groups. They are inspired by
+previous work due to respectively Shoup~\cite{Shoup90,shoup94} and
+Lenstra / De Smit~\cite{lenstra+desmit08-stdmodels}, and Couveignes /
+Lercier~\cite{couveignes+lercier11}. We briefly discuss them here and
+give more details in the further sections.
 
 Lenstra and De Smit~\cite{lenstra+desmit08-stdmodels} address
 questions similar to ours, the construction of the $\ell$-adic closure
-of $\F_q$, and then of its algebraic closure, but with a different
-purpose (standardizing the construction). The resulting algorithms run
-in polynomial time, but (implicitly) rely on linear algebra techniques
-and the use of multiplication tables, so quasi-linear time is not
-directly reachable.
+of $\F_q$ (and of its algebraic closure), with the purpose of
+standardizing the construction. The resulting algorithms run in
+polynomial time, but (implicitly) rely on linear algebra and
+multiplication tables, so quasi-linear time is not directly reachable.
 References~\cite{Shoup90,shoup94,couveignes+lercier11} discuss a
-related problem, the construction of irreducible polynomials of
-prescribed degree over $\F_q$; the question of applying embeddings
-between the levels of the tower is not present there.
+related problem, the construction of irreducible polynomials over
+$\F_q$; the question of computing embeddings is not present there.
 
 To conclude the introduction, let us mention a few applications of our
 results. 
@@ -235,10 +230,9 @@ results.
 A variety of computations in number theory and algebraic geometry
 require constructing new extension fields and moving elements from one
 to the other. As it turns out, in many cases, the $\ell$-adic
-constructions considered here are sufficient: two examples of such
-problems are~\cite{df10,GaSc12}, both in relation to torsion subgroups
-of Jacobians of curves. Our construction makes such computations
-feasible for much larger sizes than was previously possible.
+constructions considered here are sufficient: two examples
+are~\cite{df10,GaSc12}, both in relation to torsion subgroups of
+Jacobians of curves. 
 
 The main question remains of course the cost of computing in arbitrary
 extensions. As showed by Eq.~\eqref{eq:tensor}, this boils down to the
@@ -261,15 +255,16 @@ over $\F_q$ inspired by previous work of Shoup~\cite{Shoup90,shoup94},
 Lenstra-De Smit~\cite{lenstra+desmit08-stdmodels} and
 Couveignes-Lercier~\cite{couveignes+lercier11}. The results of this
 section establish the first three rows of Table~\ref{table:main}, up
-to one exception.
+to two exceptions.
 
-We start by constructing an extension $\K_0 = \F_q[Y_0]/\langle P_0
-\rangle$, such that the residue class $y_0$ of $Y_0$ is a non
-$\ell$-adic residue in $\K_0$ (we discuss this in more detail in the
-first subsection), and we let $r$ be the degree of $P_0$.
+The construction starts by building an extension $\K_0 =
+\F_q[Y_0]/\langle P_0 \rangle$, such that the residue class $y_0$ of
+$Y_0$ is a non $\ell$-adic residue in $\K_0$ (we discuss this in more
+detail in the first subsection); we let $r$ be the degree of
+$P_0$.
 
 By~\cite[Th.~VI.9.1]{lang}, for $i\ge 1$, the polynomial
-$Y_i^{\ell^i}-y_0$ is irreducible in $\K_0[Y_i]$, so that $\K_i=
+$Y_i^{\ell^i}-y_0 \in \K_0[Y_i]$ is irreducible, so that $\K_i=
 \K_0[Y_i]/\langle Y_i^{\ell^i}-y_0\rangle$ is a field with $q^{r
   \ell^i}$ elements.  If we let $y_i$ be the residue class of $Y_i$ in
 $\K_i$, these fields are naturally embedded in one another by the
@@ -283,11 +278,10 @@ trace of $y_i$ over a subfield of index $r$:
 \begin{equation}\label{eq-def:xi}
 x_i = \sum_{j = 0}^{r-1} y_i^{q^{\ell^i j}}.  
 \end{equation}
-Then,~\cite[Th.~2.1]{Shoup90} proves that $\F_q(x_i)=\F_{q^{\ell^i}}$;
-in other words, we arrive at the situation depicted in
-Figure~\ref{fig:ladic}. In particular, the minimal polynomials of
-$x_1,x_2,\dots$ form the family of irreducible polynomials $Q_i$ we
-are interested in.
+Then,~\cite[Th.~2.1]{Shoup90} proves that $\F_q(x_i)=\F_{q^{\ell^i}}$
+(see Figure~\ref{fig:ladic}). In particular,
+the minimal polynomials of $x_1,x_2,\dots$ over $\F_q$ are
+irreducible polynomials $Q_i$ we are interested in.
 
 \begin{figure}[h]
   \centering
@@ -315,7 +309,7 @@ are interested in.
   \label{fig:ladic}
 \end{figure}
 
-We will show how to compute the polynomials $Q_i$, the polynomials
+We will show how here to compute these polynomials, the polynomials
 $T_i$ introduced in Eq.~\eqref{eq:QiTi} and how to perform lift and
 push.  To this effect, we will define more general minimal
 polynomials: for $0 \le j \le i$, we will let $Q_{i,j} \in
@@ -324,27 +318,25 @@ so that $Q_{i,j}$ has degree $\ell^{i-j}$, with in particular
 $Q_{i,0}=Q_i$ and $Q_{i,i-1}=T_i(x_{i-1},X_i)$.
 
 We first consider two favorable cases, where $\ell$ divides
-respectively $q-1$ and $q+1$, before discussing the general case.
-
-The first case is folklore; it yields the fastest and simplest
+respectively $q-1$ and $q+1$, before discussing the general case. The
+first case is folklore; it yields the fastest and simplest
 algorithms. Our results for the second case are close to, but distinct
-from, previous work of Gurak~\cite{gurak06}; the algorithms are
-slightly slower than in the first case. Our results in the general
-case are yet slower, but they are still quasi-linear in $\ell^i$, up
-to the loss of a factor polynomial in $\ell$. 
+from, previous work of Gurak~\cite{gurak06}; we will revisit this case
+in more detail in the next section. Our results in the general case
+are slower, but they remain  quasi-linear in $\ell^i$, up to
+the loss of a factor polynomial in $\ell$.
 
-To our knowledge, the construction we use first appears
-in~\cite{Shoup90,shoup94}, which show how to compute $Q_i$ in time
-quadratic in $\ell^i$~\cite[Th.~11]{shoup94}.  Using {\em modular
-  composition} techniques~\cite[Ch.~12]{vzGG}, this quadratic behavior
-could be improved to get an exponent in $[1.5, 2]$, up to an extra
-cost polynomial in $\ell$.  Remark that for $\ell=3$ (where we are in
-one the first two cases), Couveignes and Lercier mention such an idea
-in~\cite[\S~2.4]{couveignes+lercier11}: using a previous result by
-Kedlaya and Umans~\cite{KeUm11} for modular composition {\em in a
-  boolean model} (where we count bit operations), they derive a cost
-of the form $O(3^{i(1+\varepsilon)} \log(q))$ bit operations for any
-$\varepsilon > 0$.
+Shoup used the same construction to compute $Q_i$ in time quadratic in
+$\ell^i$~\cite[Th.~11]{shoup94}.  Using {\em modular composition}
+techniques~\cite[Ch.~12]{vzGG}, this behavior could be improved to get
+an subquadratic exponent in $\ell^i$, up to an extra cost polynomial
+in $\ell$.  For $\ell=3$ (where we are in one the first two cases),
+Couveignes and Lercier make this remark
+in~\cite[\S~2.4]{couveignes+lercier11}; using a result by Kedlaya and
+Umans~\cite{KeUm11} for modular composition {\em in a boolean model},
+they derive for any $\varepsilon > 0$ a cost of
+$3^{i(1+\varepsilon)}O(\log(q))$ bit operations, up to 
+polynomial terms in $\log\log(q)$.
 
 In this section, and in the rest of this paper, if $L/K$ is a field
 extension, we write $\Tr_{L/K}$, $\Norm_{L/K}$ and $\Gal_{L/K}$ for
@@ -463,7 +455,7 @@ the polynomials $Q_{i,j}$.
 \end{proof}
 
 This proposition allows us to compute $Q_{i,j}$ in time
-$O(\Mult(\ell^{i-j}))$. In Section~\ref{ssec:fibers-T2}, we will use
+$O(\Mult(\ell^{i-j}))$. In Section~\ref{ssec:fibers-T2}, we use
 arithmetic geometry to give a better algorithm, and to efficiently
 find a $y_0$ satisfying the hypotheses. We leave the algorithms for
 lift and push to Section~\ref{sec:lift-push}.
