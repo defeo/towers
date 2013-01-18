@@ -254,8 +254,7 @@ In this section, we discuss a construction of the $\ell$-adic tower
 over $\F_q$ inspired by previous work of Shoup~\cite{Shoup90,shoup94},
 Lenstra-De Smit~\cite{lenstra+desmit08-stdmodels} and
 Couveignes-Lercier~\cite{couveignes+lercier11}. The results of this
-section establish the first three rows of Table~\ref{table:main}, up
-to two exceptions.
+section establish rows 1 and 3 of Table~\ref{table:main}.
 
 The construction starts by building an extension $\K_0 =
 \F_q[Y_0]/\langle P_0 \rangle$, such that the residue class $y_0$ of
@@ -360,33 +359,29 @@ there exist non $\ell$-adic residues in $\F_q[X_0]/\langle F_0
 be its minimal polynomial over $\F_q$ (which still has degree $r$);
 given $y_0$, computing $P_0$ takes $O(r^2)$ operations in $\F_q$.
 
-Following~\cite{Shoup90,shoup94,couveignes+lercier11}, we find $y_0$
-by picking it at random: we expect to find a non-residue after $O(1)$
-trials; by~\cite[Lemma~15]{shoup94}, each takes
+Following~\cite{Shoup90,shoup94,couveignes+lercier11}, we pick $y_0$
+at random: we expect to find a non-residue after $O(1)$ trials;
+by~\cite[Lemma~15]{shoup94}, each takes
 $O_e(\Mult(\ell)\log(r)+\Mult(r)\log(\ell)\log(r)+\Mult(r)\log(q))$
 operations in $\F_q$. An alternative idea, due to Lenstra and De Smit,
 is to take iterated $\ell$-th roots of $X_0 \bmod F_0$ until we find a
-non-residue.  Their approach allows for constructing the towers in a
-canonical way, but its complexity is worse, thus we will not consider
-it.
+non-residue.  This idea makes the construction canonical, but its
+complexity is worse, so we will not consider it.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{$T_1$-type extensions}\label{ssec:T1}
 
-In this subsection, we consider the simplest case, where $\ell$
-divides $q-1$; the (classical) facts below give the first row of
-Table~\ref{table:main}.
+In we consider here the simplest case, where $\ell$ divides $q-1$; the
+(classical) facts below give the first row of Table~\ref{table:main}.
 
 In this case, $\Phi_\ell$ splits into linear factors over $\F_q$ (that
-is, $r=1$). The polynomial $P_0$ is of the form $Y_0-y_0$, where
-$y_0$ is a non $\ell$-adic residue in $\F_q$.  Since we can bypass
-the factorization of $\Phi_\ell$, the cost of initialization is
-$O_e(\log(q))$ operations in $\F_q$.
-
-Then, no descent is required. For $i \ge 0$, we have
-$\K_i=\F_{q^{\ell^i}}$ and $x_i=y_i$; the families of polynomials we
-obtain are
+is, $r=1$). The polynomial $P_0$ is of the form $Y_0-y_0$, where $y_0$
+is a non $\ell$-adic residue in $\F_q$; since we can bypass the
+factorization of $\Phi_\ell$, the cost of initialization is
+$O_e(\log(q))$ operations in $\F_q$. Then, no descent is required. For
+$i \ge 0$, we have $\K_i=\F_{q^{\ell^i}}$ and $x_i=y_i$; the families
+of polynomials we obtain are
 \begin{equation}
   \label{eq:T1}
   Q_i=X_i^{\ell^i}-y_0 \quad\text{and}\quad T_i=X_{i}^\ell-X_{i-1}.
@@ -407,28 +402,28 @@ use only exponent arithmetic, and no operation in~$\F_q$.
 Next, we consider the case where $\ell$ divides $q+1$, so that
 $\Phi_\ell$ splits into quadratic factors over $\F_q$ (that is,
 $r=2$). In addition to the previous assumptions, we require that $y_0$
-has norm $1$ over $\F_q$. We can immediately give an expression for
-the polynomials $Q_{i,j}$.
+has norm $1$ over $\F_q$; we can then give an expression for the
+polynomials $Q_{i,j} \in \F_q(x_{j})[X_i]$.
 
 \begin{proposition}
   \label{th:T2-resultant}
-  For $1 \le j < i$, $Q_{i,j} \in \F_q(x_{j})[X_i]$ satisfies
+  For $1 \le j < i$, $Q_{i,j}$ satisfies
   \begin{equation}
     \label{eq:T2-relpols}
     Q_{i,j}(X_i) = Y^{\ell^{i-j}} + Y^{-\ell^{i-j}} - x_j \mod Y^2-X_iY+1
   \end{equation}
 \end{proposition}
 \begin{proof}
-  By hypothesis, $\Norm_{\K_0/\F_q}(y_0)=1$. Hence,
-  $\Norm_{\K_i/\F_q(x_i)}(y_i)$ is an $\ell^i$-th root of unity. But $\ell$
-  does not divide $q-1$, so $1$ is the only such root in $\F_q$, and
-  by induction on $i$ it also is the only root in $\F_q(x_i)$.
-
-  Hence, the minimal polynomial of $y_i$ over $\F_q(x_i)$ is $Y_i^2
-  -x_i Y_i +1$.  By composition, it follows that the minimal
-  polynomial of $y_i$ over $\F_q(x_{j})$ is $Y_i^{2\ell^{i-j}}-x_{j}
-  Y_i^{\ell^{i-j}}+1$. Eliminating $Y_i$ between these two polynomials
-  gives the following relation between $x_{j}$ and $x_i$:
+  Since $\Norm_{\K_0/\F_q}(y_0)=1$, $\Norm_{\K_i/\F_q(x_i)}(y_i)$ is
+  an $\ell^i$-th root of unity. But $\ell$ does not divide $q-1$, so
+  $1$ is the only such root in $\F_q$, and by induction on $i$ it also
+  is the only root in $\F_q(x_i)$; hence, the minimal polynomial of
+  $y_i$ over $\F_q(x_i)$ is $Y_i^2 -x_i Y_i +1$. By composition, it
+  follows that the minimal polynomial of $y_i$ over $\F_q(x_{j})$ is
+  $Y_i^{2\ell^{i-j}}-x_{j} Y_i^{\ell^{i-j}}+1$. Taking a resultant to
+  eliminate $Y_i$
+  between these two polynomials gives the following relation between
+  $x_{j}$ and $x_i$:
   \begin{equation*}
     Q_{i,j}(X_i)^2 = \mathrm{Res}_{Y_i}(Y_i^{2\ell^{i-j}}-x_{j}Y_i^{\ell^{i-j}}+1,\; Y_i^2-X_i Y_i+1).
   \end{equation*}
@@ -454,20 +449,19 @@ the polynomials $Q_{i,j}$.
   Eq.~\eqref{eq:T2-relpols}.
 \end{proof}
 
-This proposition allows us to compute $Q_{i,j}$ in time
-$O(\Mult(\ell^{i-j}))$. In Section~\ref{ssec:fibers-T2}, we use
-arithmetic geometry to give a better algorithm, and to efficiently
-find a $y_0$ satisfying the hypotheses. We leave the algorithms for
-lift and push to Section~\ref{sec:lift-push}.
+This proposition would allow us to compute $Q_{i,j}$ in time
+$O(\Mult(\ell^{i-j}))$ by repeated squaring. In
+Section~\ref{ssec:fibers-T2}, we use arithmetic geometry to give a
+better algorithm, and to efficiently find a $y_0$ satisfying the
+hypotheses; we leave the algorithms for lift and push to
+Section~\ref{sec:lift-push}.
 
 \subsection{The general case}
 
 Finally, we discuss the general situation, where we do not make any
 assumption on the behavior of $\Phi_\ell$ in $\F_q[X]$. The results
 below complete the third row of Table~\ref{table:main}, using the
-bound $r=O(\ell)$. Since we are not able to exploit the more specific
-Lenstra-De Smit construction in this case, we use Shoup's approach,
-picking a non $\ell$-adic residue at random.
+bound $r=O(\ell)$.
 
 Because $r=[\K_0 : \F_q]$ divides $\ell-1$, it is coprime with
 $\ell$. Thus, $Q_i$ remains the minimal polynomial of $x_i$ over
@@ -496,16 +490,15 @@ a second time, we will use $\Psi_i$ to perform push and lift between
 the monomial basis in $x_i$ and the bivariate basis in
 $(x_{i-1},x_i)$.
 
-We proceed step-by-step, factoring $\Psi_i$ into elementary
+We will factor $\Psi_i$ into elementary
 isomorphisms
 $$\Psi_{i,j}: \K_j[X_i]/\langle Q_{i,j}\rangle \to
-\K_{j-1}[X_i]/\langle Q_{i,j-1}\rangle,$$ for $j=i,\dots,1$.  To start
-the process, with $j=i$, we let $Q_{i,i}=X_i-x_i \in \K_i[X_i]$,
-so that $\K_i=\K_i[X_i]/\langle Q_{i,i} \rangle$.
-
-Let $j \le i$ and suppose that $Q_{i,j}$ is known. We are going to
+\K_{j-1}[X_i]/\langle Q_{i,j-1}\rangle, \quad j=i,\dots,1.$$ To start
+the process, with $j=i$, we let $Q_{i,i}=X_i-x_i \in \K_i[X_i]$, so
+that $\K_i=\K_i[X_i]/\langle Q_{i,i} \rangle$.
+Take now $j \le i$ and suppose that $Q_{i,j}$ is known. We are going to
 factor $\Psi_{i,j}$ further as $\Phi''_{i,j} \circ \Phi'_{i,j} \circ
-\Phi_{i,j}$. First, we introduce the isomorphism
+\Phi_{i,j}$, by introducing first the isomorphism
 $$\varphi_j: \K_j \to \K_{j-1}[Y_j]/\langle Y_j^\ell-y_{j-1}\rangle.$$
 The forward direction is a push from the monomial basis in $y_j$ to
 the bivariate basis in $(y_{j-1},y_j)$ and the inverse is a lift; none
@@ -518,25 +511,23 @@ coefficients of $Q_{i,j}$. Since $\Phi_{i,j}$ consists in a
 coefficient-wise application of $\varphi_j$, applying it or its
 inverse costs no arithmetic operations.
 
-Next, changing the order of the variables $Y_j$ and $X_i$, we deduce
-that there exists $S_{i,j}$ in $\K_{j-1}[X_j]$ such that we have an
-isomorphism
+Next, changing the order of $Y_j$ and $X_i$, we deduce that there
+exists $S_{i,j}$ in $\K_{j-1}[X_j]$ and an isomorphism
 \begin{multline*}
 \Phi'_{i,j}: \K_{j-1}[Y_j,X_i]/\langle Y_j^\ell-y_{j-1}, Q^\star_{i,j}\rangle
-\to\\ \K_{j-1}[X_i, Y_j]/\langle Q_{i,j-1}, Y_j-S_{i,j}\rangle;
+\to\\ \K_{j-1}[X_i, Y_j]/\langle Q_{i,j-1}, Y_j-S_{i,j}\rangle,
 \end{multline*}
 where $\deg(Q^\star_{i,j},X_i)=\ell^{i-j}$ and
-$\deg(Q_{i,j-1},X_i)=\ell^{i-j+1}$. This conversion is less obvious
-than the previous one.
+$\deg(Q_{i,j-1},X_i)=\ell^{i-j+1}$. 
 \begin{lemma}
-  Given $Q^\star_{i,j}$, one can compute $Q_{i,j-1}$ and $S_{i,j}$
-  using $O(i\Mult(\ell^{i+1})\log(\ell))$ operations in $\K_0$.
-  Once this is done, we can apply $\Phi'_{i,j}$ and its inverse 
-  using $O(\Mult(\ell^{i+1}))$ operations in $\K_0$.
+  From $Q^\star_{i,j}$, we can compute $Q_{i,j-1}$ and $S_{i,j}$
+  in $O(i\Mult(\ell^{i+1})\log(\ell))$ operations in $\K_0$.
+  Once this is done, we can apply $\Phi'_{i,j}$ or its inverse 
+  in $O(\Mult(\ell^{i+1}))$ operations in~$\K_0$.
 \end{lemma}
 \begin{proof}
   We obtain $Q_{i,j-1}$ and $S_{i,j}$ from the resultant and degree-1
-  subresultant of $Y_j-y_{j-1}$ and $Q^\star_{i,j}$ with respect to
+  subresultant of $Y_j^\ell-y_{j-1}$ and $Q^\star_{i,j}$ with respect to
   $Y_j$, computed over the polynomial ring $\K_{j-1}[X_i]$. This is
   done by the algorithms of~\cite{Reischert97,LiRo01}, using
   $O(\Mult(\ell^{i+1})\log(\ell))$ operations in $\K_0$. To obtain
@@ -547,16 +538,17 @@ than the previous one.
   Applying $\Phi'_{i,j}$ amounts to taking a polynomial $A(Y_j,X_i)$ 
   reduced modulo $\langle Y_j^\ell-y_{j-1}, Q^\star_{i,j}\rangle$
   and reducing it modulo $\langle Q_{i,j-1}, Y_j-S_{i,j}\rangle$. This
-  is done by evaluating $Y_j$ at $S_{i,j}$, doing all operations
+  is done by computing $A(S_{i,j},X_i)$, doing all operations
   modulo $Q_{i,j-1}$. Using Horner's scheme, this takes $O(\ell)$ 
   operations $(+,\times)$ in $\K_{j-1}[X_i]/\langle Q_{i,j-1}\rangle$,
-  so the complexity claim follows.
+  so the complexity claim follows (using Kronecker's substitution for
+  all multiplications).
 
   In the converse direction, we start from $A(X_i)$ reduced modulo
   $Q_{i,j-1}$; we have to reduce it modulo $\langle Y_j^\ell-y_{j-1},
-  Q^\star_{i,j}\rangle$. This is done by applying the fast Euclidean
+  Q^\star_{i,j}\rangle$. This is done using the fast Euclidean
   division algorithm with coefficients in $\K_{j-1}[Y_j]/\langle
-  Y_j^\ell-y_{j-1}\rangle$, for a cost of $O(\Mult(\ell^{i+1}))$
+  Y_j^\ell-y_{j-1}\rangle$ (and Kronecker's substitution) for a cost of $O(\Mult(\ell^{i+1}))$
   operations in $\K_0$.
 \end{proof}
 
@@ -564,8 +556,6 @@ The last isomorphism $\Phi''_{i,j}$ is trivial:
 $$\Phi''_{i,j}: \K_{j-1}[X_i, Y_j]/\langle Q_{i,j-1}, Y_j-S_{i,j}\rangle
 \to \K_{j-1}[X_i]/\langle Q_{i,j-1}\rangle$$
 forgets the variable $Y_j$; it requires no arithmetic operation.
-
-\medskip
 
 Taking $j=i,\dots,1$ allows us to compute $Q_{i,i-1}$ and $Q_{i,0}$
 for $O(i^2\Mult(\ell^{i+1})\log(\ell))$ operations in $\K_0$. Composing
@@ -579,7 +569,7 @@ cost. Let us for instance explain how to lift.
 We start from $A$ written on the bivariate basis in $(x_{i-1},x_i)$;
 that is, $A$ is in $\K_0[X_{i-1},X_i]/\langle Q_{i-1},
 T_{i}\rangle$. Apply $\Psi_{i-1}$ to its coefficients in
-$x_i^0,\dots,x_i^{\ell-1}$, so as to rewrite $A$ as an element of
+$x_i^0,\dots,x_i^{\ell-1}$, to rewrite $A$ as an element of
 $$\K_0[Y_{i-1},X_i]/\langle Y_{i-1}^{\ell^{i-1}}-y_{i-2},
 T_{i}\rangle = \K_{i-1}[X_i]/\langle Q_{i,i-1} \rangle.$$ Applying
 $\Psi_{i,i}^{-1}$ gives us the image of $A$ in $\K_i$, and applying
@@ -594,26 +584,48 @@ $\Psi_i$ finally brings it to $\K_0[X_i]/\langle Q_{i}\rangle$.
 In this section we discuss another construction of the $\ell$-adic
 tower based on work of Couveignes and
 Lercier~\cite{couveignes+lercier11}. The results of this section are
-summarized in the last two rows of Table~\ref{table:main}. This
+summarized in rows 2, 4 and 5 of Table~\ref{table:main}. This
 construction is not unrelated to the ones of the previous section, and
-indeed we will start by showing how those of Section~\ref{ssec:T1}
+indeed we will start by showing how those of Sections~\ref{ssec:T1}
 and~\ref{ssec:T2} reduce to it.
 
-Here is the bottom line of Couveignes' and Lercier's idea. Let $G, G'$ be integral algebraic 
-$\F_q$-groups, and let $\eta$ be the generic point of $G$. We say a morphism $f: G' \rightarrow 
-G$ is generically finite if the fiber $G'_\eta = G' \times_{G} \kappa(\eta)$, where $\kappa(\eta)$ 
-is the residue field of $G$ at $\eta$, is a finite set. Now let $f: G' \rightarrow G$ be a 
-surjective, generically finite morphism of finite type. Then the extension $K(G')/K(G)$ of the 
-fraction fields is finite algebraic, and the degree of $f$ is defined as $[K(G'): K(G)]$. The 
-morphism $f$ is said to be separable if the extension $K(G')/K(G)$ is separable. If $f$ is 
-separable of degree $\ell$ then the set of points $x \in G$ with fiber $G'_x$ of cardinality 
-$\ell$ is a nonempty open subset $U \subset G$. If the induced homomorphism $G'(\F_q) \rightarrow 
-G(\F_q)$ of groups is not surjective then there are points of $G(\F_q)$ with fibers living in an 
-algebraic extension of $\F_q$. Assume that we are able to choose $f$ so that at least one of these 
-points is contained in $U$ and has an irreducible fiber, then we project its fiber onto a linear 
-form in generic position (e.g., onto an axis). The resulting polynomial is irreducible of degree 
-$\ell$, as required. If we can repeat the construction with a new map $f':G''\to G'$, and so on 
-indefinitely, the sequence of extensions makes an $\ell$-adic tower over $\F_q$.
+Here is the bottom line of Couveignes' and Lercier's idea. Let $G, G'$
+be integral algebraic $\F_q$-groups of the same dimension and let $f:
+G' \rightarrow G$ be a surjective, separable algebraic group morphism.
+Let $\ell$ be the degree of $f$; then, the set of points $x \in G$
+with fiber $G'_x$ of cardinality $\ell$ is a nonempty open subset $U
+\subset G$. If the induced homomorphism $G'(\F_q) \rightarrow G(\F_q)$
+of groups is not surjective then there are points of $G(\F_q)$ with
+fibers lying in algebraic extensions of $\F_q$. Assume that we are able
+to choose $f$ so that at least one of these points is contained in $U$
+and has an irreducible fiber, and apply a linear projection to this
+fiber (e.g., onto an axis). The resulting polynomial is irreducible of
+degree dividing $\ell$ (and expectedly equal to $\ell$, as
+required. If we can repeat the construction with a new map $f':G''\to
+G'$, and so on indefinitely, the sequence of extensions makes an
+$\ell$-adic tower over $\F_q$.
+
+%% Here is the bottom line of Couveignes' and Lercier's idea. Let $G, G'$
+%% be integral algebraic $\F_q$-groups, and let $\eta$ be the generic
+%% point of $G$. We say a morphism $f: G' \rightarrow G$ is generically
+%% finite if the fiber $G'_\eta = G' \times_{G} \kappa(\eta)$, where
+%% $\kappa(\eta)$ is the residue field of $G$ at $\eta$, is a finite
+%% set. Now let $f: G' \rightarrow G$ be a surjective, generically finite
+%% morphism of finite type. Then the extension $K(G')/K(G)$ of the
+%% fraction fields is finite algebraic, and the degree of $f$ is defined
+%% as $[K(G'): K(G)]$. The morphism $f$ is said to be separable if the
+%% extension $K(G')/K(G)$ is separable. If $f$ is separable of degree
+%% $\ell$ then the set of points $x \in G$ with fiber $G'_x$ of
+%% cardinality $\ell$ is a nonempty open subset $U \subset G$. If the
+%% induced homomorphism $G'(\F_q) \rightarrow G(\F_q)$ of groups is not
+%% surjective then there are points of $G(\F_q)$ with fibers living in an
+%% algebraic extension of $\F_q$. Assume that we are able to choose $f$
+%% so that at least one of these points is contained in $U$ and has an
+%% irreducible fiber, then we project its fiber onto a linear form in
+%% generic position (e.g., onto an axis). The resulting polynomial is
+%% irreducible of degree $\ell$, as required. If we can repeat the
+%% construction with a new map $f':G''\to G'$, and so on indefinitely,
+%% the sequence of extensions makes an $\ell$-adic tower over $\F_q$.
 
 
 
