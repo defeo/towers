@@ -215,7 +215,7 @@ Lercier~\cite{couveignes+lercier11}. We briefly discuss them here and
 give more details in the further sections.
 
 Lenstra and De Smit~\cite{lenstra+desmit08-stdmodels} address
-questions similar to ours, the construction of the $\ell$-adic closure
+a question similar to ours, the construction of the $\ell$-adic closure
 of $\F_q$ (and of its algebraic closure), with the purpose of
 standardizing the construction. The resulting algorithms run in
 polynomial time, but (implicitly) rely on linear algebra and
@@ -280,7 +280,7 @@ x_i = \sum_{j = 0}^{r-1} y_i^{q^{\ell^i j}}.
 Then,~\cite[Th.~2.1]{Shoup90} proves that $\F_q(x_i)=\F_{q^{\ell^i}}$
 (see Figure~\ref{fig:ladic}). In particular,
 the minimal polynomials of $x_1,x_2,\dots$ over $\F_q$ are
-irreducible polynomials $Q_i$ we are interested in.
+the irreducible polynomials $Q_i$ we are interested in.
 
 \begin{figure}[h]
   \centering
@@ -308,11 +308,11 @@ irreducible polynomials $Q_i$ we are interested in.
   \label{fig:ladic}
 \end{figure}
 
-We will show how here to compute these polynomials, the polynomials
+We will show here how to compute these polynomials, the polynomials
 $T_i$ introduced in Eq.~\eqref{eq:QiTi} and how to perform lift and
 push.  To this effect, we will define more general minimal
 polynomials: for $0 \le j \le i$, we will let $Q_{i,j} \in
-\F_q(x_j)[X_j]$ be the minimal polynomial of $x_i$ over $\F_q(x_j)$,
+\F_q(x_j)[X_i]$ be the minimal polynomial of $x_i$ over $\F_q(x_j)$,
 so that $Q_{i,j}$ has degree $\ell^{i-j}$, with in particular
 $Q_{i,0}=Q_i$ and $Q_{i,i-1}=T_i(x_{i-1},X_i)$.
 
@@ -372,7 +372,7 @@ complexity is worse, so we will not consider it.
 
 \subsection{$T_1$-type extensions}\label{ssec:T1}
 
-In we consider here the simplest case, where $\ell$ divides $q-1$; the
+We consider here the simplest case, where $\ell$ divides $q-1$; the
 (classical) facts below give the first row of Table~\ref{table:main}.
 
 In this case, $\Phi_\ell$ splits into linear factors over $\F_q$ (that
@@ -601,7 +601,7 @@ to choose $f$ so that at least one of these points is contained in $U$
 and has an irreducible fiber, and apply a linear projection to this
 fiber (e.g., onto an axis). The resulting polynomial is irreducible of
 degree dividing $\ell$ (and expectedly equal to $\ell$, as
-required. If we can repeat the construction with a new map $f':G''\to
+required). If we can repeat the construction with a new map $f':G''\to
 G'$, and so on indefinitely, the sequence of extensions makes an
 $\ell$-adic tower over $\F_q$.
 
