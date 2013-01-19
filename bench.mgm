@@ -1,0 +1,126 @@
+/*
+  All the test routines take three parameters:
+    p : size of the base field
+    l : degree of the tower
+    h : height of the tower
+
+  and return a list of lists containing timings for various
+  operations (create, embed, push, lift) at each level.
+
+  They also print some summary of timings for convenience.
+*/
+
+// subroutine used to test lift/push
+function test_lp(K, l, trials)
+    tpush := [];
+    tlift := [];
+    for i := 2 to #K do
+	tl := 0; tp := 0;
+	for j := 1 to trials do
+	    a := Random(K[i]);
+	    t := Cputime();
+	    _ := Eltseq(a, K[i-1]);
+	    tp +:= Cputime(t);
+
+	    B := [Random(K[i-1]) : k in [1..l]];
+	    t := Cputime();
+	    _ := Seqelt(B, K[i]);
+	    tl +:= Cputime(t);
+	end for;
+	tpush[i-1] := tp/trials;
+	tlift[i-1] := tl/trials;
+    end for;
+    print "Push time:", &+tpush;
+    print "Lift time:", &+tlift;
+
+    return tpush, tlift;
+end function;
+
+
+// Construct tower using default ext<> constructor
+function default_ext(p, l, h)
+    K := [GF(p)];
+
+    tcreat := [];
+    for i := 2 to h+1 do
+	t := Cputime();
+	K[i] := ext<K[i-1]|l>;
+	tcreat[i-1] := Cputime(t);
+    end for;
+    print "Creation time:", &+tcreat;
+
+    tpush, tlift := test_lp(K, l, 3);
+    
+    return tcreat, tpush, tlift;
+end function;
+
+
+// Construct tower using default sub<> constructor
+function default_sub(p, l, h)
+    K := [GF(p)];
+
+    tcreat := [];
+    t := Cputime();
+    K[h+1] := GF(p, l^h);
+    tcreat[h] := Cputime(t);
+    for i := h to 2 by -1 do
+	t := Cputime();
+	K[i] := sub<K[i+1]|l^(i-1)>;
+	tcreat[i-1] := Cputime(t);
+    end for;
+    print "Creation time:", &+tcreat;
+
+    tpush, tlift := test_lp(K, l, 3);
+
+    return tcreat, tpush, tlift;
+end function;
+
+
+// Construct tower creating the default fields first, then embedding
+function default_embed(p, l, h)
+    K := [];
+    K[1] := GF(p);
+    tcreat := [];
+    tembed := [];
+    for i := 2 to h+1 do
+	t := Cputime();
+	K[i] := GF(p, l^(i-1));
+	tcreat[i-1] := Cputime(t);
+
+	t := Cputime();
+	Embed(K[i-1], K[i]);
+	tembed[i-1] := Cputime(t);
+    end for;
+    print "Creation time:", &+tcreat;
+    print "Embedding time:", &+tembed;
+    
+    tpush, tlift := test_lp(K, l, 3);
+    
+    return tcreat, tembed, tpush, tlift;
+end function;
+
+
+// Construct tower creating fields from random polynomials, then embedding
+function random_embed(p, l, h)
+    K := [];
+    K[1] := GF(p);
+    tcreat := [];
+    tembed := [];
+    for i := 2 to h+1 do
+	P := RandomIrreduciblePolynomial(K[1], l^(i-1));
+	t := Cputime();
+	K[i] := ext<K[1]|P>;
+	tcreat[i-1] := Cputime(t);
+
+	t := Cputime();
+	Embed(K[i-1], K[i]);
+	tembed[i-1] := Cputime(t);
+    end for;
+    print "Creation time:", &+tcreat;
+    print "Embedding time:", &+tembed;
+    
+    tpush, tlift := test_lp(K, l, 3);
+    
+    return tcreat, tembed, tpush, tlift;
+end function;
+
