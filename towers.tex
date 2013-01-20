@@ -88,7 +88,7 @@ extension fields are still out of reach.
 In this paper, we discuss an approach based on polynomial arithmetic
 rather than linear algebra with much better performance. We consider
 here one aspect of the question, $\ell$-adic towers; we expect that
-this will play an important r\^ole towards a complete solution.
+this will play an important role towards a complete solution.
 
 %%%% it feels stupid to put the table here, but I want it on page 2.
 %%%% if I were better at floats, I would know how to put it where it belongs
@@ -931,7 +931,7 @@ $H_i$. The construction is depicted in Figure~\ref{fig:volcano}.
   $O(\sqrt{q}\log (q))$.
 \end{proof}
 
-In what follows, the index $i$ to be understood modulo the length of
+In what follows, the index $i$ is to be understood modulo the length of
 the cycle. This is a slight abuse, because $E_n$ is isomorphic but not
 equal to $E_0$, but it does not hide any theoretical or computational
 difficulty.
@@ -998,7 +998,7 @@ next section.
   To build the $i$-th level, we first need to find the equation of
   $E_{-i}$. For this, we evaluate $\Phi_\ell$ at $j(E_{-i+1})$, using
   $O(\ell^2)$ operations. The resulting polynomial has two roots in
-  $\F_q$, one corresponding to the $j(E_{-i})$, the other to the
+  $\F_q$, namely $j(E_{-i})$ and
   $j(E_{-i+2})$. We factor it using $O_e(\Mult(\ell)\log(\ell q))$
   operations~\cite[Ch~14]{vzGG}. Once $E_{-i}$ is known, we find an
   $\ell$-torsion point using $O_e(\log q)$ operations, and apply
@@ -1227,8 +1227,8 @@ Sage implementation and timings.
 
 %%%
 
-\section{Aknowledgements}
-De Feo would like to thank Antoine Joux.
+\bigskip \textbf{Aknowledgements.}  De Feo would like to thank Antoine
+Joux and J\'er\^ome Pl\^ut for fruitful discussions.
 
 \scriptsize
 \bibliographystyle{abbrv}
