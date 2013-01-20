@@ -156,6 +156,9 @@ def compose(Ps, f, g=1):
     everything can be done in place (although it is not in this
     implementation).
     """
+    if not Ps:
+        return f.parent()(0)
+
     n = len(Ps)
     
     def color(i, n, h):

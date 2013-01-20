@@ -8,40 +8,29 @@ from sage.misc.functional import cyclotomic_polynomial
 from itertools import izip_longest
 from de_compose import *
 
-def _torsion_poly(ell, mod=None):
+def _torsion_poly(ell, K=None):
     """
-    Computes the ell-th gauss period modulo `mod`. It uses a
-    multi-modular algorithm.
+    Computes the ell-th gauss period modulo `p`.
 
     This is my favourite equality:
     
     sage: all(_torsion_poly(n)(I) == I^n*lucas_number2(n,1,-1) for n in range(1,10))
     True
     """
-    def tp_prime(Rs, ell):
-        "Multimodular algorithm to compute the non-null coefficients"
-        t = [[R(1) for R in Rs]]
-        for k in range(1, ell/2 + 1):
-            m = ZZ(ell - 2*k + 2) * (ell - 2*k + 1) / ((ell - k) * k)
-            t.append([-c * m for c in t[-1]])
-        return t
-
-    if mod is None:
-        t = sum(map(lambda x:(x[0], 0), tp_prime([ZZ], ell)), ())
+    if K is None:
+        K, R = QQ, ZZ
+    elif K.characteristic() == 0:
         R = ZZ
     else:
-        fact = factor(mod)
-        moduli = [p**e for (p,e) in fact]
-        ts = tp_prime([Zp(p, prec=e, type='capped-rel')
-                       for (p,e) in fact],
-                      ell)
-        ts = map(lambda x:map(lambda (c,(_,e)):c.residue(e).lift(), 
-                              zip(x,fact)),
-                 ts)
-        t = sum(map(lambda x:(CRT(x, moduli), 0), ts), ())
-        R = Integers(mod)
+        R = Zp(K.characteristic(), prec=1, type='capped-rel')
+    
+    t = [1, 0]
+    for k in range(1, ell/2 + 1):
+        m = R(ell - 2*k + 2) * R(ell - 2*k + 1) / (R(ell - k) * R(k))
+        t.append(-t[-2] * m)
+        t.append(0)
 
-    P = PolynomialRing(R, 'x')
+    P = PolynomialRing(K, 'x')
     return P(list(reversed(t))).shift(ell % 2 - 1)
 
 
@@ -83,7 +72,7 @@ class Tower:
         self._base = K
         self._degree = ell
         self._name = name
-        self._t = _torsion_poly(ell, K.characteristic())
+        self._t = _torsion_poly(ell, K)
         self._levels = [K]
         self._minpolys = [None]
         self._eta = eta
@@ -99,7 +88,7 @@ class Tower:
             p = self._t - self._eta
         else:
             p = _torsion_poly(self._degree**len(self._levels),
-                              self._base.characteristic()) - self._eta
+                              self._base) - self._eta
         self._minpolys.append(p)
 
         k = self._levels[-1]
@@ -114,10 +103,14 @@ class Tower:
         P = f.parent(x.polynomial())
         level = x.parent().degree().valuation(self._degree)
 
-        return [self[level-1](list(c))
-                for c in izip_longest(*decompose(P, f))]
+        p = [self[level-1](list(c))
+             for c in izip_longest(*decompose(P, f), fillvalue=0)]
+        return p if p else [self[level-1](0)]
 
     def _lift(self, xs):
+        if not xs:
+            raise RuntimeError("Don't know where to lift to.")
+
         f = self._t
         Ps = map(f.parent().__call__, izip_longest(*map(lambda x:x.polynomial(), xs)))
         level = xs[0].parent().degree().valuation(self._degree)

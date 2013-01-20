@@ -102,10 +102,14 @@ class Tower:
         x *= x.parent(g**deg)
         P = f.parent(x.polynomial())
 
-        return [self[level-1](list(c))
-                for c in izip_longest(*decompose(P, f, g, deg))]
+        p = [self[level-1](list(c))
+             for c in izip_longest(*decompose(P, f, g, deg), fillvalue=0)]
+        return p if p else [self[level-1](0)]
 
     def _lift(self, xs):
+        if not xs:
+            raise RuntimeError("Don't know where to lift to.")
+
         level = xs[0].parent().degree().valuation(self._degree)
         f, g = self._rel_polys[(-level-1) % len(self._rel_polys)]
         Ps = map(f.parent().__call__, izip_longest(*map(lambda x:x.polynomial(), xs)))
