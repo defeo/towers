@@ -1,3 +1,5 @@
+from sage.rings.integer_ring import ZZ
+
 def compose(Ps, f, g=1):
     """
     Compute the numerator of Ps(f/g). Ps is a list of coefficients.
@@ -222,7 +224,7 @@ def decompose(P, f, g=None, target=None):
     if g is None:
         g = f.parent()(1)
     if target is None:
-        target = P.degree() // f.degree()
+        target = ZZ(P.degree() // f.degree())
     n, a, b = 0, 1, 1
     moduli = []
     for bit in reversed(target.bits()):

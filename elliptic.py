@@ -2,14 +2,14 @@ from sage.rings.integer_ring import ZZ
 from sage.rings.padics.factory import Zp
 from sage.rings.finite_rings.constructor import GF
 from sage.rings.finite_rings.integer_mod_ring import Integers
-from sage.rings.arith import CRT, factor
+from sage.rings.arith import CRT, factor, valuation
 from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
 from sage.schemes.elliptic_curves.constructor import EllipticCurve_from_j
 from itertools import izip_longest
 from de_compose import *
 
 class Tower:
-    def __init__(self, K, ell, name, debug=False):
+    def __init__(self, K, ell, name, implementation=None, debug=False):
         """
         Initialize the ell-adic extension tower of K.
         """
@@ -43,6 +43,7 @@ class Tower:
             P = E.random_point() * c.prime_to_m_part(ell)
         self._eta = P[0]
 
+        self._P = PolynomialRing(K, name, implementation=implementation)
         # Run through the isogeny cycle
         self._rel_polys = []
         baseE = E
@@ -56,8 +57,8 @@ class Tower:
                 P *= ell
             i = E.isogeny(P)
 
-            f = i[0].numerator().univariate_polynomial()
-            g = i[0].denominator().univariate_polynomial()
+            f = self._P(i[0].numerator())
+            g = self._P(i[0].denominator())
             E = i.codomain()
             if E.is_isomorphic(baseE):
                 iso = E.isomorphism_to(baseE)
@@ -82,37 +83,35 @@ class Tower:
         
         F, G = (self._abs_polys[-1] 
                 if self._abs_polys
-                else (f.parent().gen(), f.parent()(1)))
+                else (self._P.gen(), self._P(1)))
         F = compose(list(F), f, g)
         G = g*compose(list(G), f, g)
         self._abs_polys.append((F, G))
         p = F - self._eta*G
 
-        k = self._levels[-1]
-        K = GF(k.cardinality()**self._degree, 
-               name=self._name + str(len(self._levels)),
-               modulus=p,
-               check_irreducible=self._debug)
+        if self._debug and not p.is_irreducible():
+            raise RuntimeError('Polynomial must be irreducible')
+
+        K = self._P.quo(p, self._name + str(len(self._levels)))
         self._levels.append(K)
 
     def _push(self, x):
-        level = x.parent().degree().valuation(self._degree)
+        level = valuation(x.parent().degree(), self._degree)
         f, g = self._rel_polys[-level % len(self._rel_polys)]
         deg = self._degree**(level - 1) - 1
         x *= x.parent(g**deg)
-        P = f.parent(x.polynomial())
 
         p = [self[level-1](list(c))
-             for c in izip_longest(*decompose(P, f, g, deg), fillvalue=0)]
+             for c in izip_longest(*decompose(x.lift(), f, g, deg), fillvalue=0)]
         return p if p else [self[level-1](0)]
 
     def _lift(self, xs):
         if not xs:
             raise RuntimeError("Don't know where to lift to.")
 
-        level = xs[0].parent().degree().valuation(self._degree)
+        level = valuation(xs[0].parent().degree(), self._degree)
         f, g = self._rel_polys[(-level-1) % len(self._rel_polys)]
-        Ps = map(f.parent().__call__, izip_longest(*map(lambda x:x.polynomial(), xs)))
+        Ps = map(self._P.__call__, izip_longest(*xs))
 
         return (self[level+1](compose(Ps, f, g)) / 
                 self[level+1](g**(len(Ps)-1)))

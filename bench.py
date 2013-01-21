@@ -21,13 +21,11 @@ import elliptic as EC
 from sage.rings.finite_rings.constructor import GF
 from sage.misc.sage_timeit import sage_timeit
 
-def test(p, l, h, T, number, repeat):
+def test(p, l, h, T, implementation=None, number=0, repeat=3):
     """
     This subroutine does the real job
     """
-    tower = T(GF(p), l, 'x')
-    context = globals()
-    context.update(locals())
+    tower = T(GF(p), l, 'x', implementation=implementation)
     
     tcreat, tlift, tpush = [], [], []
     for i in range(1, h+1):
@@ -45,14 +43,14 @@ def test(p, l, h, T, number, repeat):
     print 'Push time:', sum(tpush)
     print 'Lift time:', sum(tlift)
 
-    return tcreat, tlift, tpush
+    return tcreat, tpush, tlift
     
 
-def test_torus(p, l, h, number=0, repeat=3):
+def test_torus(p, l, h, implementation=None, number=0, repeat=3):
     "Tests the T2 construction"
-    return test(p, l, h, T2.Tower, number, repeat)
+    return test(p, l, h, T2.Tower, implementation, number, repeat)
 
-def test_elliptic(p, l, h, number=0, repeat=3):
+def test_elliptic(p, l, h, implementation=None, number=0, repeat=3):
     "Tests C&L construction"
-    return test(p, l, h, EC.Tower, number, repeat)
+    return test(p, l, h, EC.Tower, implementation, number, repeat)
 

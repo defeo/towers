@@ -2,27 +2,28 @@ from sage.rings.integer_ring import ZZ
 from sage.rings.padics.factory import Zp
 from sage.rings.finite_rings.constructor import GF
 from sage.rings.finite_rings.integer_mod_ring import Integers
-from sage.rings.arith import CRT, factor
+from sage.rings.arith import CRT, factor, valuation
 from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
 from sage.misc.functional import cyclotomic_polynomial
 from itertools import izip_longest
 from de_compose import *
 
-def _torsion_poly(ell, K=None):
+def _torsion_poly(ell, P=None):
     """
-    Computes the ell-th gauss period modulo `p`.
+    Computes the ell-th gauss period. If `P` is given, it must be a
+    polynomial ring into which te result is coerced.
 
     This is my favourite equality:
     
     sage: all(_torsion_poly(n)(I) == I^n*lucas_number2(n,1,-1) for n in range(1,10))
     True
     """
-    if K is None:
-        K, R = QQ, ZZ
-    elif K.characteristic() == 0:
+    if P is None:
+        P, R, = PolynomialRing(ZZ, 'x'), ZZ, 
+    elif P.characteristic() == 0:
         R = ZZ
     else:
-        R = Zp(K.characteristic(), prec=1, type='capped-rel')
+        R = Zp(P.characteristic(), prec=1, type='capped-rel')
     
     t = [1, 0]
     for k in range(1, ell/2 + 1):
@@ -30,7 +31,6 @@ def _torsion_poly(ell, K=None):
         t.append(-t[-2] * m)
         t.append(0)
 
-    P = PolynomialRing(K, 'x')
     return P(list(reversed(t))).shift(ell % 2 - 1)
 
 
@@ -47,7 +47,7 @@ def _pellmul(x, n):
 
 
 class Tower:
-    def __init__(self, K, ell, name, debug=False):
+    def __init__(self, K, ell, name, implementation=None, debug=False):
         """
         Initialize the ell-adic extension tower of K.
         """
@@ -70,9 +70,10 @@ class Tower:
                 eta = K.random_element()
 
         self._base = K
+        self._P = PolynomialRing(K, name, implementation=implementation)
         self._degree = ell
         self._name = name
-        self._t = _torsion_poly(ell, K)
+        self._t = _torsion_poly(ell, self._P)
         self._levels = [K]
         self._minpolys = [None]
         self._eta = eta
@@ -88,23 +89,21 @@ class Tower:
             p = self._t - self._eta
         else:
             p = _torsion_poly(self._degree**len(self._levels),
-                              self._base) - self._eta
+                              self._P) - self._eta
         self._minpolys.append(p)
 
-        k = self._levels[-1]
-        K = GF(k.cardinality()**self._degree, 
-               name=self._name + str(len(self._levels)),
-               modulus=p,
-               check_irreducible=self._debug)
+        if self._debug and not p.is_irreducible():
+            raise RuntimeError('Polynomial must be irreducible')
+
+        K = self._P.quo(p, self._name + str(len(self._levels)))
         self._levels.append(K)
 
     def _push(self, x):
         f = self._t
-        P = f.parent(x.polynomial())
-        level = x.parent().degree().valuation(self._degree)
+        level = valuation(x.parent().degree(), self._degree)
 
         p = [self[level-1](list(c))
-             for c in izip_longest(*decompose(P, f), fillvalue=0)]
+             for c in izip_longest(*decompose(x.lift(), f), fillvalue=0)]
         return p if p else [self[level-1](0)]
 
     def _lift(self, xs):
@@ -112,7 +111,7 @@ class Tower:
             raise RuntimeError("Don't know where to lift to.")
 
         f = self._t
-        Ps = map(f.parent().__call__, izip_longest(*map(lambda x:x.polynomial(), xs)))
-        level = xs[0].parent().degree().valuation(self._degree)
+        Ps = map(self._P.__call__, izip_longest(*xs))
+        level = valuation(xs[0].parent().degree(), self._degree)
 
         return self[level+1](compose(Ps, f))
