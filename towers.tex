@@ -864,6 +864,7 @@ follow-up to the present work.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Towers from elliptic curves}
+\label{sec:elliptic}
 
 Since it seems hard to deal with higher dimensional algebraic tori, it
 is interesting to look at other algebraic groups. Being
@@ -904,7 +905,7 @@ under the $q$-th power map; such an isogeny exists if and only if the
 curves have the same number of points over $\F_q$. An isogeny of
 degree $n$ is separable if and only if $n$ is prime to $p$, in which
 case its kernel contains exactly $n$ points.  Because of the
-assumptions on $\ell$, there exist an $e\ge1$ such that, for any curve
+assumptions on $\ell$, there exists an $e\ge1$ such that, for any curve
 $E$ isogenous to $E_0$, the $\F_q$-rational part of $E[\ell]$ is
 cyclic of order $\ell^e$.
 
@@ -923,7 +924,7 @@ $H_i$. The construction is depicted in Figure~\ref{fig:volcano}.
 
 \begin{lemma}
   \label{th:class-number}
-  Let $E_0,E_1,\dots$ be defined as above, there exist $n\in
+  Let $E_0,E_1,\dots$ be defined as above, there exists $n\in
   O(\sqrt{q}\log (q))$ such that $E_n$ is isomorphic to $E_0$.
 \end{lemma}
 \begin{proof}
@@ -979,9 +980,9 @@ following assumption: we suppose that the {\em modular polynomial}
 $\Phi_\ell\bmod p$ is known.
 
 \begin{theorem}\label{theo:elliptic}
-  Suppose $4\ell\le q^{1/4}$, and under the above assumption,
-  initializing the $\ell$-adic tower requires
-  $O\tilde{_e}(\ell\log^5(q))$ bit operations, and building the $i$-th
+  Suppose $4\ell\le q^{1/4}$, and under the above assumption.
+  Initializing the $\ell$-adic tower requires
+  $O\tilde{_e}(\ell\log^5(q))$ bit operations; and building the $i$-th
   level requires $O_e(\ell^2+\Mult(\ell)\log(\ell
   q)+\Mult(\ell^i)\log(\ell^i))$ operations in $\F_q$.
 \end{theorem}
@@ -1000,7 +1001,7 @@ $\Phi_\ell\bmod p$ is known.
   $O_e(\Mult(\ell)\log(\ell q))$ operations~\cite[Ch~14]{vzGG}. Once
   $E_{-i}$ is known, we find an $\ell$-torsion point using $O_e(\log
   q)$ operations, and apply Vélu's formulas to compute $\phi_{-i}$. We
-  deduce the polynomial $T_i$ and $Q_i$ is obtained using
+  deduce the polynomial $T_i$, and $Q_i$ is obtained using
   $O(\Mult(\ell^i)\log(\ell^i))$ operations using
   Algorithm~\ref{alg:compose} given in the next section.
 \end{proof}
@@ -1201,8 +1202,42 @@ of~\cite{vzGG}.
 
 \section{Implementation}
 \label{sec:impl}
+To demonstrate the interest of our constructions, we made a very basic
+implementation of the towers of Sections~\ref{ssec:fibers-T2}
+and~\ref{sec:elliptic} in Sage~\cite{Sage} and compared it to various
+ways of constructing the same towers in Magma. Our implementation
+relies on Sage's default implementation of quotient rings of
+$\F_p[X]$, which itself uses NTL \cite{shoup2003ntl} for $p=2$ and
+FLINT~\cite{hart2010flint} for other primes. The source code is
+available on De Feo's web page.
 
-Sage implementation and timings.
+We tested three ways of constructing an $\ell$-adic tower in Magma:
+\begin{enumerate}
+\item Constructing the levels from bottom to top using the default
+  finite field constructor \verb+GF()+. For the parameter size we
+  tested\footnote{According to
+    \url{http://magma.maths.usyd.edu.au/magma/releasenotes/2/14\#subsection_7_3}},
+  Magma uses tables of precomputed Conway polynomials and
+  automatically computes embeddings on creation.
+\item Constructing the highest level of the tower first, then all the
+  lower levels using the \verb+sub<>+ constructor.
+\item Constructing the levels from bottom to top using random dense
+  polynomials, and embedding them using the \verb+Embed()+
+  function. We do not account for the time spent finding the
+  irreducible polynomials.
+\end{enumerate}
+
+We constructed $3$-adic towers on top of $\F_2$ and $\F_5$ on a
+\todo{machine?} running Sage 5.5 and Magma 2.18.12. The time required
+for their creation (including the time required for embedding) is
+summarized in Figure~. Despite not being optimized (or even compiled),
+our code consistently outperforms Magma on creation time. On the other
+hand, being based on linear algebra, lift and push operations take
+essentially no time in Magma, while they take a measurable amount of
+time in our implementation. Figure~ summarizes the time required for a
+push/lift in the highest level of the towers constructed using our
+code.
+
 
 %%%
 
