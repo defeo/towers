@@ -100,9 +100,9 @@ $$
   q = 1 \bmod \ell & O_e(\log(q))  & O(\ell^i) & O(\ell^i) \\
   q = -1 \bmod \ell & O_e(\log(q)) & O(\ell^i) & O(\Mult(\ell^i) \log(\ell^i)) \\
   - & O_e (\ell^2+\Mult(\ell) \log(q)) & O(\Mult(\ell^{i+1})\Mult(\ell)\log(\ell^i)^2) & O( \Mult(\ell^{i+1})\Mult(\ell)\log(\ell^i))\\
-  4\ell \le q^{1/4} & O_e(\ell\log^3(q))^\star  & O_e(\ell^2+\Mult(\ell)\log(\ell
-  q)+\Mult(\ell^i)\log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \\
-  4\ell \le q^{1/4} & O_e(\ell\log^3(q) + \Mult(\ell)\sqrt{q}\log(q))^\star & O_e(\log(q) + \Mult(\ell^i) \log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \vspace{-0.5cm}
+  4\ell \le q^{1/4} & O\tilde{_e}(\ell\log^5(q)) \text{~(bit)}  & O_e(\ell^2+\Mult(\ell)\log(\ell
+  q)+\Mult(\ell^i)\log(\ell^i))^\star & O(\Mult(\ell^i) \log(\ell^i)) \\
+  4\ell \le q^{1/4} & O\tilde{_e}(\ell\log^5(q))  \text{~(bit)}  + O_e(\Mult(\ell)\sqrt{q}\log(q)) & O_e(\log(q) + \Mult(\ell^i) \log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \vspace{-0.5cm}
 \end{array}
 $$
 \label{table:main}
@@ -203,37 +203,44 @@ and applications to solving Artin-Schreier or quadratic equations,
 given in~\cite{df+schost12} and~\cite{DoSc12} for respectively
 $\ell=p$ and $\ell=2$.
 
-Table~\ref{table:main} summarizes the main results in this paper.
-Under various assumptions, it gives costs (counted in terms of
-operations in $\F_q$) for initializing the construction, building the
-polynomials $Q_i$ and $T_i$ from~Eq.\eqref{eq:QiTi}, and performing
-lift and push; the notation $O_e(\ )$ indicates probabilistic
-algorithms with expected running time. In all cases, our results are
-close to being linear-time in $\ell^i$, up to sometimes the loss of a
-factor polynomial in $\ell$.  Except for the (very simple) case where
-$q=1 \bmod \ell$, these results are new, to the best of our knowledge.
-Two entries are starred: they correspond to situations where we use
-precomputed information (modular polynomials) whose computation would
-not fit into our model (it involves computations over $\Z$).
+Table~\ref{table:main} summarizes our main results.  Under various
+assumptions, it gives costs (counted in terms of operations in $\F_q$)
+for initializing the construction, building the polynomials $Q_i$ and
+$T_i$ from~Eq.\eqref{eq:QiTi}, and performing lift and push. $O_e(\ )$
+indicates probabilistic algorithms with expected running time, and
+$O\tilde{_e}(\ )$ indicates the additional omission of logarithmic
+factors.  Two entries mention bit complexity (due to an elliptic curve
+point counting algorithm), and the starred entry relies on an extra
+assumption (see Theorem~\ref{theo:elliptic}).
 
-We use two constructions: the first one (Section~\ref{sec:LDtower})
-uses cyclotomy and descent algorithms; the second one
+In all cases, our results are close to being linear-time in $\ell^i$,
+up to sometimes the loss of a factor polynomial in $\ell$.  Except for
+the (very simple) case where $q=1 \bmod \ell$, these results are new,
+to the best of our knowledge. To otbain them, we use two
+constructions: the first one (Section~\ref{sec:LDtower}) uses
+cyclotomy and descent algorithms; the second one
 (Section~\ref{sec:fibers}) relies on the construction of a sequence of
-fibers of isogenies between algebraic groups. They are inspired by
-previous work due to respectively Shoup~\cite{Shoup90,shoup94} and
-Lenstra / De Smit~\cite{lenstra+desmit08-stdmodels}, and Couveignes /
+fibers of isogenies between algebraic groups. 
+
+These constructions are inspired by previous work due to respectively
+Shoup~\cite{Shoup90,shoup94} and Lenstra / De
+Smit~\cite{lenstra+desmit08-stdmodels}, and Couveignes /
 Lercier~\cite{couveignes+lercier11}. We briefly discuss them here and
 give more details in the further sections.
 
-Lenstra and De Smit~\cite{lenstra+desmit08-stdmodels} address
-a question similar to ours, the construction of the $\ell$-adic closure
+Lenstra and De Smit~\cite{lenstra+desmit08-stdmodels} address a
+question similar to ours, the construction of the $\ell$-adic closure
 of $\F_q$ (and of its algebraic closure), with the purpose of
 standardizing the construction. The resulting algorithms run in
 polynomial time, but (implicitly) rely on linear algebra and
 multiplication tables, so quasi-linear time is not directly reachable.
 References~\cite{Shoup90,shoup94,couveignes+lercier11} discuss a
 related problem, the construction of irreducible polynomials over
-$\F_q$; the question of computing embeddings is not present there.
+$\F_q$; the question of computing embeddings is not considered.  Note
+that the results in~\cite{couveignes+lercier11} are {\em
+  quasi-linear}; they rely however on an algorithm by Kedlaya and
+Umans~\cite{KeUm11} that works only in a boolean model, and as a
+result share this specificity.
 
 To conclude the introduction, let us mention a few applications of our
 results. A variety of computations in number theory and algebraic
@@ -338,14 +345,13 @@ $\ell$.
 Shoup used this setup to compute $Q_i$ in time quad\-ratic in
 $\ell^i$~\cite[Th.~11]{shoup94}. It is noted there that using {\em
   modular composition} techniques~\cite[Ch.~12]{vzGG}, this behavior
-could be improved to get a subquadratic exponent in $\ell^i$, up to
-an extra cost polynomial in $\ell$.  For $\ell=3$ (where we are in one
+could be improved to get a subquadratic exponent in $\ell^i$, up to an
+extra cost polynomial in $\ell$.  For $\ell=3$ (where we are in one
 the first two cases), Couveignes and Lercier make a similar remark
 in~\cite[\S~2.4]{couveignes+lercier11}; using a result by Kedlaya and
-Umans~\cite{KeUm11} for modular composition {\em in a boolean model},
-they derive for any $\varepsilon > 0$ a cost of
-$3^{i(1+\varepsilon)}O(\log(q))$ bit operations, up to polynomial
-terms in $\log\log(q)$.
+Umans~\cite{KeUm11} for modular composition, they derive for any
+$\varepsilon > 0$ a cost of $3^{i(1+\varepsilon)}O(\log(q))$ {\em bit}
+operations, up to polynomial terms in $\log\log(q)$.
 
 In this section, and in the rest of this paper, if $L/K$ is a field
 extension, we write $\Tr_{L/K}$, $\Norm_{L/K}$ and $\Gal_{L/K}$ for
@@ -836,7 +842,6 @@ sampling and testing.
   that $[(q+1)/\ell]P$ is not the group identity. By
   Lemma~\ref{th:montgomery}, this computation requires $O(\log q)$
   operations.
-
   About half of the points of $\F_q$ are quadratic non-residues, and
   about $1-1/\ell$ of them are the abscissas of points with the
   required order, thus we expect to find the required element after
@@ -894,12 +899,11 @@ $E_0$ be an elliptic curve whose cardinality is a multiple of
 $\ell$. By Hasse's bound, this is only possible if $\ell\le q +
 2\sqrt{q} + 1$.  An \emph{isogeny} is an algebraic group morphism
 between two elliptic curves that is surjective in the algebraic
-closure; it is said to be rational over $\F_q$ if it is invariant
-under the $q$-th power map. A rational isogeny between two curves
-exists if and only if they have the same number of points over
-$\F_q$. The degree of an isogeny is its degree as an algebraic map; an
-isogeny of degree $n$ is separable if and only if $n$ is prime to $p$,
-in which case its kernel contains exactly $n$ points.  Because of the
+closure. It is said to be rational over $\F_q$ if it is invariant
+under the $q$-th power map; such an isogeny exists if and only if the
+curves have the same number of points over $\F_q$. An isogeny of
+degree $n$ is separable if and only if $n$ is prime to $p$, in which
+case its kernel contains exactly $n$ points.  Because of the
 assumptions on $\ell$, there exist an $e\ge1$ such that, for any curve
 $E$ isogenous to $E_0$, the $\F_q$-rational part of $E[\ell]$ is
 cyclic of order $\ell^e$.
@@ -936,15 +940,13 @@ the cycle. This is a slight abuse, because $E_n$ is isomorphic but not
 equal to $E_0$, but it does not hide any theoretical or computational
 difficulty.
 
-\begin{theorem}[{\cite[Section~4]{couveignes+lercier11}}]
-  Under the former assumptions, let $P$ a point of $E_i$ of order
-  divisible by $\ell^e$, and let
-  $\psi=\phi_{i-1}\circ\phi_{i-2}\circ\cdots\circ\phi_{j}$. The fiber
-  $\psi^{-1}(P)$ is irreducible and has cardinality $\ell^{i-j}$.
-\end{theorem}
-
-Vélu's formulas~\cite{velu71} allow us to express the isogenies
-$\phi_i$ as rational fractions
+Under the former assumptions, it is proved
+in~\cite[Section~4]{couveignes+lercier11} that if $P$ is a point of
+$E_i$ of order divisible by $\ell^e$, if
+$\psi=\phi_{i-1}\circ\phi_{i-2}\circ\cdots\circ\phi_{j}$, then the
+fiber $\psi^{-1}(P)$ is irreducible and has cardinality $\ell^{i-j}$.
+Knowing $E_i$, Vélu's formulas~\cite{velu71} allow us to express the
+isogenies $\phi_i$ as rational fractions
 \begin{equation}
   \begin{aligned}
     \phi_i: E_i &\to E_{i+1},\\
@@ -953,60 +955,55 @@ $\phi_i$ as rational fractions
 \end{equation}
 where $g_i$ is the square polynomial of degree $\ell-1$ vanishing on
 the abscissas of the affine points of $H_i$, and $f_i$ is a polynomial
-of degree $\ell$.
+of degree $\ell$. 
 
-\begin{corollary}[{\cite[Section~4]{couveignes+lercier11}}]
-  Let $\eta\in\F_q$ be the abscissa of a point of $E_0$ of order
-  $\ell^e\ne 2$. The polynomials
-  \begin{align*}
-    T_1 &= f_{-1}(X_1) - \eta g_{-1}(X_1),\\
-    T_i &= f_{-i}(X_i) - X_{i-1} g_{-i}(X_i)
-  \end{align*}
-  define an $\ell$-adic tower.
-\end{corollary}
+There is a subtle difference between our setting and Couveignes' and
+Lercier's. The goal of~\cite{couveignes+lercier11} is to compute an
+extension of degree $\ell^i$ of $\F_q$ for a fixed $i$: this can be
+done by going forward $i$ times, then taking the fiber of a point of $E_i$ by
+the isogenies $\phi_{i-1}, \ldots, \phi_0$. In our case, we are
+interested in building extensions of degree $\ell^i$
+\emph{incrementally}, i.e.\ without any \emph{a priori} bound on
+$i$. Thus, we have to walk \emph{backwards} in the isogeny cycle: if
+$\eta\in\F_q$ is the abscissa of a point of $E_0$ of order $\ell^e\ne
+2$, we will use the following polynomials to define the $\ell$-adic
+tower:
+\begin{align*}
+  T_1 &= f_{-1}(X_1) - \eta g_{-1}(X_1),\\ 
+  T_i &= f_{-i}(X_i) - X_{i-1} g_{-i}(X_i).
+\end{align*}
 
-Using Vélu's formulas, the polynomials $T_i$ can be computed with
-$O(\Mult(\ell))$ operations in $\F_q$. The minimal polynomials $Q_i$
-of $X_i$ over $\F_q$ can be computed by composing the isogenies
-$\phi_{-1},\dots,\phi_{-i-1}$ using Algorithm~\ref{alg:compose}. This
-requires $O(\Mult(\ell^i)\log(\ell^i))$ operations as proved in the
-next section.
+The following theorem gives the time for building the tower; lift and
+push are detailed in the next section. This result will depend on the
+following assumption: we suppose that the {\em modular polynomial}
+$\Phi_\ell\bmod p$ is known.
 
-\begin{theorem}
-  Suppose $4\ell\le q^{1/4}$, then initializing the $\ell$-adic tower
-  above requires $O_e(\ell\log^3(q))$ operations, and building the
-  $i$-th level requires $O_e(\ell^2+\Mult(\ell)\log(\ell
-  q)+\Mult(\ell^i)\log(\ell^i))$ operations.
+\begin{theorem}\label{theo:elliptic}
+  Suppose $4\ell\le q^{1/4}$, and under the above assumption,
+  initializing the $\ell$-adic tower requires
+  $O\tilde{_e}(\ell\log^5(q))$ bit operations, and building the $i$-th
+  level requires $O_e(\ell^2+\Mult(\ell)\log(\ell
+  q)+\Mult(\ell^i)\log(\ell^i))$ operations in $\F_q$.
 \end{theorem}
 \begin{proof}
-  Let $s$ be a prime, the modular polynomial $\Phi_s$ is the minimal
-  polynomial of the modular function $j(s\tau)$. It is a symmetric
-  bivariate polynomial of degree $s+1$ in each variable. Many
-  computations about isogenies, including point
-  counting~\cite{schoof95}, use it.  We suppose that the modular
-  polynomials $\Phi_\ell\bmod p$ and $\Phi_s\bmod p$ for all the
-  primes $s$ up to $\log(q)$ are precoumputed. This is a strong
-  assumption, but it is often true in practice.
-
   For the initialization, \cite[Section~4.3]{couveignes+lercier11}
   shows that if $4\ell\le q^{1/4}$, about $1/2\ell$ of all elliptic
   curves over $\F_q$ contain a point of $\ell$-torsion. We find $E_0$
-  by taking curves at random and counting their points. This requires
-  $O_e(\ell\log^3(q))$\todo{!!!} using the SEA
+  by taking curves at random and counting their points, which requires
+  $O\tilde{_e}(\ell\log^5(q))$ bit operations using Schoof's
   algorithm~\cite{schoof95}.
 
   To build the $i$-th level, we first need to find the equation of
   $E_{-i}$. For this, we evaluate $\Phi_\ell$ at $j(E_{-i+1})$, using
   $O(\ell^2)$ operations. The resulting polynomial has two roots in
-  $\F_q$, namely $j(E_{-i})$ and
-  $j(E_{-i+2})$. We factor it using $O_e(\Mult(\ell)\log(\ell q))$
-  operations~\cite[Ch~14]{vzGG}. Once $E_{-i}$ is known, we find an
-  $\ell$-torsion point using $O_e(\log q)$ operations, and apply
-  Vélu's formulas to compute $\phi_{-i}$. The polynomials $T_i$ and
-  $Q_i$ are computed as explained above using
-  $O(\Mult(\ell^i)\log(\ell^i))$ operations .
+  $\F_q$, namely $j(E_{-i})$ and $j(E_{-i+2})$. We factor it using
+  $O_e(\Mult(\ell)\log(\ell q))$ operations~\cite[Ch~14]{vzGG}. Once
+  $E_{-i}$ is known, we find an $\ell$-torsion point using $O_e(\log
+  q)$ operations, and apply Vélu's formulas to compute $\phi_{-i}$. We
+  deduce the polynomial $T_i$ and $Q_i$ is obtained using
+  $O(\Mult(\ell^i)\log(\ell^i))$ operations using
+  Algorithm~\ref{alg:compose} given in the next section.
 \end{proof}
-
 
 Instead of computing the cycle step by step, we could compute it
 entirely during the initialization phase, by using Vélu's formulas
@@ -1035,24 +1032,6 @@ R(X), T(X,Y) \rangle,$$ with $R$ of degree $\ell^{i-1}$, $S$ of degree
 $\ell^i$, and where $T(X,Y)$ has the form $f(Y)-X g(Y)$, with $\deg(f)
 =\ell$, $\deg(g) < \ell$ and $\gcd(f,g)=1$; possibly, $g=1$. In all
 this section, $f$, $g$ and their degree $\ell$ are fixed.
-
-%% According to Eqs.~\eqref{eq:T1}, \eqref{eq:T2-minpols}
-%% and~\eqref{eq:elliptic}, the polynomials $Q_{i-1}$ are equivalent to
-%% the relation
-%% \begin{equation}
-%%   \label{eq:level-i}
-%%   \frac{F_{i-1}(x_{i-1})}{G_{i-1}(x_{i-1})} = \eta,
-%% \end{equation}
-%% where $F$ is a polynomial of degree $\ell^{i-1}$, $G$ is a polynomial
-%% of degree less than $\ell^{i-1}$ (eventually, $G=1$), and $\eta$ is an
-%% element of $\F_q$. Similarly, the polynomials $T_i$ are equivalent to
-%% the relation
-%% \begin{equation}
-%%   \label{eq:level-i+1}
-%%   \frac{f_i(x_i)}{g_i(x_i)} = x_{i-1},
-%% \end{equation}
-%% where $f$ is a polynomial of degree $\ell$, and $g$ is a polynomial of
-%% degree less than $\ell$ (eventually, $g=1$).  
 
 Lift is the conversion from the bivariate basis associated to the
 right-hand side to the univariate basis associated to the left-hand side;
@@ -1209,10 +1188,10 @@ of~\cite{vzGG}.
 \begin{proof}
   Given $\alpha$ represented by a univariate polynomial $A(Y)$ of
   degree less than $\ell n$, with $n =\ell^{i-1}$. We compute
-  $g^{n-1}$ and $\bar{A} = g^{n-1} A \bmod S$ using $O(\Mult(\ell^i))$
+  $g^{n-1}$ and $A^\star = g^{n-1} A \bmod S$ using $O(\Mult(\ell^i))$
   operations. Then, we compute $h=1/g \bmod f$ in time
   $O(\Mult(\ell)\log(\ell))$ and apply Algorithm~\ref{alg:decompose}
-  to $\bar{A}$, $f$, $g$, $h$ and $n$. The result is a bivariate
+  to $A^\star$, $f$, $g$, $h$ and $n$. The result is a bivariate
   polynomial $B$, representing $\alpha$ on the bivariate basis. The
   dominant phase is Algorithm~\ref{alg:decompose}, costing
   $O(\Mult(\ell^i)\log(\ell^i))$ operations in $\F_q$.
@@ -1227,8 +1206,9 @@ Sage implementation and timings.
 
 %%%
 
-\bigskip \textbf{Aknowledgements.}  De Feo would like to thank Antoine
-Joux and J\'er\^ome Pl\^ut for fruitful discussions.
+\bigskip\noindent \textbf{Aknowledgements.}  De Feo would like to thank Antoine
+Joux and J\'er\^ome Pl\^ut for fruitful discussions. Schost acknowledges
+support from NSERC and the CRC program.
 
 \scriptsize
 \bibliographystyle{abbrv}
