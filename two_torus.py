@@ -4,6 +4,7 @@ from sage.rings.finite_rings.constructor import GF
 from sage.rings.finite_rings.integer_mod_ring import Integers
 from sage.rings.arith import CRT, factor, valuation
 from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
+from sage.rings.polynomial.polynomial_quotient_ring import PolynomialQuotientRing_field
 from sage.misc.functional import cyclotomic_polynomial
 from itertools import izip_longest
 from de_compose import *
@@ -95,7 +96,8 @@ class Tower:
         if self._debug and not p.is_irreducible():
             raise RuntimeError('Polynomial must be irreducible')
 
-        K = self._P.quo(p, self._name + str(len(self._levels)))
+        K =  PolynomialQuotientRing_field(self._P, p,
+                                          self._name + str(len(self._levels)))
         self._levels.append(K)
 
     def _push(self, x):
