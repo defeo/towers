@@ -101,7 +101,7 @@ $$
   q = -1 \bmod \ell & O_e(\log(q)) & O(\ell^i) & O(\Mult(\ell^i) \log(\ell^i)) \\
   - & O_e (\ell^2+\Mult(\ell) \log(q)) & O(\Mult(\ell^{i+1})\Mult(\ell)\log(\ell^i)^2) & O( \Mult(\ell^{i+1})\Mult(\ell)\log(\ell^i))\\
   4\ell \le q^{1/4} & O\tilde{_e}(\ell\log^5(q)) \text{~(bit)}  & O_e(\ell^2+\Mult(\ell)\log(\ell
-  q)+\Mult(\ell^i)\log(\ell^i))^\star & O(\Mult(\ell^i) \log(\ell^i)) \\
+  q)+\Mult(\ell^i)\log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \\
   4\ell \le q^{1/4} & O\tilde{_e}(\ell\log^5(q))  \text{~(bit)}  + O_e(\Mult(\ell)\sqrt{q}\log(q)) & O_e(\log(q) + \Mult(\ell^i) \log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \vspace{-0.5cm}
 \end{array}
 $$
@@ -209,9 +209,8 @@ for initializing the construction, building the polynomials $Q_i$ and
 $T_i$ from~Eq.\eqref{eq:QiTi}, and performing lift and push. $O_e(\ )$
 indicates probabilistic algorithms with expected running time, and
 $O\tilde{_e}(\ )$ indicates the additional omission of logarithmic
-factors.  Two entries mention bit complexity (due to an elliptic curve
-point counting algorithm), and the starred entry relies on an extra
-assumption (see Theorem~\ref{theo:elliptic}).
+factors.  Two entries mention bit complexity, as they use an elliptic
+curve point counting algorithm.
 
 In all cases, our results are close to being linear-time in $\ell^i$,
 up to sometimes the loss of a factor polynomial in $\ell$.  Except for
@@ -975,9 +974,7 @@ tower:
 \end{align*}
 
 The following theorem gives the time for building the tower; lift and
-push are detailed in the next section. This result will depend on the
-following assumption: we suppose that the {\em modular polynomial}
-$\Phi_\ell\bmod p$ is known.
+push are detailed in the next section. 
 
 \begin{theorem}\label{theo:elliptic}
   Suppose $4\ell\le q^{1/4}$, and under the above assumption.
@@ -992,7 +989,10 @@ $\Phi_\ell\bmod p$ is known.
   curves over $\F_q$ contain a point of $\ell$-torsion. We find $E_0$
   by taking curves at random and counting their points, which requires
   $O\tilde{_e}(\ell\log^5(q))$ bit operations using Schoof's
-  algorithm~\cite{schoof95}.
+  algorithm~\cite{schoof95}. We also need to compute the $\ell$th
+  modular polynomial $\Phi_\ell\bmod p$; for this, we compute is over
+  $\Z$ then reduce it modulo $p$. The cost is negligible compared to
+  that of the point countings~\cite{enge09}.
 
   To build the $i$-th level, we first need to find the equation of
   $E_{-i}$. For this, we evaluate $\Phi_\ell$ at $j(E_{-i+1})$, using
