@@ -1241,7 +1241,8 @@ We ran tests on an Intel Xeon E5620 clocked at 2.4 GHz, using Sage 5.5
 and Magma 2.18.12. The time required for the creation of $3$-adic
 towers of increasing height is summarized in
 Figure~\ref{fig:build}; the timings of our algorithms are labeled 
-T$_2$ and Elliptic.
+T$_2$ and Elliptic. Computations that took more than 4GB RAM were
+interrupted.
 
 Despite its simplicity, our code consistently outperforms Magma on
 creation time. On the other hand, lift and push operations take
