@@ -100,7 +100,7 @@ $$
   q = 1 \bmod \ell & O_e(\log(q))  & O(\ell^i) & O(\ell^i) \\
   q = -1 \bmod \ell & O_e(\log(q)) & O(\ell^i) & O(\Mult(\ell^i) \log(\ell^i)) \\
   - & O_e (\ell^2+\Mult(\ell) \log(q)) & O(\Mult(\ell^{i+1})\Mult(\ell)\log(\ell^i)^2) & O( \Mult(\ell^{i+1})\Mult(\ell)\log(\ell^i))\\
-  4\ell \le q^{1/4} & O\tilde{_e}(\ell\log^5(q)) \text{~(bit)}  & O_e(\ell^2+\Mult(\ell)\log(\ell
+  4\ell \le q^{1/4} & O\tilde{_e}(\ell\log^5(q)+\ell^3) \text{~(bit)}  & O_e(\ell^2+\Mult(\ell)\log(\ell
   q)+\Mult(\ell^i)\log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \\
   4\ell \le q^{1/4} & O\tilde{_e}(\ell\log^5(q))  \text{~(bit)}  + O_e(\Mult(\ell)\sqrt{q}\log(q)) & O_e(\log(q) + \Mult(\ell^i) \log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \vspace{-0.5cm}
 \end{array}
@@ -977,22 +977,21 @@ The following theorem gives the time for building the tower; lift and
 push are detailed in the next section. 
 
 \begin{theorem}\label{theo:elliptic}
+  \sloppy
   Suppose $4\ell\le q^{1/4}$, and under the above assumption.
   Initializing the $\ell$-adic tower requires
-  $O\tilde{_e}(\ell\log^5(q))$ bit operations; and building the $i$-th
-  level requires $O_e(\ell^2+\Mult(\ell)\log(\ell
+  $O\tilde{_e}(\ell\log^5(q)+\ell^3)$ bit operations; and building the
+  $i$-th level requires $O_e(\ell^2+\Mult(\ell)\log(\ell
   q)+\Mult(\ell^i)\log(\ell^i))$ operations in $\F_q$.
 \end{theorem}
 \begin{proof}
   For the initialization, \cite[Section~4.3]{couveignes+lercier11}
-  shows that if $4\ell\le q^{1/4}$, about $1/2\ell$ of all elliptic
-  curves over $\F_q$ contain a point of $\ell$-torsion. We find $E_0$
-  by taking curves at random and counting their points, which requires
-  $O\tilde{_e}(\ell\log^5(q))$ bit operations using Schoof's
-  algorithm~\cite{schoof95}. We also need to compute the $\ell$th
-  modular polynomial $\Phi_\ell\bmod p$; for this, we compute is over
-  $\Z$ then reduce it modulo $p$. The cost is negligible compared to
-  that of the point countings~\cite{enge09}.
+  shows that if $4\ell\le q^{1/4}$, a curve $E_0$ with the required
+  number of points can be found in $O\tilde{_e}(\ell\log^5(q))$ bit
+  operations. We also need to compute the $\ell$th modular polynomial
+  $\Phi_\ell\bmod p$; for this, we compute it over $\Z$ with
+  $\tildO(\ell^3)$ bit operations~\cite{enge09}, then reduce it
+  modulo $p$.
 
   To build the $i$-th level, we first need to find the equation of
   $E_{-i}$. For this, we evaluate $\Phi_\ell$ at $j(E_{-i+1})$, using
@@ -1006,15 +1005,18 @@ push are detailed in the next section.
   Algorithm~\ref{alg:compose} given in the next section.
 \end{proof}
 
-Instead of computing the cycle step by step, we could compute it
-entirely during the initialization phase, by using Vélu's formulas
-alone to compute $E_1,E_2,\dots$ until we hit $E_0$ again. By doing
-so, we avoid using the modular polynomial $\Phi_\ell$ at each new
-level. By Lemma~\ref{th:class-number}, this requires
-$O_e(\ell\sqrt{q}\log(q))$ operations. This is not asymptotically good
-in $q$, but for practical values of $q$ and $\ell$ the cycle is often
-small and this approach works well. This is accounted for in the last
-row of Table~\ref{table:main}.
+\begin{remark}
+  \label{rk:elliptic}
+  Instead of computing the cycle step by step, we could compute it
+  entirely during the initialization phase, by using Vélu's formulas
+  alone to compute $E_1,E_2,\dots$ until we hit $E_0$ again. By doing
+  so, we avoid using the modular polynomial $\Phi_\ell$ at each new
+  level. By Lemma~\ref{th:class-number}, this requires
+  $O_e(\ell\sqrt{q}\log(q))$ operations. This is not asymptotically good
+  in $q$, but for practical values of $q$ and $\ell$ the cycle is often
+  small and this approach works well. This is accounted for in the last
+  row of Table~\ref{table:main}.  
+\end{remark}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1204,40 +1206,51 @@ of~\cite{vzGG}.
 \label{sec:impl}
 To demonstrate the interest of our constructions, we made a very basic
 implementation of the towers of Sections~\ref{ssec:fibers-T2}
-and~\ref{sec:elliptic} in Sage~\cite{Sage} and compared it to various
-ways of constructing the same towers in Magma. Our implementation
-relies on Sage's default implementation of quotient rings of
-$\F_p[X]$, which itself uses NTL \cite{shoup2003ntl} for $p=2$ and
-FLINT~\cite{hart2010flint} for other primes. The source code is
-available on De Feo's web page.
+and~\ref{sec:elliptic} in Sage~\cite{Sage}. It relies on Sage's
+default implementation of quotient rings of $\F_p[X]$, which itself
+uses NTL \cite{shoup2003ntl} for $p=2$ and FLINT~\cite{hart2010flint}
+for other primes. Towers based on elliptic curves are constructed
+using the algorithm described in Remark~\ref{rk:elliptic}. The source
+code is available on De Feo's web page.
 
-We tested three ways of constructing an $\ell$-adic tower in Magma:
-\begin{enumerate}
-\item Constructing the levels from bottom to top using the default
-  finite field constructor \verb+GF()+. For the parameter size we
-  tested\footnote{According to
-    \url{http://magma.maths.usyd.edu.au/magma/releasenotes/2/14\#subsection_7_3}},
-  Magma uses tables of precomputed Conway polynomials and
-  automatically computes embeddings on creation.
-\item Constructing the highest level of the tower first, then all the
+We compare our implementation against three ways of constructing
+$\ell$-adic towers in Magma:
+\begin{itemize}
+\item We construct the levels from bottom to top using the default
+  finite field constructor \verb+GF()+. For the parameters we were
+  able to test, Magma uses tables of precomputed Conway polynomials
+  and automatically computes embeddings on
+  creation.\footnote{See \url{http://magma.maths.usyd.edu.au/magma/releasenotes/2/14}}
+\item We construct the highest level of the tower first, then all the
   lower levels using the \verb+sub<>+ constructor.
-\item Constructing the levels from bottom to top using random dense
-  polynomials, and embedding them using the \verb+Embed()+
-  function. We do not account for the time spent finding the
-  irreducible polynomials.
-\end{enumerate}
+\item We construct the levels from bottom to top using random dense
+  polynomials, then we call the \verb+Embed()+ function.  We do not
+  account for the time spent finding the irreducible polynomials.
+\end{itemize}
 
-We constructed $3$-adic towers on top of $\F_2$ and $\F_5$ on a
-\todo{machine?} running Sage 5.5 and Magma 2.18.12. The time required
-for their creation (including the time required for embedding) is
-summarized in Figure~. Despite not being optimized (or even compiled),
-our code consistently outperforms Magma on creation time. On the other
-hand, being based on linear algebra, lift and push operations take
-essentially no time in Magma, while they take a measurable amount of
-time in our implementation. Figure~ summarizes the time required for a
-push/lift in the highest level of the towers constructed using our
-code.
+\begin{figure}
+  \centering
+  \includegraphics[height=4.7cm]{creat}
+  \caption{Times for building $3$-adic towers on top of $\F_2$ (left)
+    and $\F_5$ (right), in Magma (first three lines) and using our
+    code.}
+  \label{fig:build}
+\end{figure}
 
+We ran tests on an Intel Xeon E5620 clocked at 2.4 GHz, using Sage 5.5
+and Magma 2.18.12. The time required for the creation of $3$-adic
+towers of increasing height is summarized in
+Figure~\ref{fig:build}. Despite its simplicity, our code consistently
+outperforms Magma on creation time. On the other hand, lift and push
+operations take essentially no time in Magma, while in all the tests
+of Figure~\ref{fig:build} we measured a running time almost perfectly
+linear for one push followed by one lift, taking approximately $62\mu
+s$ per coefficient (this is in the order of the seconds around level
+10). Nevertheless, the large gain in creation time makes the
+difference in lift and push tiny, and we are convinced that an
+optimized C implementation of the algorithms of
+Section~\ref{sec:lift-push} will eventually match Magma's
+performances.
 
 %%%
 
