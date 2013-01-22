@@ -1240,17 +1240,19 @@ $\ell$-adic towers in Magma:
 We ran tests on an Intel Xeon E5620 clocked at 2.4 GHz, using Sage 5.5
 and Magma 2.18.12. The time required for the creation of $3$-adic
 towers of increasing height is summarized in
-Figure~\ref{fig:build}. Despite its simplicity, our code consistently
-outperforms Magma on creation time. On the other hand, lift and push
-operations take essentially no time in Magma, while in all the tests
-of Figure~\ref{fig:build} we measured a running time almost perfectly
+Figure~\ref{fig:build}; the timings of our algorithms are labeled 
+T$_2$ and Elliptic.
+
+Despite its simplicity, our code consistently outperforms Magma on
+creation time. On the other hand, lift and push operations take
+essentially no time in Magma, while in all the tests of
+Figure~\ref{fig:build} we measured a running time almost perfectly
 linear for one push followed by one lift, taking approximately $62\mu
-s$ per coefficient (this is in the order of the seconds around level
+s$ per coefficient (this is in the order of a second around level
 10). Nevertheless, the large gain in creation time makes the
 difference in lift and push tiny, and we are convinced that an
 optimized C implementation of the algorithms of
-Section~\ref{sec:lift-push} will eventually match Magma's
-performances.
+Section~\ref{sec:lift-push} would match Magma's performances.
 
 %%%
 
