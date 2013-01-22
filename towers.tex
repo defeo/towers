@@ -60,7 +60,7 @@
 \category{F.2.1}{Theory of computation}{Analysis of algorithms and problem complexity}[Computations in finite fields]
 \category{G.4}{Mathematics of computing}{Mathematical software}
 \terms{Algorithms,Theory}
-\keywords{Finite fields, irreducible polynomials, extension towers, algebraic tori, elliptic curves.}
+\keywords{Finite fields, irreducible polynomials, extension towers, algebraic tori, Pell's equation, elliptic curves.}
 
 %%%
 
@@ -85,8 +85,8 @@ the Magma core has evolved since the publication of the paper,
 experiments in Section~\ref{sec:impl} show that embeddings of large
 extension fields are still out of reach.
 
-In this paper, we discuss an approach based on polynomial arithmetic
-rather than linear algebra with much better performance. We consider
+In this paper, we discuss an approach based on polynomial arithmetic,
+rather than linear algebra, with much better performance. We consider
 here one aspect of the question, $\ell$-adic towers; we expect that
 this will play an important role towards a complete solution.
 
@@ -130,7 +130,7 @@ algebraic closure $\bar{\F}_q$ of $\F_q$, as there is an isomorphism
 where the tensor products are over $\F_q$; we will briefly mention
 below the algorithmic counterpart of this equality.
 
-Our contribution is algorithms that allow us to ``compute'' in the
+We present here algorithms that allow us to ``compute'' in the
 first levels of $\ell$-adic towers (in a sense defined hereafter); at
 level $i$, our goal is to be able to perform all basic operations in
 quasi-linear time in the extension degree $\ell^i$.  We do not discuss
@@ -163,7 +163,7 @@ Let $\Mult : \N \rightarrow
 \N$ be such that polynomials in $\F_q[X]$ of degree less than $n$ can
 be multiplied in $\Mult(n)$ operations in $\F_q$, under the
 assumptions of~\cite[Ch.~8.3]{vzGG}; using FFT multiplication, one can
-take $\Mult(n)=O(n\log (n) \log\log (n))$. Then, multiplications and
+take $\Mult(n)\in O(n\log (n) \log\log (n))$. Then, multiplications and
 inversions in $\F_q[X_i]/\langle Q_i \rangle$ can be done in
 respectively $O(\Mult(\ell^i))$ and $O(\Mult(\ell^i)\log(\ell^i))$
 operations in $\F_q$~\cite[Ch.~9-11]{vzGG}. This is almost optimal, as
@@ -230,7 +230,7 @@ give more details in the further sections.
 Lenstra and De Smit~\cite{lenstra+desmit08-stdmodels} address a
 question similar to ours, the construction of the $\ell$-adic closure
 of $\F_q$ (and of its algebraic closure), with the purpose of
-standardizing the construction. The resulting algorithms run in
+standardizing it. The resulting algorithms run in
 polynomial time, but (implicitly) rely on linear algebra and
 multiplication tables, so quasi-linear time is not directly reachable.
 References~\cite{Shoup90,shoup94,couveignes+lercier11} discuss a
@@ -256,7 +256,7 @@ algorithms for computing in \emph{composita}.
 References~\cite{Shoup90,shoup94,couveignes+lercier11} deal with
 related questions for the problem of computing irreducible polynomials;
 a natural follow-up to the present work is to study the cost of
-embeddings and similar change of bases in this more general context.
+embeddings and similar changes of bases in this more general context.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -457,9 +457,9 @@ Section~\ref{sec:lift-push}.
 
 \subsection{The general case}\label{ssec:gal}
 
-Finally, we discuss the general situation, where we do not make any
-assumption on the behavior of $\Phi_\ell$ in $\F_q[X]$. These complete
-the third row of Table~\ref{table:main}, using the bound $r=O(\ell)$.
+Finally, we discuss the general situation, where make no
+assumption on the behavior of $\Phi_\ell$ in $\F_q[X]$. This completes
+the third row of Table~\ref{table:main}, using the bound $r\in O(\ell)$.
 
 Because $r=[\K_0 : \F_q]$ divides $\ell-1$, it is coprime with
 $\ell$. Thus, $Q_i$ remains the minimal polynomial of $x_i$ over
@@ -589,18 +589,18 @@ indeed we will start by showing how those of Sections~\ref{ssec:T1}
 and~\ref{ssec:T2} reduce to it.
 
 Here is the bottom line of Couveignes' and Lercier's idea. Let $G, G'$
-be integral algebraic $\F_q$-groups of the same dimension and let $f:
+be integral algebraic $\F_q$-groups of the same dimension and let $\phi:
 G' \rightarrow G$ be a surjective, separable algebraic group morphism.
-Let $\ell$ be the degree of $f$; then, the set of points $x \in G$
+Let $\ell$ be the degree of $\phi$; then, the set of points $x \in G$
 with fiber $G'_x$ of cardinality $\ell$ is a nonempty open subset $U
 \subset G$. If the induced homomorphism $G'(\F_q) \rightarrow G(\F_q)$
 of groups is not surjective then there are points of $G(\F_q)$ with
 fibers lying in algebraic extensions of $\F_q$. Assume that we are
-able to choose $f$ so that we can find one of these points contained
+able to choose $\phi$ so that we can find one of these points contained
 in $U$, with an irreducible fiber, and apply a linear projection to
 this fiber (e.g., onto an axis). The resulting polynomial is
 irreducible of degree dividing $\ell$ (and expectedly equal to
-$\ell$). If we can repeat the construction with a new map $f':G''\to
+$\ell$). If we can repeat the construction with a new map $\phi':G''\to
 G'$, and so on, the sequence of extensions makes an $\ell$-adic tower
 over $\F_q$.
 
@@ -653,7 +653,7 @@ completing the second row in Table~\ref{table:main}.
     \end{cases}
   \end{equation}
   Multiplication in $T_2$ induces a group law on $C$. The neutral
-  element is $(2,0)$ if $p\ne2$ or $(0,1)$ if $p=2$. The sum of two
+  element is $(2,0)$ if $p\ne2$, or $(0,1)$ if $p=2$. The sum of two
   points $P=(x_1,y_1)$ and $Q=(x_2,y_2)$ is defined
   by
   \begin{equation*}
@@ -927,7 +927,7 @@ $H_i$. The construction is depicted in Figure~\ref{fig:volcano}.
   O(\sqrt{q}\log (q))$ such that $E_n$ is isomorphic to $E_0$.
 \end{lemma}
 \begin{proof}
-  It is shown in \cite[Section~4]{couveignes+lercier11} that the
+  It is shown in \cite[\S~4]{couveignes+lercier11} that the
   isogenies $\phi_i$ are \emph{horizontal} in the sense
   of~\cite{kohel}, hence they necessarily form a cycle. Let $t$ be the
   trace of $E_0$, the length of the cycle is bounded by the class
@@ -941,7 +941,7 @@ equal to $E_0$, but it does not hide any theoretical or computational
 difficulty.
 
 Under the former assumptions, it is proved
-in~\cite[Section~4]{couveignes+lercier11} that if $P$ is a point of
+in~\cite[\S~4]{couveignes+lercier11} that if $P$ is a point of
 $E_i$ of order divisible by $\ell^e$, if
 $\psi=\phi_{i-1}\circ\phi_{i-2}\circ\cdots\circ\phi_{j}$, then the
 fiber $\psi^{-1}(P)$ is irreducible and has cardinality $\ell^{i-j}$.
@@ -985,7 +985,7 @@ push are detailed in the next section.
   q)+\Mult(\ell^i)\log(\ell^i))$ operations in $\F_q$.
 \end{theorem}
 \begin{proof}
-  For the initialization, \cite[Section~4.3]{couveignes+lercier11}
+  For the initialization, \cite[\S~4.3]{couveignes+lercier11}
   shows that if $4\ell\le q^{1/4}$, a curve $E_0$ with the required
   number of points can be found in $O\tilde{_e}(\ell\log^5(q))$ bit
   operations. We also need to compute the $\ell$th modular polynomial
@@ -1108,7 +1108,7 @@ polynomial composition~\cite[Ex.~9.20]{vzGG}.
   $O(\Mult(\ell^i)\log(\ell^i))$ operations in $\F_q$.
 \end{corollary}
 \begin{proof}
-  We start from element $\alpha$ written on the bivariate basis, that
+  We start from an element $\alpha$ written on the bivariate basis, that
   is, represented as $A(X,Y)$ with $\deg(A,X)<n=\ell^{i-1}$ and
   $\deg(A,Y)<\ell$ (note that $\ell n =\ell^i$).  We compute the
   univariate polynomials $A^\star=A[f,g,n]$ and $\gamma=g^{n-1}$ using
@@ -1247,7 +1247,7 @@ Despite its simplicity, our code consistently outperforms Magma on
 creation time. On the other hand, lift and push operations take
 essentially no time in Magma, while in all the tests of
 Figure~\ref{fig:build} we measured a running time almost perfectly
-linear for one push followed by one lift, taking approximately $62\mu
+linear for one push followed by one lift, taking approximately $70\mu
 s$ per coefficient (this is in the order of a second around level
 10). Nevertheless, the large gain in creation time makes the
 difference in lift and push tiny, and we are convinced that an
