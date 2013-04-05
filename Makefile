@@ -1,4 +1,4 @@
-tower.pdf: towers.tex creat.pdf
+towers.pdf: towers.tex creat.pdf
 	pdflatex towers
 	bibtex towers
 	pdflatex towers
