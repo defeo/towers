@@ -624,20 +624,22 @@ Section~\ref{sec:LDtower}). For any $i>0$, the fiber $\phi^{-i}(\eta)$
 is defined by $X^{\ell^i}-\eta$: we recover the construction of
 Subsection~\ref{ssec:T1}.
 
-More generally, let $k=\F_q$, $L=\F_{q^n}$ and $k\subset F\subsetneq
-L$. The Weil restriction $\Res_{L/k}\mathbb{G}_m$ is an
-\emph{algebraic torus}, and the norm $\Norm_{L/F}$ induces a map
+More generally, following~\cite{rubin+silverberg03,voskresenskii98},
+we let $k=\F_q$, $L=\F_{q^n}$ and $k\subset F\subsetneq L$. The Weil
+restriction $\Res_{L/k}\mathbb{G}_m$ is an \emph{algebraic torus}, and
+the norm $\Norm_{L/F}$ induces a map
 $\Res_{L/k}\mathbb{G}_m\to\Res_{F/k}\mathbb{G}_m$. Define the
 \emph{maximal torus} $T_n$ as the intersection of the kernels of the
 maps $\Norm_{L/F}$ for all subfields $F$. Then $T_n$ has dimension
-$\euler(n)$,  is isomorphic to
-$\mathbb{G}_m^{\euler(n)}$ over the algebraic closure, and
+$\euler(n)$, is isomorphic to $\mathbb{G}_m^{\euler(n)}$ over the
+algebraic closure, and its $k$-rational points form a group of
+cardinality $\Phi_n(q)$:
 \begin{equation}
   \label{eq:Tn}
   T_n(k) \isom \{\alpha\in L^\ast \;|\; \Norm_{L/F}(\alpha) = 1 
-  \text{ for all $k\subset F\subsetneq L$} \}
+  \text{ for all $k\subset F\subsetneq L$} \}.
 \end{equation}
-is a subgroup of cardinality $\Phi_n(q)$~\cite{rubin+silverberg03,voskresenskii98}.
+
 
 We now detail how the construction of Section~\ref{ssec:T2} can be
 obtained by considering the torus $T_2$; this will allow us to start
@@ -872,8 +874,8 @@ constructing irreducible polynomials).
 \end{figure}
 
 Let $\ell$ be a prime different from $p$ and not dividing $q-1$. Let
-$E_0$ be an elliptic curve whose cardinality is a multiple of
-$\ell$. By Hasse's bound, this is only possible if $\ell\le q +
+$E_0$ be an elliptic curve whose cardinality over $\F_q$ is a multiple
+of $\ell$. By Hasse's bound, this is only possible if $\ell\le q +
 2\sqrt{q} + 1$.  An \emph{isogeny} is an algebraic group morphism
 between two elliptic curves that is surjective in the algebraic
 closure. It is said to be rational over $\F_q$ if it is invariant
@@ -881,8 +883,8 @@ under the $q$-th power map; such an isogeny exists if and only if the
 curves have the same number of points over $\F_q$. An isogeny of
 degree $n$ is separable if and only if $n$ is prime to $p$, in which
 case its kernel contains exactly $n$ points.  Because of the
-assumptions on $\ell$, there exists an $e\ge1$ such that, for any curve
-$E$ isogenous to $E_0$, the $\F_q$-rational part of $E[\ell]$ is
+assumptions on $\ell$, there exists an $e\ge1$ such that, for any
+curve $E$ isogenous to $E_0$, the $\F_q$-rational part of $E[\ell]$ is
 cyclic of order $\ell^e$.
 
 Suppose for simplicity, that $p\ne2,3$ and let $E_0$ be expressed as
