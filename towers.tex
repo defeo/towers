@@ -334,9 +334,10 @@ $Q_{i,0}=Q_i$ and $Q_{i,i-1}=T_i(x_{i-1},X_i)$.
 
 In Subsections~\ref{ssec:T1} and~\ref{ssec:T2}, we discuss favorable
 cases, where $\ell$ divides respectively $q-1$ and $q+1$. The first
-case is folklore; it yields the fastest and simplest algorithms; our
-results for the second case are close to, but distinct from, previous
-work of Gurak~\cite{gurak06} -- we will revisit these cases in
+case is folklore; it yields the fastest and simplest algorithms. Our
+results for the second case are related to known facts about Chebyshev
+polynomials~\cite[\S~6.2]{silverman2007arithmetic}, but, to the best
+of our knowledge, are new. We will revisit these cases in
 Section~\ref{sec:fibers} and account for their naming convention. Our
 results in the general case (Subsection~\ref{ssec:gal}) are slower,
 but still quasi-linear in $\ell^i$, up to a factor polynomial in
@@ -386,7 +387,7 @@ canonical, but more costly, so we do not consider it.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{$T_1$-type extensions}\label{ssec:T1}
+\subsection{$\mathbb{G}_m$-type extensions}\label{ssec:T1}
 
 We consider here the simplest case, where $\ell$ divides $q-1$; the
 (classical) facts below give the first row of Table~\ref{table:main}.
@@ -412,7 +413,7 @@ use only exponent arithmetic, and no operation in~$\F_q$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{$T_2$-type extensions}
+\subsection{Chebyshev-type extensions}
 \label{ssec:T2}
 
 Next, we consider the case where $\ell$ divides $q+1$, so that
