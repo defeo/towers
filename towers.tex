@@ -28,6 +28,7 @@
 \newcommand{\Cyc}{\Phi}  % Cyclotomic polynomial
 \newcommand{\bb}{\mathbf{B}}  
 \newcommand{\uu}{\mathbf{U}}  % bases for lift and push
+\DeclareMathOperator{\Res}{Res}
 
 \newdef{remark}{Remark}
 
@@ -622,17 +623,20 @@ Section~\ref{sec:LDtower}). For any $i>0$, the fiber $\phi^{-i}(\eta)$
 is defined by $X^{\ell^i}-\eta$: we recover the construction of
 Subsection~\ref{ssec:T1}.
 
-More generally, let $\F_{q^n}/\F_q$ be a finite extension and define
-its \emph{maximal torus} as
+More generally, let $k=\F_q$, $L=\F_{q^n}$ and $k\subset F\subsetneq
+L$. The Weil restriction $\Res_{L/k}\mathbb{G}_m$ is an
+\emph{algebraic torus}, and the norm $\Norm_{L/F}$ induces a map
+$\Res_{L/k}\mathbb{G}_m\to\Res_{F/k}\mathbb{G}_m$. Define the
+\emph{maximal torus} $T_n$ as the intersection of the kernels of the
+maps $\Norm_{L/F}$ for all subfields $F$. Then $T_n$ has dimension
+$\euler(n)$,  is isomorphic to
+$\mathbb{G}_m^{\euler(n)}$ over the algebraic closure, and
 \begin{equation}
   \label{eq:Tn}
-  T_n = \{\alpha\in\F_{q^n} \;|\; \Norm_{\F_{q^n}/\F_{q^m}}(\alpha) = 1 
-  \text{ for any $m|n$} \}.
+  T_n(k) \isom \{\alpha\in L^\ast \;|\; \Norm_{L/F}(\alpha) = 1 
+  \text{ for all $k\subset F\subsetneq L$} \}
 \end{equation}
-$T_n$ is a multiplicative subgroup of $\F_q^\ast$, and, by Weil
-descent, an algebraic group over $\F_q$. It has dimension $\euler(n)$,
-cardinality $\Phi_n(q)$, and is isomorphic to
-$\mathbb{G}_m^{\euler(n)}$ over $\bar \F_q$~\cite{rubin+silverberg03,voskresenskii98}.
+is a subgroup of cardinality $\Phi_n(q)$~\cite{rubin+silverberg03,voskresenskii98}.
 
 We now detail how the construction of Section~\ref{ssec:T2} can be
 obtained by considering the torus $T_2$; this will allow us to start
@@ -642,8 +646,7 @@ completing the second row in Table~\ref{table:main}.
   Let $\Delta\in\F_q$ be a quadratic non-residue if $p\ne2$, or such
   that $\Tr_{\F_q/\F_2}(\Delta)=1$ otherwise. Let $\delta=\sqrt{\Delta}$
   or $\delta^2+\delta=\Delta$ accordingly. The
-  maximal torus $T_2$ of $\F_q(\delta)/\F_q$ is isomorphic to the
-  \emph{Pell conic}
+  maximal torus $T_2$ is isomorphic to the \emph{Pell conic}
   \begin{equation}
     \label{eq:Pell}
     C \;:\; 
@@ -668,11 +671,11 @@ completing the second row in Table~\ref{table:main}.
   \end{equation*}
 \end{lemma}
 \begin{proof}
-  The isomorphism follows by Weil descent with respect to the basis
-  $(1/2,\delta/2)$ if $p\ne2$, or $(\delta,1)$ if $p=2$. Indeed, by
-  virtue of Eq.~\eqref{eq:Tn}, an element $(x,y)$ of $\F_q(\delta)$
-  belongs to $T_2$ if and only if its norm over $\F_q$ is $1$.
-
+  The isomorphism follows by Weil restriction to $\F_q(\delta)/\F_q$
+  with respect to the basis $(1/2,\delta/2)$ if $p\ne2$, or
+  $(\delta,1)$ if $p=2$. Indeed, by virtue of Eq.~\eqref{eq:Tn}, an
+  element $(x,y)$ of $\F_q(\delta)$ belongs to $T_2$ if and only if
+  its norm over $\F_q$ is $1$.
   Let $\sigma$ be the generator of $\Gal_{\F_q(\delta)/\F_q}$. For
   $p=2$, clearly $\delta^\sigma=-\delta$. For $p\ne2$, by
   Artin-Schreier theory,
@@ -687,31 +690,22 @@ factorization~\cite{lemmermeyer03,hambleton12} and
 cryptography~\cite{rubin-silverberg+crypto03}. 
 
 As customary, we denote by $[n](x,y)$ the $n$-th scalar multiple of a
-point $(x,y)$.
+point $(x,y)$.  $[n]$ is an endomorphism of $C$ of degree
+$n$, separable if and only if $(n,p)=1$.
 
 \begin{lemma}
   \label{th:T2-divpol}
-  If $(n,p)=1$, then $[n]$ is a separable endomorphism of $C$ of
-  degree $n$, given by the rational maps
+  Let $P=(\alpha,\beta)$ be a point of $C$. The abscissa of $[n]P$ is
+  given by $C_n(\alpha)$, where $C_n\in\Z[X]$ is the $n$-th Chebyshev
+  polynomial, defined by $C_0=2$, $C_1=X$, and
   \begin{equation}
-    \label{eq:Pell-rec}
-    [n](x,y) = 
-    \begin{cases}
-      \bigr(P_n(x), y R_n(x)\bigl) & \text{if $p\ne2$,}\\
-      \bigr(P_n(x), y R_n(x) + R_{n-1}(x)\bigl) & \text{if $p=2$.}      
-    \end{cases}
+    \label{eq:Chebyshev}
+    C_{n+1} = XC_n - C_{n-1}.
   \end{equation}
-  where $P_n$ and $R_n$ are defined by the initial values
-  \begin{align*}
-    P_0 &= 2,\qquad P_1=X,\\
-    R_0 &= 0,\qquad R_1=1,
-  \end{align*}
-  and by the same recurrence $u_{n+1} = Xu_{n} - u_{n-1}$.
 \end{lemma}
 \begin{proof}
-  We know that $C\isom\mathbb{G}_m$, thus $C[n]\isom\Z/n\Z$ and $[n]$
-  is separable of degree $n$. Eq.~\eqref{eq:Pell-rec} is shown by
-  induction using Eq.~\eqref{eq:Pell} and the group law.
+  Induction on $n$. A detailed proof can be found in
+  \cite[Prop.~6.6]{silverman2007arithmetic}.
 \end{proof}
 
 
@@ -723,7 +717,7 @@ point $(x,y)$.
   \label{th:T2-irred}
   Let $\eta\in\F_q(\delta)$ be a non $\ell$-adic residue in $T_2$, and
   let $P=(\alpha,\beta)$ be its image in $C/\F_q$. For any $i>0$, the
-  polynomials $P_{\ell^i}-\alpha$ are irreducible. Their roots are the
+  polynomials $C_{\ell^i}-\alpha$ are irreducible. Their roots are the
   abscissas of the images in $C/\F_{q^{\ell^i}}$ of the $\ell^i$-th
   roots of $\eta$.
 \end{theorem}
@@ -734,10 +728,10 @@ point $(x,y)$.
   them.
 
   Two points of $C$ have the same abscissa if and only if they are
-  opposite. But $\eta\ne\eta^{-1}$, hence all the points in
-  $[\ell^i]^{-1}(P)$ have distinct abscissa.  By
-  Lemma~\ref{th:T2-divpol}, $P_{\ell^i}-\alpha$ vanishes precisely on
-  those abscissas and is thus irreducible.
+  opposite. But $\eta$ is a non $\ell$-adic residue, hence
+  $\eta\ne\eta^{-1}$, and all the points in $[\ell^i]^{-1}(P)$ have
+  distinct abscissa.  By Lemma~\ref{th:T2-divpol}, $C_{\ell^i}-\alpha$
+  vanishes precisely on those abscissas and is thus irreducible.
 \end{proof}
 
 We can now apply our results to the computation of the polynomials
@@ -747,7 +741,7 @@ $Q_i$ and $T_i$ of Section~\ref{ssec:T2}.
   The polynomials $Q_{i,j}$ of Prop.~\ref{th:T2-resultant}
   satisfy
   \begin{equation*}
-    Q_{i,j}(X_i) = P_{\ell^{i-j}}(X_i) - x_j.
+    Q_{i,j}(X_i) = C_{\ell^{i-j}}(X_i) - x_j.
   \end{equation*}
 \end{corollary}
 \begin{proof}
@@ -759,45 +753,27 @@ $Q_i$ and $T_i$ of Section~\ref{ssec:T2}.
   statement follows from the previous theorem.
 \end{proof}
 
+There is a folklore algorithm computing the $n$-th Chebyshev
+polynomial using $O(n)$ operations in
+$\Z$~\cite{koepf1999chebyshev}. We shall need a slightly better
+algorithm working modulo $p$.
+
 \begin{corollary}
   The polynomials $Q_{i,j}$ can be computed using $O(\ell^{i-j})$
-  operations.
+  operations in $\F_p$.
 \end{corollary}
 \begin{proof}
-  From the previous corollary, it is enough to compute $P_n$ using
-  $O(n)$ operations. We write $P_n = \sum_i c_{n,i}X^{n-i}$, from
-  Lemma~\ref{th:T2-divpol} we deduce that
-  \begin{equation}
-    c_{n,i} = c_{n-1,i} - c_{n-2,i-2}.
-  \end{equation}
-  By induction, it is immediate that $c_{n,i}=0$ for $i$ odd, and that
-  signs alternate for $i$ even, so we remove the odd coefficients and
-  take absolute values. The new coefficients $b_{n,k}=\lvert
-  c_{n+k,2k}\rvert$ satisfy the relation
-  \begin{equation*}
-    b_{n,k} = b_{n-1,k} + b_{n-1,k-1},
-  \end{equation*}
-  which is the same as Pascal's relation; we actually obtain the
-  $(1,2)$-Pascal triangle, also called Lucas'
-  triangle~\cite{benjamin10}.  In the same way, we can prove that the
-  even coefficients of $R_n$ are the entries of Pascal's triangle with
-  alternating signs.
-  
-  As is well-known, the coefficients of
-  Lucas' triangle are related to those of Pascal's by
-  \begin{equation}
-    \label{eq:lucas-tri}
-    b_{n,k} = \binom{n}{k} + \binom{n-1}{k-1} = \frac{n+k}{n}\binom{n}{k}.
-  \end{equation}
-  Using Eq.~\eqref{eq:lucas-tri} and the sign alternation property,
-  we get
+  Let $C_n = \sum_i c_{n,i}X^{n-i}$. It is well known that $\lvert
+  c_{n+k,2k}\rvert$ are the coefficients of the $(1,2)$-Pascal
+  triangle, also called Lucas' triangle
+  (see~\cite[Prop.~6.6]{silverman2007arithmetic}
+  and~\cite{benjamin10}). It follows that
   \begin{equation*}
     \frac{c_{n,2k+2}}{c_{n,2k}} = 
-    -\frac{(n-2k)(n-2k-1)}{(n-k-1)(k+1)}.
+    -\frac{(n-2k)(n-2k-1)}{(n-k-1)(k+1)},
   \end{equation*}
-  The last equation gives the formula to compute all the coefficients
-  of $P_n$ using $O(n)$ operations in $\F_p$. Indeed, since we know
-  the $c_{n,2k}$'s are the image mod $p$ of integers, we compute them
+  which immediately gives the algorithm. Indeed, since we know the
+  $c_{n,2k}$'s are the image mod $p$ of integers, we compute them
   using multiplications and divisions in $\Q_p$ with relative
   precision 1.
 \end{proof}
@@ -1219,7 +1195,7 @@ default implementation of quotient rings of $\F_p[X]$, which itself
 uses NTL \cite{shoup2003ntl} for $p=2$ and FLINT~\cite{hart2010flint}
 for other primes. Towers based on elliptic curves are constructed
 using the algorithm described in Remark~\ref{rk:elliptic}. The source
-code is available on De Feo's web page.
+code is available at \url{https://defeo.github.io/towers}
 
 We compare our implementation against three ways of constructing
 $\ell$-adic towers in Magma:
@@ -1269,9 +1245,11 @@ Section~\ref{sec:lift-push} would match Magma's performances.
 
 %%%
 
-\bigskip\noindent \textbf{Aknowledgements.}  De Feo would like to thank Antoine
-Joux and J\'er\^ome Pl\^ut for fruitful discussions. Schost acknowledges
-support from NSERC and the CRC program.
+\bigskip\noindent \textbf{Aknowledgements.}  We acknowledge support
+from NSERC, the CRC program, and ANR through the ECLIPSES project
+under Contract ANR-09-VERS-018. De Feo would like to thank Antoine
+Joux and J\'er\^ome Pl\^ut for fruitful discussions. He acknowledges
+support from the ANR pro .
 
 \scriptsize
 \bibliographystyle{abbrv}
