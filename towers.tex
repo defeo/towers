@@ -1086,17 +1086,21 @@ polynomial composition~\cite[Ex.~9.20]{vzGG}.
   $P_1$ have degrees less than $m$ and $n-m$ respectively. By
   induction hypothesis,
   \begin{equation*}
-    \begin{aligned}
-      Q_0 &= P_0[f,g,m] = \sum_{i=0}^{m-1}p_if^ig^{m-1-i},\\
-      Q_1 &= P_1[f,g,n-m] = \sum_{i=0}^{n-m-1}p_{i+m}f^ig^{n-m-1-i}.   
-    \end{aligned}
+    \setlength{\arraycolsep}{1pt}
+    \begin{array}{lllll}
+      Q_0 & = & P_0[f,g,m] & = & \sum_{i=0}^{m-1}p_if^ig^{m-1-i},\vspace*{1mm}\\
+      Q_1 & = & P_1[f,g,n-m] & = & \sum_{i=0}^{n-m-1}p_{i+m}f^ig^{n-m-1-i}.   
+    \end{array}
   \end{equation*}
   Hence,
-  \begin{equation*}
-    Q = \sum_{i=0}^{m-1}p_if^ig^{n-1-i} +
-    \sum_{i=0}^{n-m-1}p_{i+m}f^{i+m}g^{n-m-1-i} =
-    P[f,g,n].
-  \end{equation*}
+  \[
+  \setlength{\arraycolsep}{1pt}
+  \begin{array}{lll}
+    Q & = & \sum_{i=0}^{m-1}p_if^ig^{n-1-i} +
+    \sum_{i=0}^{n-m-1}p_{i+m}f^{i+m}g^{n-m-1-i}\vspace*{1mm}\\
+    & = & P[f,g,n].
+  \end{array}
+  \]
   The only step that requires a computation is
   Step~\ref{alg:compose:res}, costing $O(\Mult(\ell n))$ operations in
   $\F_q$. The recursion has depth $\log(n)$, hence the overall
@@ -1162,18 +1166,22 @@ of~\cite{vzGG}.
   (n-m)$. By induction, $P_0$ and $P_1$ have degree less than $m$,
   resp. $n-m$, in $X$, and less than  $\ell$ in $Y$, and
   \begin{equation*}
-    \begin{aligned}
-      Q_0 &= P_0[f,g,m] = \sum_{i=0}^{m-1} p_{0,i}f^ig^{m-1-i},\\
-      Q_1 &= P_1[f,g,n-m] = \sum_{i=0}^{n-m-1} p_{1,i}f^ig^{n-m-1-i}.
-    \end{aligned}
+    \setlength{\arraycolsep}{1pt}
+    \begin{array}{lllll}
+      Q_0 & = & P_0[f,g,m] & = & \sum_{i=0}^{m-1} p_{0,i}f^ig^{m-1-i},\vspace*{1mm}\\
+      Q_1 & = & P_1[f,g,n-m] & = & \sum_{i=0}^{n-m-1} p_{1,i}f^ig^{n-m-1-i}.
+    \end{array}
   \end{equation*}
   Hence, $P=P_0+X^mP_1$ has degree less than $n$ in $X$ and less than $\ell$ 
   in $Y$, and the following proves correctness:
-  \begin{multline*}
-    P[f,g,n] = \sum_{i=0}^{m-1}p_{0,i}f^ig^{n-1-i} + 
-    \sum_{i=m}^{n-1}p_{1,i-m}f^ig^{n-1-i} \\
-    =P_0[f,g,m]g^{n-m} + P_1[f,g,n-m]f^m = Q.
-  \end{multline*}
+  \[
+  \setlength{\arraycolsep}{1pt}
+  \begin{array}{ll}
+    P[f,g,n] & = \sum_{i=0}^{m-1}p_{0,i}f^ig^{n-1-i} + 
+    \sum_{i=m}^{n-1}p_{1,i-m}f^ig^{n-1-i} \vspace*{1mm}\\
+    & =P_0[f,g,m]g^{n-m} + P_1[f,g,n-m]f^m = Q.
+  \end{array}
+  \]
   At Step~\ref{alg:decompose:xgcd}, we do as follows: starting from
   $h=1/g \bmod f$, we deduce $1/g^{n-m} \bmod f$ in time
   $O(\Mult(\ell)\log(n))$ by binary powering mod $f$. We also compute
@@ -1220,7 +1228,8 @@ $\ell$-adic towers in Magma:
   finite field constructor \verb+GF()+. For the parameters we were
   able to test, Magma uses tables of precomputed Conway polynomials
   and automatically computes embeddings on
-  creation.\footnote{See \url{http://magma.maths.usyd.edu.au/magma/releasenotes/2/14}}
+  creation.\footnote{See \scriptsize \url{http://magma.maths.usyd.
+  edu.au/magma/releasenotes/2/14}}
 \item We construct the highest level of the tower first, then all the
   lower levels using the \verb+sub<>+ constructor.
 \item We construct the levels from bottom to top using random dense
@@ -1228,13 +1237,16 @@ $\ell$-adic towers in Magma:
   account for the time spent finding the irreducible polynomials.
 \end{itemize}
 
+%\setlength{\textfloatsep}{3mm plus 1mm minus 1mm}
 \begin{figure}
   \centering
   \includegraphics[height=4.7cm]{creat}
+  \vspace*{-6mm}
   \caption{Times for building $3$-adic towers on top of $\F_2$ (left)
     and $\F_5$ (right), in Magma (first three lines) and using our
     code.}
   \label{fig:build}
+  \vspace*{-3mm}
 \end{figure}
 
 We ran tests on an Intel Xeon E5620 clocked at 2.4 GHz, using Sage 5.5
