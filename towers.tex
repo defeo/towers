@@ -5,6 +5,7 @@
 \usepackage{graphicx}
 \usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage{xfrac}
 \usepackage{mysymbols}
 \usepackage{hyperref}
 \usepackage{tikz}
@@ -102,9 +103,9 @@ $$
   q = 1 \bmod \ell & O_e(\log(q))  & O(\ell^i) & O(\ell^i) \\
   q = -1 \bmod \ell & O_e(\log(q)) & O(\ell^i) & O(\Mult(\ell^i) \log(\ell^i)) \\
   - & O_e (\ell^2+\Mult(\ell) \log(q)) & O(\Mult(\ell^{i+1})\Mult(\ell)\log(\ell^i)^2) & O( \Mult(\ell^{i+1})\Mult(\ell)\log(\ell^i))\\
-  4\ell \le q^{1/4} & O\tilde{_e}(\ell\log^5(q)+\ell^3) \text{~(bit)}  & O_e(\ell^2+\Mult(\ell)\log(\ell
+  4\ell \le q^{\sfrac{1}{4}} & O\tilde{_e}(\ell\log^5(q)+\ell^3) \text{~(bit)}  & O_e(\ell^2+\Mult(\ell)\log(\ell
   q)+\Mult(\ell^i)\log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \\
-  4\ell \le q^{1/4} & O\tilde{_e}(\ell\log^5(q))  \text{~(bit)}  + O_e(\Mult(\ell)\sqrt{q}\log(q)) & O_e(\log(q) + \Mult(\ell^i) \log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \vspace{-0.5cm}
+  4\ell \le q^{\sfrac{1}{4}} & O\tilde{_e}(\ell\log^5(q))  \text{~(bit)}  + O_e(\Mult(\ell)\sqrt{q}\log(q)) & O_e(\log(q) + \Mult(\ell^i) \log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \vspace{-0.5cm}
 \end{array}
 $$
 \label{table:main}
@@ -685,7 +686,7 @@ completing the second row in Table~\ref{table:main}.
   element $(x,y)$ of $\F_q(\delta)$ belongs to $\mathbb{T}_2$ if and only if
   its norm over $\F_q$ is $1$.
   Let $\sigma$ be the generator of $\Gal_{\F_q(\delta)/\F_q}$. For
-  $p=2$, clearly $\delta^\sigma=-\delta$. For $p\ne2$, by
+  $p\neq2$, clearly $\delta^\sigma=-\delta$. For $p=2$, by
   Artin-Schreier theory,
   $\Tr_{\F_q(\delta)/\F_q}(\delta)=\Tr_{\F_q/\F_2}(\Delta)=1$, hence
   $\delta^\sigma=1+\delta$. In both cases, Eq.~\eqref{eq:Pell}
@@ -857,7 +858,7 @@ referring to~\cite{couveignes+lercier11} for details, and point out
 the modifications needed in order to build towers (as opposed to
 constructing irreducible polynomials).
 
-\begin{figure}
+\begin{figure}[t]
   \centering
   \begin{tikzpicture}
     \def\n{4}
@@ -961,16 +962,15 @@ The following theorem gives the time for building the tower; lift and
 push are detailed in the next section. 
 
 \begin{theorem}\label{theo:elliptic}
-  \sloppy
-  Suppose $4\ell\le q^{1/4}$, and under the above assumption.
+  Suppose $4\ell\le q^{\sfrac{1}{4}}$, and under the above assumption.
   Initializing the $\ell$-adic tower requires
   $O\tilde{_e}(\ell\log^5(q)+\ell^3)$ bit operations; and building the
   $i$-th level requires $O_e(\ell^2+\Mult(\ell)\log(\ell
-  q)+\Mult(\ell^i)\log(\ell^i))$ operations in $\F_q$.
+  q)+\Mult(\ell^i)\log(\ell^i))$ operations in~$\F_q$.
 \end{theorem}
 \begin{proof}
   For the initialization, \cite[\S~4.3]{couveignes+lercier11}
-  shows that if $4\ell\le q^{1/4}$, a curve $E_0$ with the required
+  shows that if $4\ell\le q^{\sfrac{1}{4}}$, a curve $E_0$ with the required
   number of points can be found in $O\tilde{_e}(\ell\log^5(q))$ bit
   operations. We also need to compute the $\ell$th modular polynomial
   $\Phi_\ell\bmod p$; for this, we compute it over $\Z$ with
@@ -979,13 +979,14 @@ push are detailed in the next section.
 
   To build the $i$-th level, we first need to find the equation of
   $E_{-i}$. For this, we evaluate $\Phi_\ell$ at $j(E_{-i+1})$, using
-  $O(\ell^2)$ operations. The resulting polynomial has two roots in
-  $\F_q$, namely $j(E_{-i})$ and $j(E_{-i+2})$. We factor it using
-  $O_e(\Mult(\ell)\log(\ell q))$ operations~\cite[Ch~14]{vzGG}. Once
-  $E_{-i}$ is known, we find an $\ell$-torsion point using $O_e(\log
-  q)$ operations, and apply Vélu's formulas to compute $\phi_{-i}$. We
-  deduce the polynomial $T_i$, and $Q_i$ is obtained using
-  $O(\Mult(\ell^i)\log(\ell^i))$ operations using
+  $O(\ell^2)$ operations. Lemma~\ref{th:class-number} implies that
+  this polynomial has only two roots in $\F_q$, namely $j(E_{-i})$ and
+  $j(E_{-i+2})$. We factor it using $O_e(\Mult(\ell)\log(\ell q))$
+  operations~\cite[Ch~14]{vzGG}, and we take an arbitrary curve with
+  $j$-invariant $j(E_{-i})$. Then we find an $\ell$-torsion point
+  using $O_e(\log q)$ operations, and apply Vélu's formulas to compute
+  $\phi_{-i}$. We deduce the polynomial $T_i$, and $Q_i$ is obtained
+  using $O(\Mult(\ell^i)\log(\ell^i))$ operations using
   Algorithm~\ref{alg:compose} given in the next section.
 \end{proof}
 
