@@ -8,6 +8,7 @@
 \usepackage{mysymbols}
 \usepackage{hyperref}
 \usepackage{tikz}
+\usetikzlibrary{positioning}
 \usepackage{dblfloatfix}
 \usepackage{placeins}
 
@@ -143,14 +144,15 @@ operations $\{+,-,\times,\div\}$ in $\F_q$ at unit cost.
 %% of small finite fields, such as primitive polynomials, Zech
 %% logarithms, Conway polynomials, etc.
 
-The techniques we use are inspired by those in~\cite{df+schost12},
-which dealt with the Artin-Schreier case $\ell=p$ (see
-also~\cite{DoSc12}, which reused these ideas in the case $\ell=2$): we
-construct families of irreducible polynomials with special properties,
-then give algorithms that exploit the special form of those
-polynomials to apply the embeddings. Because they are treated in the
-references~\cite{df+schost12,DoSc12}, {\em we exclude the cases $\ell=p$
-and $\ell=2$}.
+Our techniques are inspired by those
+in~\cite{cantor89,couveignes00,df+schost12}, which dealt with the
+Artin-Schreier case $\ell=p$ (see also~\cite{DoSc12}, which reused
+these ideas in the case $\ell=2$): we construct families of
+irreducible polynomials with special properties, then give algorithms
+that exploit the special form of those polynomials to apply the
+embeddings. Because they are treated in the
+references~\cite{df+schost12,DoSc12}, {\em we exclude the cases
+  $\ell=p$ and $\ell=2$}.
 
 The field $\F_{q^{\ell^i}}$ will be represented as $\F_q[X_i]/\langle
 Q_i\rangle$, for some irreducible polynomial $Q_i \in
@@ -231,16 +233,15 @@ give more details in the further sections.
 Lenstra and De Smit~\cite{lenstra+desmit08-stdmodels} address a
 question similar to ours, the construction of the $\ell$-adic closure
 of $\F_q$ (and of its algebraic closure), with the purpose of
-standardizing it. The resulting algorithms run in
-polynomial time, but (implicitly) rely on linear algebra and
-multiplication tables, so quasi-linear time is not directly reachable.
+standardizing it. The resulting algorithms run in polynomial time, but
+(implicitly) rely on linear algebra and multiplication tables, so
+quasi-linear time is not directly reachable.
 References~\cite{Shoup90,shoup94,couveignes+lercier11} discuss a
 related problem, the construction of irreducible polynomials over
-$\F_q$; the question of computing embeddings is not considered.  Note
-that the results in~\cite{couveignes+lercier11} are {\em
-  quasi-linear}; they rely however on an algorithm by Kedlaya and
-Umans~\cite{KeUm11} that works only in a boolean model, and as a
-result share this specificity.
+$\F_q$; the question of computing embeddings is not considered.  The
+results in~\cite{couveignes+lercier11} are {\em quasi-linear}, but
+they rely on an algorithm by Kedlaya and Umans~\cite{KeUm11} that
+works only in a boolean model.
 
 To conclude the introduction, let us mention a few applications of our
 results. A variety of computations in number theory and algebraic
@@ -272,27 +273,28 @@ Lenstra-De Smit~\cite{lenstra+desmit08-stdmodels} and
 Couveignes-Lercier~\cite{couveignes+lercier11}. The results of this
 section establish rows 1 and 3 of Table~\ref{table:main}.
 
-The construction starts by building an extension $\K_0 =
-\F_q[Y_0]/\langle P_0 \rangle$, such that the residue class $y_0$ of
-$Y_0$ is a non $\ell$-adic residue in $\K_0$ (we discuss this in more
-detail in the first subsection); we let $r$ be the degree of
-$P_0$.
 
+The construction starts by building an extension $\K_0 =
+\F_q[Y_0]/\langle P_0 \rangle$ obtained by adjoining an $\ell$th root
+of unity to $\F_q$, such that the residue class $y_0$ of $Y_0$ is a
+non $\ell$-adic residue in $\K_0$ (we discuss this in more detail in
+the first subsection); we let $r$ be the degree of $P_0$.
 By~\cite[Th.~VI.9.1]{lang}, for $i\ge 1$, the polynomial
-$Y_i^{\ell^i}-y_0 \in \K_0[Y_i]$ is irreducible, so that $\K_i=
+$Y_i^{\ell^i}-y_0 \in \K_0[Y_i]$ is irreducible, so $\K_i=
 \K_0[Y_i]/\langle Y_i^{\ell^i}-y_0\rangle$ is a field with $q^{r
-  \ell^i}$ elements.  If we let $y_i$ be the residue class of $Y_i$ in
+  \ell^i}$ elements.  Letting $y_i$ be the residue class of $Y_i$ in
 $\K_i$, these fields are naturally embedded in one another by the
 isomorphism $\K_{i+1} \simeq \K_i[Y_{i+1}]/\langle
-Y_{i+1}^\ell-y_i\rangle$; in particular, the relation
-$y_{i+1}^\ell=y_i$ holds.
+Y_{i+1}^\ell-y_i\rangle$; in particular, we have
+$y_{i+1}^\ell=y_i$.
+
 
 In order to build $\F_{q^{\ell^i}}$, we apply a descent process, for
 which we follow an idea of Shoup's. For $i \ge 0$, let $x_i$ be the
 trace of $y_i$ over a subfield of index $r$:
-\begin{equation}\label{eq-def:xi}
-x_i = \sum_{j = 0}^{r-1} y_i^{q^{\ell^i j}}.  
-\end{equation}
+$$\begin{array}{ccc}
+x_i &=& \sum_{0 \le j \le r-1}\ y_i^{q^{\ell^i j}}.  
+\end{array}$$
 Then,~\cite[Th.~2.1]{Shoup90} proves that $\F_q(x_i)=\F_{q^{\ell^i}}$
 (see Figure~\ref{fig:ladic}). In particular,
 the minimal polynomials of $x_1,x_2,\dots$ over $\F_q$ are
@@ -300,9 +302,9 @@ the irreducible polynomials $Q_i$ we are interested in.
 
 \begin{figure}[h]
   \centering
-  \begin{tikzpicture}[node distance=1.6cm]
+  \begin{tikzpicture}[node distance=1.5cm]
     \node(Q){$\F_q$};
-    \node(Q0)[above left of=Q]{$\K_0=\F_q(y_0)$};
+    \node(Q0)[above left =0.5cm of Q]{$\K_0=\F_q(y_0)$};
     \node(K1)[above right of=Q]{$\F_{q^\ell}=\F_q(x_1)$};
     \node(Q1)[above right of=Q0]{$\K_1=\K_0(y_1)$};
     \node(K2)[above right of=K1]{$\F_{q^{\ell^2}}=\F_q(x_2)$};
@@ -320,17 +322,18 @@ the irreducible polynomials $Q_i$ we are interested in.
           (Koo) edge[dashed] (K2)
                edge node[auto]{\scriptsize$r$} (Qoo);
   \end{tikzpicture}
-  \caption{The $\ell$-adic towers over $\F_q$ and $\K_0$.}
+  \vspace{-0.3cm}
+  \caption{The $\ell$-adic towers over $\F_q$ and $\K_0$.}\vspace{-0.5cm}
   \label{fig:ladic}
 \end{figure}
 
-We will show here how to compute these polynomials, the polynomials
-$T_i$ introduced in Eq.~\eqref{eq:QiTi} and how to perform lift and
-push.  To this effect, we will define more general minimal
-polynomials: for $0 \le j \le i$, we will let $Q_{i,j} \in
-\F_q(x_j)[X_i]$ be the minimal polynomial of $x_i$ over $\F_q(x_j)$,
-so that $Q_{i,j}$ has degree $\ell^{i-j}$, with in particular
-$Q_{i,0}=Q_i$ and $Q_{i,i-1}=T_i(x_{i-1},X_i)$.
+We show here how to compute these polynomials, the polynomials $T_i$
+of Eq.~\eqref{eq:QiTi} and how to perform lift and push.  To this
+effect, we will define more general minimal polynomials: for $0 \le j
+\le i$, we will let $Q_{i,j} \in \F_q(x_j)[X_i]$ be the minimal
+polynomial of $x_i$ over $\F_q(x_j)$, so that $Q_{i,j}$ has degree
+$\ell^{i-j}$, with in particular $Q_{i,0}=Q_i$ and
+$Q_{i,i-1}=T_i(x_{i-1},X_i)$.
 
 In Subsections~\ref{ssec:T1} and~\ref{ssec:T2}, we discuss favorable
 cases, where $\ell$ divides respectively $q-1$ and $q+1$. The first
@@ -343,12 +346,13 @@ results in the general case (Subsection~\ref{ssec:gal}) are slower,
 but still quasi-linear in $\ell^i$, up to a factor polynomial in
 $\ell$.
 
+
 Shoup used this setup to compute $Q_i$ in time quad\-ratic in
 $\ell^i$~\cite[Th.~11]{shoup94}. It is noted there that using {\em
-  modular composition} techniques~\cite[Ch.~12]{vzGG}, this behavior
-could be improved to get a subquadratic exponent in $\ell^i$, up to an
-extra cost polynomial in $\ell$.  For $\ell=3$ (where we are in one
-the first two cases), Couveignes and Lercier make a similar remark
+  modular composition} techniques~\cite[Ch.~12]{vzGG}, this could be
+improved to get a subquadratic exponent in $\ell^i$, up to an extra
+cost polynomial in $\ell$.  For $\ell=3$ (where we are in one the
+first two cases), Couveignes and Lercier make a similar remark
 in~\cite[\S~2.4]{couveignes+lercier11}; using a result by Kedlaya and
 Umans~\cite{KeUm11} for modular composition, they derive for any
 $\varepsilon > 0$ a cost of $3^{i(1+\varepsilon)}O(\log(q))$ {\em bit}
@@ -356,8 +360,7 @@ operations, up to polynomial terms in $\log\log(q)$.
 
 In this section, and in the rest of this paper, if $L/K$ is a field
 extension, we write $\Tr_{L/K}$, $\Norm_{L/K}$ and $\Gal_{L/K}$ for
-the trace, norm and Galois group of the extension. Recall also that
-the notation $O_e(\ )$ indicates an {\em expected} running time.
+the trace, norm and Galois group of the extension. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -374,7 +377,8 @@ divides $\ell-1$); let $F_0$ be one of these factors. By construction,
 there exist non $\ell$-adic residues in $\F_q[X_0]/\langle F_0
 \rangle$. Once such a non-residue $y_0$ is found, we simply let $P_0$
 be its minimal polynomial over $\F_q$ (which still has degree $r$);
-given $y_0$, computing $P_0$ takes $O(r^2)$ operations in $\F_q$.
+given $y_0$, computing $P_0$ takes $O(r^2)$ operations in
+$\F_q$~\cite[Th.~4]{shoup94}.
 
 Following~\cite{Shoup90,shoup94,couveignes+lercier11}, we pick $y_0$
 at random: we expect to find a non-residue after $O(1)$ trials;
@@ -389,9 +393,9 @@ canonical, but more costly, so we do not consider it.
 
 \subsection{$\mathbb{G}_m$-type extensions}\label{ssec:T1}
 
+
 We consider here the simplest case, where $\ell$ divides $q-1$; the
 (classical) facts below give the first row of Table~\ref{table:main}.
-
 In this case, $\Phi_\ell$ splits into linear factors over $\F_q$ (so
 $r=1$). The polynomial $P_0$ is of the form $Y_0-y_0$, where $y_0$ is
 a non $\ell$-adic residue in $\F_q$; since we can bypass the
@@ -403,24 +407,25 @@ families of polynomials we obtain are
   \label{eq:T1}
   Q_i=X_i^{\ell^i}-y_0 \quad\text{and}\quad T_i=X_{i}^\ell-X_{i-1}.
 \end{equation}
-Lifting amounts to taking $F = \sum_{0 \le j < \ell^{i+1}} f_j
-x_{i+1}^j$ and rewriting it as a bivariate polynomial in
-$x_i,x_{i+1}$, using the rule
-$$x_{i+1}^j = x_i^{\,j {\rm~div~} \ell} x_{i+1}^{\,j \bmod \ell}.$$
-Pushing does the converse operation, using the rule
-$$x_i^e x_{i+1}^f = x_{i+1}^{e \ell + f}.$$ Both 
-use only exponent arithmetic, and no operation in~$\F_q$. 
+Lift and push use no operation in~$\F_q$, only exponent
+arithmetic. Lift takes $F = \sum_{0 \le j < \ell^{i+1}}
+f_j x_{i+1}^j$ and rewrites it as a bivariate polynomial in
+$x_i,x_{i+1}$ and push does  the converse operation, 
+using the rules
+$$x_{i+1}^j = x_i^{\,j {\rm~div~} \ell} x_{i+1}^{\,j \bmod \ell}
+\quad\text{and}\quad
+x_i^e x_{i+1}^f = x_{i+1}^{e \ell + f}.$$ 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Chebyshev-type extensions}
 \label{ssec:T2}
 
-Next, we consider the case where $\ell$ divides $q+1$, so that
-$\Phi_\ell$ splits into quadratic factors over $\F_q$ (that is,
-$r=2$). We also require that $y_0$ has norm $1$ over $\F_q$ (see below
-for a discussion); we can then deduce an expression for the
-polynomials $Q_{i,j} \in \F_q(x_{j})[X_i]$.
+Consider now the case where $\ell$ divides $q+1$: then, $\Phi_\ell$
+splits into quadratic factors over $\F_q$ and $r=2$. We also require
+that $y_0$ has norm $1$ over $\F_q$ (see below for a discussion); we
+deduce an expression for the polynomials $Q_{i,j} \in
+\F_q(x_{j})[X_i]$.
 
 \begin{proposition}
   \label{th:T2-resultant}
@@ -448,21 +453,19 @@ polynomials $Q_{i,j} \in \F_q(x_{j})[X_i]$.
   Eq.~\eqref{eq:T2-relpols}.
 \end{proof}
 
-This proposition would allow us to compute $Q_{i,j}$ in time
-$O(\Mult(\ell^{i-j}))$ by repeated squaring. In
-Section~\ref{ssec:fibers-T2}, we use arithmetic geometry to give a
-better algorithm, and to efficiently find a $y_0$ satisfying the
-hypotheses; we leave the algorithms for lift and push to
+As a result, we can compute $Q_{i,j}$ in time $O(\Mult(\ell^{i-j}))$
+by repeated squaring, but we give a better algorithm in
+Section~\ref{ssec:fibers-T2} (and show how to find a $y_0$ satisfying
+the hypotheses); we leave the algorithms for lift and push to
 Section~\ref{sec:lift-push}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{The general case}\label{ssec:gal}
 
-Finally, we discuss the general situation, where make no
-assumption on the behavior of $\Phi_\ell$ in $\F_q[X]$. This completes
-the third row of Table~\ref{table:main}, using the bound $r\in O(\ell)$.
-
+Finally, we discuss the general case, with no assumption on the
+behavior of $\Phi_\ell$ in $\F_q[X]$. This completes the third row of
+Table~\ref{table:main}, using the bound $r\in O(\ell)$.
 Because $r=[\K_0 : \F_q]$ divides $\ell-1$, it is coprime with
 $\ell$. Thus, $Q_i$ remains the minimal polynomial of $x_i$ over
 $\K_0$, and more generally $Q_{i,j}$ remains the minimal polynomial of
@@ -472,12 +475,14 @@ $\K_0$, and we will deduce the cost over $\F_q$ by adding a factor
 $O(\Mult(r)\log(r))$ to account for the cost of arithmetic in $\K_0$.
 
 For $i \ge 0$, since $\K_i=\K_0[Y_i]/\langle Y_i^{\ell^i}-y_0\rangle$,
-we represent the elements of $\K_i$ on the basis $\{y_i^e \mid 0 \le e
-< \ell^i\}$; for instance, $x_i$ is written on this basis as
-\begin{equation}\label{eq-def:xiyi}
-x_i = \sum_{j = 0}^{r-1} y_i^{q^{\ell^i j} \bmod \ell^i}
+we represent its elements on the basis $\{y_i^e \mid 0 \le e <
+\ell^i\}$; e.g., $x_i$ is written as
+$$
+\begin{array}{ccc}
+x_i &=& \sum_{0 \le j \le r-1}\ y_i^{q^{\ell^i j} \bmod \ell^i}
 y_0^{q^{\ell^i j} {\rm~div~} \ell^i}. 
-\end{equation}
+\end{array}
+$$
 Our strategy is to convert between two univariate bases of $\K_i$,
 $\{y_i^e \mid 0 \le e < \ell^i\}$ and $\{x_i^e \mid 0 \le e <
 \ell^i\}$. In other words, we show how to apply the isomorphism
@@ -629,27 +634,27 @@ we let $k=\F_q$, $L=\F_{q^n}$ and $k\subset F\subsetneq L$. The Weil
 restriction $\Res_{L/k}\mathbb{G}_m$ is an \emph{algebraic torus}, and
 the norm $\Norm_{L/F}$ induces a map
 $\Res_{L/k}\mathbb{G}_m\to\Res_{F/k}\mathbb{G}_m$. Define the
-\emph{maximal torus} $T_n$ as the intersection of the kernels of the
-maps $\Norm_{L/F}$ for all subfields $F$. Then $T_n$ has dimension
+\emph{maximal torus} $\mathbb{T}_n$ as the intersection of the kernels of the
+maps $\Norm_{L/F}$ for all subfields $F$. Then $\mathbb{T}_n$ has dimension
 $\euler(n)$, is isomorphic to $\mathbb{G}_m^{\euler(n)}$ over the
 algebraic closure, and its $k$-rational points form a group of
 cardinality $\Phi_n(q)$:
 \begin{equation}
   \label{eq:Tn}
-  T_n(k) \isom \{\alpha\in L^\ast \;|\; \Norm_{L/F}(\alpha) = 1 
+  \mathbb{T}_n(k) \isom \{\alpha\in L^\ast \;|\; \Norm_{L/F}(\alpha) = 1 
   \text{ for all $k\subset F\subsetneq L$} \}.
 \end{equation}
 
 
 We now detail how the construction of Section~\ref{ssec:T2} can be
-obtained by considering the torus $T_2$; this will allow us to start
+obtained by considering the torus $\mathbb{T}_2$; this will allow us to start
 completing the second row in Table~\ref{table:main}.
 
 \begin{lemma}
   Let $\Delta\in\F_q$ be a quadratic non-residue if $p\ne2$, or such
   that $\Tr_{\F_q/\F_2}(\Delta)=1$ otherwise. Let $\delta=\sqrt{\Delta}$
   or $\delta^2+\delta=\Delta$ accordingly. The
-  maximal torus $T_2$ is isomorphic to the \emph{Pell conic}
+  maximal torus $\mathbb{T}_2$ is isomorphic to the \emph{Pell conic}
   \begin{equation}
     \label{eq:Pell}
     C \;:\; 
@@ -658,7 +663,7 @@ completing the second row in Table~\ref{table:main}.
       x^2\Delta + xy + y^2 = 1 &\text{if $p=2$.}
     \end{cases}
   \end{equation}
-  Multiplication in $T_2$ induces a group law on $C$. The neutral
+  Multiplication in $\mathbb{T}_2$ induces a group law on $C$. The neutral
   element is $(2,0)$ if $p\ne2$, or $(0,1)$ if $p=2$. The sum of two
   points $P=(x_1,y_1)$ and $Q=(x_2,y_2)$ is defined
   by
@@ -677,7 +682,7 @@ completing the second row in Table~\ref{table:main}.
   The isomorphism follows by Weil restriction to $\F_q(\delta)/\F_q$
   with respect to the basis $(1/2,\delta/2)$ if $p\ne2$, or
   $(\delta,1)$ if $p=2$. Indeed, by virtue of Eq.~\eqref{eq:Tn}, an
-  element $(x,y)$ of $\F_q(\delta)$ belongs to $T_2$ if and only if
+  element $(x,y)$ of $\F_q(\delta)$ belongs to $\mathbb{T}_2$ if and only if
   its norm over $\F_q$ is $1$.
   Let $\sigma$ be the generator of $\Gal_{\F_q(\delta)/\F_q}$. For
   $p=2$, clearly $\delta^\sigma=-\delta$. For $p\ne2$, by
@@ -718,7 +723,7 @@ $n$, separable if and only if $(n,p)=1$.
 
 \begin{theorem}
   \label{th:T2-irred}
-  Let $\eta\in\F_q(\delta)$ be a non $\ell$-adic residue in $T_2$, and
+  Let $\eta\in\F_q(\delta)$ be a non $\ell$-adic residue in $\mathbb{T}_2$, and
   let $P=(\alpha,\beta)$ be its image in $C/\F_q$. For any $i>0$, the
   polynomials $C_{\ell^i}-\alpha$ are irreducible. Their roots are the
   abscissas of the images in $C/\F_{q^{\ell^i}}$ of the $\ell^i$-th
@@ -750,7 +755,7 @@ $Q_i$ and $T_i$ of Section~\ref{ssec:T2}.
 \begin{proof}
   We have already shown that $\Norm_{\K_j/\F_q(x_j)}(y_j)=1$ for any
   $j$, thus $y_j$ is a non $\ell$-adic residue in
-  $T_2/\F_q(x_j)$. Independently of the characteristic and of the
+  $\mathbb{T}_2/\F_q(x_j)$. Independently of the characteristic and of the
   element $\Delta\in\F_q(x_j)$ chosen, the abscissa of the image of
   $y_j$ in $C/\F_q(x_j)$ is $\Tr_{\K_j/\F_q(x_j)}y_j=x_j$. The
   statement follows from the previous theorem.
@@ -828,11 +833,11 @@ sampling and testing.
 
 It is natural to ask whether a similar construction could be applied
 to any $\ell$. If $r$ is the order of $q$ modulo $\ell$, the natural
-object to look at is $T_r$, but here we are faced with two
+object to look at is $\mathbb{T}_r$, but here we are faced with two
 problems. First, multiplication by $\ell$ is now a degree
 $\ell^{\euler(r)}$ map, thus its fibers have too many points; instead,
 isogenies of degree $\ell$ should be considered. Second, it is an open
-question whether $T_r$ can be parameterized using $\euler(r)$
+question whether $\mathbb{T}_r$ can be parameterized using $\euler(r)$
 coordinates; but even assuming it can be, we are still faced with the
 computation of a univariate annihilating polynomial for a set embedded
 in a $\euler(r)$-dimensional space, a problem not known to be feasible
@@ -1200,21 +1205,19 @@ for other primes. Towers based on elliptic curves are constructed
 using the algorithm described in Remark~\ref{rk:elliptic}. The source
 code is available at \url{https://defeo.github.io/towers}
 
-We compare our implementation against three ways of constructing
-$\ell$-adic towers in Magma:
-\begin{itemize}
-\item We construct the levels from bottom to top using the default
-  finite field constructor \verb+GF()+. For the parameters we were
-  able to test, Magma uses tables of precomputed Conway polynomials
-  and automatically computes embeddings on
-  creation.\footnote{See \scriptsize \url{http://magma.maths.usyd.
-  edu.au/magma/releasenotes/2/14}}
-\item We construct the highest level of the tower first, then all the
-  lower levels using the \verb+sub<>+ constructor.
-\item We construct the levels from bottom to top using random dense
-  polynomials, then we call the \verb+Embed()+ function.  We do not
-  account for the time spent finding the irreducible polynomials.
-\end{itemize}
+We compare our implementation to three ways of constructing
+$\ell$-adic towers in Magma. First, one may construct the levels from
+bottom to top using the finite field constructor \verb+GF()+. For the
+parameters we used, Magma uses tables of precomputed
+Conway polynomials and automatically computes embeddings on creation,
+see~\url{http://magma.maths.usyd.
+  edu.au/magma/releasenotes/2/14}. The second approach constructs the
+highest level of the tower first, then all the lower levels using the
+\verb+sub<>+ constructor. The last one constructs the levels from
+bottom to top using random dense polynomials and calls the
+\verb+Embed()+ function; we do not count the time for finding the
+irreducible polynomials.
+
 
 %\setlength{\textfloatsep}{3mm plus 1mm minus 1mm}
 \begin{figure}
@@ -1252,7 +1255,8 @@ Section~\ref{sec:lift-push} would match Magma's performances.
 from NSERC, the CRC program, and ANR through the ECLIPSES project
 under Contract ANR-09-VERS-018. De Feo would like to thank Antoine
 Joux and J\'er\^ome Pl\^ut for fruitful discussions. He acknowledges
-support from the ANR pro .
+support from the ANR pro. We are grateful to the reviewers for their
+remarks.
 
 \scriptsize
 \bibliographystyle{abbrv}
