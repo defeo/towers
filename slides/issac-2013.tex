@@ -1,5 +1,5 @@
 
-\documentclass[10pt]{beamer}
+\documentclass[12pt]{beamer}
 
 
 \usepackage[english]{babel}
@@ -19,6 +19,7 @@
 \usetikzlibrary{intersections}
 \usetikzlibrary{backgrounds}
 \usetikzlibrary{fit}
+\usetikzlibrary{arrows}
 \usepackage{algorithmic}
 \usepackage{algorithm}
 
@@ -85,7 +86,7 @@
 \date{ISSAC 2013}
 
 \pgfdeclareimage[height = 5mm]{westernlogo}{Western_Logo_CMYK}
-\pgfdeclareimage[height = 5mm]{versailleslogo}{uvsq-logo}
+\pgfdeclareimage[height = 6mm]{versailleslogo}{uvsq-logo}
 
 \begin{document}
 
@@ -183,8 +184,9 @@
 		\draw [xshift = 4.5cm] node [right, text width = 2.5cm, 
 			rounded corners, fill=red!10, inner sep = 1mm]{
 				\small
-				\[\F_q^{(\ell)} = \bigcup_{i\ge 0}\F_{q^{\ell^i}},\]
-				\[\bar{\F}_q \cong \bigotimes_{\ell\text{ prime}} \F_q^{(\ell)}\]
+				\mbox{$\displaystyle\F_q^{(\ell)} = \bigcup_{i\ge 0}\F_{q^{\ell^i}},$}\\
+                                \smallskip
+				\mbox{$\displaystyle\bar{\F}_q \cong \bigotimes_{\ell\text{ prime}} \F_q^{(\ell)}$}
 			};
 		\draw[xshift = -3.8cm] node [left, rounded corners, fill=red!10, inner sep = 1mm]{
 				\small $q$ and $\ell$ fixed
@@ -215,7 +217,7 @@
 	\end{tikzpicture}
 	
 	\vspace*{3mm}
-	\textbf{Motivations}:
+	\textbf{Goals}:
 	\begin{itemize}
 		\item Describing embeddings:
 		\begin{itemize}
@@ -231,7 +233,7 @@
 	\textbf{Application examples}:
 	\begin{itemize}
 		\item In general: finite field arithmetic.
-		\item Computing isogenies between ordinary elliptic curves, L. De Feo, 2011.
+		\item Computing isogenies between elliptic curves, L. De Feo, 2011.
 		\item Point-counting in genus 2, Gaudry and Schost, 2012.
 	\end{itemize}
 	
@@ -239,10 +241,19 @@
 
 %###################################################
 
+{
+\setbeamertemplate{itemize/enumerate body begin}{\fontsize{10pt}{12pt}\selectfont}
+\setbeamertemplate{itemize/enumerate subbody begin}{\fontsize{9pt}{12pt}\selectfont\setlength{\leftmarginii}{2mm}}
 \begin{frame}
 	\frametitle{Previous works}
-	
+
 	\begin{itemize}
+          \item Magma's implementation:
+            \begin{itemize}
+          \setlength{\itemindent}{0pt}
+            \item Bosma, Cannon, Steel, \textit{Lattices of compatibly embedded finite fields}, 1997.
+            \item E. Rains, \textit{Efficient computation of isomorphisms between finite fields}, 199x.
+            \end{itemize}
 		\item Artin-Schreier towers, $\ell=p$:
 		\begin{itemize}
 			\item D.~G. Cantor, \textit{On arithmetical algorithms over finite fields}, 1989.
@@ -255,48 +266,106 @@
 		\end{itemize}
 		\item Inspiration behind this work:
 		\begin{itemize}
-			\item Lenstra and De Smit, \textit{Standard models for finite fields}, 2008.
+			\item De Smit and Lenstra, \textit{Standard models for finite fields}, 2008.
 			\item Couveignes and Lercier, \textit{Fast construction of irreducible polynomials over finite fields}, 2011.
 			\item V. Shoup, \textit{Fast construction of irreducible polynomials over finite fields}, 1994.
 		\end{itemize}
 	\end{itemize}
 \end{frame}
+}
+%###################################################
+\begin{frame}
+  \frametitle{Univariate vs. Multivariate}
+
+  \begin{tikzpicture}
+    \begin{scope}[node distance=2cm]
+      \node (F0) {$\F_q$};
+      \node[above of = F0] (F1) {$\K_1$};
+      \node[above of = F1] (F2) {$\K_2$};
+      \node[above of = F2] (Fi) {$\K_i$};
+      \draw (F0) -- node[auto]{\small$\ell$} (F1) -- node[auto]{\small$\ell$} (F2);
+      \draw[dashed] (F2) -- (Fi);
+      \visible<2>{
+        \path (F2) to[bend right] node (F2i){} (Fi);
+        \draw[dashed,color=black!30,bend right,every node/.style={auto,swap,color=black}]
+        (F0) edge node {$T_1$} (F1)
+        (F1) edge node {$T_2$} (F2)
+        (F2) edge (F2i)
+        (F2i) edge (Fi);
+      }
+      \visible<3>{
+        \draw[dashed,color=black!30,auto,swap,pos=0.8]
+        (F0) edge[bend right=30] node[color=black] {$Q_1$} (F1)
+        (F0) edge[bend right=50] node[color=black] {$Q_2$} (F2)
+        (F0) edge[bend right=70] node[color=black] {$Q_i$} (Fi);
+      }
+    \end{scope}
+    %%%%%%%%%%%%%%%%%%%%%%% 
+    \uncover<2->{
+      \node[right=3cm of F1] (T) {
+        $\F_q[X_1,X_2,\dots,X_i] /
+        \left|\begin{aligned}
+            T_i(X_i, \dots, X_2, X_1)\\
+            \vdots\qquad\\
+            T_2(X_2, X_1)\\
+            T_1(X_1)
+          \end{aligned}\right.
+        $
+      };
+    }
+    \visible<2>{
+      \draw[->] (Fi) .. controls +(0.8cm,0cm) .. +(1.6cm,-2cm)
+      node[pos=1,auto,sloped] {$\sim$}
+      .. controls +(2.4cm,-4cm) .. (T)  ;
+    }
+    \uncover<3->{
+      \node[above = 2cm of T] (Q) {
+        $\F_q[X_i] / Q_i(X_i)$
+      };
+    }
+    \visible<3->{
+      \draw[<->,dashed,color=black!50] 
+      (Q) edge node {Embedding evaluation} (T);
+      \draw[->] (Fi) to[bend left=10] node[auto,sloped] {$\sim$} (Q);
+    }
+  \end{tikzpicture}
+\end{frame}
 
 %###################################################
 
-\begin{frame}
-	\frametitle{Remarks}
+% \begin{frame}
+% 	\frametitle{Remarks}
 	
-	\begin{exampleblock}{}
-		\begin{itemize}
-			\item Multiplications and inversions are quasi-linear in the extension degree.
-			\item The Embedding problem is reduced to a pair of consecutive levels.
-		\end{itemize}
-	\end{exampleblock}
+% 	\begin{exampleblock}{}
+% 		\begin{itemize}
+% 			\item Multiplications and inversions are quasi-linear in the extension degree.
+% 			\item The Embedding problem is reduced to a pair of consecutive levels.
+% 		\end{itemize}
+% 	\end{exampleblock}
 	
-	\begin{center}
-		\begin{tikzpicture}
-			\footnotesize
-			\node (A) {$\F_{q^{\ell^{i}}}$};
-			\node[below left=1cm of A] (B) {$\F_q[X_{i}]/ \langle Q_{i} \rangle$};
-			\node[below right=1cm of A] (C) {$\F_q[X_{i-1},X_i]/\langle Q_{i-1}(X_{i-1}), T_i(X_{i-1},X_i)\rangle$};
-			\node[below=1.5cm of B] (D) {$\uu_i = (1,x_{i},x_{i}^2,\ldots,x_{i}^{\ell^{i}-1})$};
-			\node[below=1.5cm of C] (E) { %
-				$\begin{aligned}
-					\bb_{i} = ( & 1,\ldots,x_{i-1}^{\ell^{i-1}-1},\ldots, \\
-					& x_i^{\ell-1},\ldots,x_{i-1}^{\ell^{i-1}-1}x_i^{\ell-1})
-				\end{aligned}$ %
-			};
-			%
-			\path[->] (A) edge node[above,sloped,inner sep=0.5pt] {$ \sim $} (B);
-			\path[->] (A) edge node[above,sloped,inner sep=0.5pt] {$ \sim $} (C);
-			\path[->] (B) edge node[fill = white] {has basis} (D);
-			\path[->] (C) edge node[fill = white] {has basis} (E);
-			\path[->] (D.north east) edge[out = 30, in = 150] node[above] {\color{blue} \it push} (E.north west);
-			\path[->] (E.west) edge[out = 210, in = 330] node[below] {\color{blue} \it lift} (D.south east);
-		\end{tikzpicture}
-	\end{center}
-\end{frame}
+% 	\begin{center}
+% 		\begin{tikzpicture}
+% 			\footnotesize
+% 			\node (A) {$\F_{q^{\ell^{i}}}$};
+% 			\node[below left=1cm of A] (B) {$\F_q[X_{i}]/ \langle Q_{i} \rangle$};
+% 			\node[below right=1cm of A] (C) {$\F_q[X_{i-1},X_i]/\langle Q_{i-1}(X_{i-1}), T_i(X_{i-1},X_i)\rangle$};
+% 			\node[below=1.5cm of B] (D) {$\uu_i = (1,x_{i},x_{i}^2,\ldots,x_{i}^{\ell^{i}-1})$};
+% 			\node[below=1.5cm of C] (E) { %
+% 				$\begin{aligned}
+% 					\bb_{i} = ( & 1,\ldots,x_{i-1}^{\ell^{i-1}-1},\ldots, \\
+% 					& x_i^{\ell-1},\ldots,x_{i-1}^{\ell^{i-1}-1}x_i^{\ell-1})
+% 				\end{aligned}$ %
+% 			};
+% 			%
+% 			\path[->] (A) edge node[above,sloped,inner sep=0.5pt] {$ \sim $} (B);
+% 			\path[->] (A) edge node[above,sloped,inner sep=0.5pt] {$ \sim $} (C);
+% 			\path[->] (B) edge node[fill = white] {has basis} (D);
+% 			\path[->] (C) edge node[fill = white] {has basis} (E);
+% 			\path[->] (D.north east) edge[out = 30, in = 150] node[above] {\color{blue} \it push} (E.north west);
+% 			\path[->] (E.west) edge[out = 210, in = 330] node[below] {\color{blue} \it lift} (D.south east);
+% 		\end{tikzpicture}
+% 	\end{center}
+% \end{frame}
 
 %###################################################
 
@@ -304,29 +373,29 @@
 	\frametitle{Summary of Main Results}
 	
 	\resizebox{0.93\textwidth}{!}{
+          \footnotesize
 		\begin{minipage}{\textwidth}
 			\[
 			\begin{array}{c|cccc}
-				\text{Condition} & \text{\bf Initialization} & \mathbf{Q_i, T_i} & \text{\bf Lift, push}\\
+				\text{Condition} & \text{\bf Initialization} & \mathbf{Q_i, T_i} & \text{\bf Embedding eval.}\\
 				\hline \hline
-				q = 1 \bmod \ell & O_e(1)  & O(\ell^i) & O(\ell^i) \\
-				q = -1 \bmod \ell & O_e(1) & O(\ell^i) & O(\Mult(\ell^i) \log(\ell^i)) \\
-				- & O_e (\ell^2) & O(\Mult(\ell^{i+1})\Mult(\ell)\log(\ell^i)^2) & O( \Mult(\ell^{i+1})\Mult(\ell)\log(\ell^i))\\
-				4\ell \le q^{1 / 4} & O\tilde{_e}(\ell^3) \text{~(bit)}  & O_e(\Mult(\ell^i)\log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \\
-				4\ell \le q^{1 / 4} & O\tilde{_e}(\Mult(\ell)) & O_e(\Mult(\ell^i) \log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \vspace{-0.5cm}
+				q = 1 \bmod \ell & O(1)  & O(\ell^i) & O(\ell^i) \\
+				q = -1 \bmod \ell & O(1) & O(\ell^i) & O(\Mult(\ell^i) \log(\ell^i)) \\
+				- & O (\ell^2) & O(\Mult(\ell^{i+1})\Mult(\ell)\log(\ell^i)^2) & O( \Mult(\ell^{i+1})\Mult(\ell)\log(\ell^i))\\
+				4\ell \le q^{1 / 4} & \tildO(\ell^3) \text{~(bit)}  & O(\Mult(\ell^i)\log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \\
+				4\ell \le q^{1 / 4} & \tildO(\Mult(\ell)) & O(\Mult(\ell^i) \log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \vspace{-0.5cm}
 			\end{array}
 			\]
 		\end{minipage}
 	}
 	
 	\vspace*{1.5cm}
-	\begin{block}{Notations}
+	\begin{block}{Objective}
 		\footnotesize
 		\begin{itemize}
-			\item $\Mult$: polynomial multiplication
-			\item $O_e(\ )$: probabilistic with expected running time
-			\item $O\tilde{_e}(\ )$: additional omission of logarithmic factors.
-			\item bit: bit complexity.
+			\item $q$ and $\ell$ fixed,
+                        \item \alert{$\tildO(\ell^i)$} operations in $\F_q$,
+                        \item limit additional factors in $\ell$ and $q$ as much as possible.
 		\end{itemize}
 	\end{block}
 \end{frame}
@@ -337,107 +406,100 @@
 \section{Quasi-cyclotomic towers}
 
 \begin{frame}
-	\frametitle{\insertsection 
-	\\{\small\normalfont\footnotesize \color{black} 
-	(inspired by Shoup, Lenstra and De Smit, Couveignes and Lercier)}}
+	\frametitle{\insertsection }
+%	\\{\small\normalfont\footnotesize \color{black} 
+%	(inspired by Shoup, De Smit and Lenstra)}}
 	
+    \begin{columns}
+      \begin{column}{0.65\textwidth}
 	\begin{center}
 		\begin{tikzpicture}[thick, node distance=2cm, inner sep = 2pt]
 			\node[blue] (Q) {$\F_q$};
-			\node (Q0) [above left = 1cm of Q]{$\K_0=\F_q(y_0)$};
-			\node[blue] (K1) [above right of=Q]{$\F_{q^\ell}=\F_q(x_1)$};
-			\node (Q1) [above right of=Q0]{$\K_1=\K_0(y_1)$};
-			\node[blue] (K2)[above right of=K1]{$\F_{q^{\ell^2}}=\F_q(x_2)$};
-			\node (Q2) [above right of=Q1]{$\K_2=\K_1(y_2)$};
-			\node[blue] (Koo)[above right of=K2]{$\quad \F_q^{(\ell)}$};
-			\node (Qoo) [above right of=Q2]{$\quad\K_0^{(\ell)}$};
-			%--------------------------
+			\node (Q0) [above left = 1cm of Q]{$\F_q(\zeta_\ell)$};
+			\node[blue] (K1) [above right of=Q]{$\F_q(x_1)$};
+			\node (Q1) [above right of=Q0]{$\F_q(\zeta_{\ell^2})$};
+			\node[blue] (K2)[above right of=K1]{$\F_q(x_2)$};
+			\node (Q2) [above right of=Q1]{$\F_q(\zeta_{\ell^3})$};
+			\node[blue] (Koo)[above right of=K2]{$\quad \F_q(x_i)$};
+			\node (Qoo) [above right of=Q2]{$\quad\F_q(\zeta_{\ell^i})$};
+			% --------------------------
 			\draw (Q) edge[red] node[auto]{$r$} (Q0)
-			          edge[blue] node[auto,swap]{$\ell$} (K1)
-			      (K1) edge[red] node[red, auto] {$r$} (Q1)
-			           edge[blue] node[auto,swap]{$\ell$} (K2)
-			      (Q1) edge node[auto]{$\ell$} (Q0)
-			      (Q2) edge[red] node[red, auto, swap]{$r$} (K2)
-			           edge node[auto]{$\ell$} (Q1)
-			           edge[dotted] (Qoo)
-			      (Koo) edge[blue, dotted] (K2)
-			           edge[red] node[red, auto]{$r$} (Qoo);
-			\node[below right = 1mm of K2, text width = 4cm, fill = red!10, rounded corners, font = \small]{
-				\begin{itemize}
-					\item $\K_i= \K_0[Y_i]/\langle Y_i^{\ell^i}-y_0\rangle$
-					\item $x_i = \Tr_{\K_i / \F_{q^{\ell^i}}}(y_i)$
-					\item We are interested in $Q_i = \operatorname{minpoly}_{\F_q}(x_i)$
-				\end{itemize}
-			};
+                        edge[blue] node[auto,swap]{$\ell$} (K1)
+                        (K1) edge[red] node[red, auto] {$r$} (Q1)
+                        edge[blue] node[auto,swap]{$\ell$} (K2)
+                        (Q1) edge node[auto]{$\ell$} (Q0)
+                        (Q2) edge[red] node[red, auto, swap]{$r$} (K2)
+                        edge node[auto]{$\ell$} (Q1)
+                        edge[dotted] (Qoo)
+                        (Koo) edge[blue, dotted] (K2)
+                        edge[red] node[red, auto]{$r$} (Qoo);
+			% --------------------------
+                        \uncover<1>{
+                        \node (cyclo) [above left = 2mm of Q2, fill = red!10, rounded corners, font=\small]{ Cyclotomic fields };
+                        \draw[dashed, ->, color = black!30] (cyclo) edge[bend right] (Q0)
+                         edge[bend right] (Q1)
+                         edge[bend left] (Q2)
+                         edge[bend left] (Qoo);}
+			% --------------------------
+                       \uncover<2>{
+                         \draw[dashed,bend right=40,color = black!30]
+                         (K1) edge node[auto,swap,color=black]{$T_2$} (K2)
+                         (Q) edge node[auto,swap,color=black]{$Q_i$} (Koo);
+                       }
 		\end{tikzpicture}
 	\end{center}
+      \end{column}
+      \begin{column}{0.35\textwidth}
+        \begin{block}{}
+          \begin{itemize}
+          \item<1-> $r|(\ell-1)$;
+          \item<1-> $x_i = \Tr_{\K_i / \F_{q^{\ell^i}}}(\zeta_{\ell^i})$;
+          \item<2-> Both $T_i$ and $Q_i$
+            can be computed by
+            resultants.
+          \end{itemize}
+        \end{block}
+      \end{column}
+    \end{columns}
 \end{frame}
 
 %###################################################
 
 \begin{frame}
-	\frametitle{$\mathbb{G}_m$ and Chebyshev-type extensions}
-	
-	\begin{exampleblock}{$\mathbb{G}_m$-type extensions}
-		\begin{itemize}
-			\item $\ell \mid q-1$, $r = 1$.
-			\item Initialization: $O_e(\log(q))$ operations in $\F_q$.
-			\item $Q_i=X_i^{\ell^i}-y_0 \quad\text{and}\quad T_i=X_{i}^\ell-X_{i-1}$.
-			\item Lift and push: no operation in $\F_q$.
-		\end{itemize}
-	\end{exampleblock}
-	
-	\vspace*{3mm}
-	\begin{exampleblock}{Chebyshev-type extensions}
-		\begin{itemize}
-			\item $\ell \mid q + 1$, $r = 2$.
-			\item Initialization: $O_e(\log(q))$ operations in $\F_q$.
-			\item $Q_i(X_i) = Y^{\ell^i} + Y^{-\ell^i} - x_0 \mod Y^2-X_iY+1$.
-			\begin{itemize}
-				\item $Q_i$ can be computed in $O(\Mult(\ell^i))$; a better algorithm \textcolor{blue}{later}.
-			\end{itemize}
-			\item Lift and push: \textcolor{blue}{later}.
-		\end{itemize}
-	\end{exampleblock}
-	
+  \frametitle{Special cases}
+
+  \begin{exampleblock}{Generic algorithm}
+    \begin{itemize}
+    \item Perform all computations in the \emph{cyclotomic tower};
+    \item Construction and embedding evaluation: penalty only \alert{$\tildO(\ell^2)$}.
+    \end{itemize}
+  \end{exampleblock}
+
+  \begin{overlayarea}{\textwidth}{5cm}
+    \begin{onlyenv}<1>
+      \begin{exampleblock}{$\ell | (q-1) \Leftrightarrow r=1$}
+        Classical case: Kummer extension
+        \[\alert{Q_i=X_i^{\ell^i}-y_0} \qquad\text{and}\qquad \alert{T_i=X_{i}^\ell-X_{i-1}}\]
+        Embeddings are trvial.
+      \end{exampleblock}
+    \end{onlyenv}	
+
+    \begin{onlyenv}<2>
+      \begin{exampleblock}{$\ell \mid (q + 1) \Leftrightarrow r = 2$}
+        By direct reslutant computation
+        \[\alert{Q_i(X_i) = Y^{\ell^i} + Y^{-\ell^i} - x_0 \mod Y^2-X_iY+1}\]
+
+        \vspace*{-3mm}
+        \begin{itemize}
+        \item Similar form for $T_i$.
+        \item $Q_i$ can be computed in $O(\Mult(\ell^i))$; a better algorithm \textcolor{blue}{later}.
+        \item Embeddings: \textcolor{blue}{later}.
+        \end{itemize}
+      \end{exampleblock}
+    \end{onlyenv}	
+  \end{overlayarea}
 \end{frame}
 
-%###################################################
-
-\begin{frame}
-	\frametitle{General extensions}
-	
-	\begin{itemize}
-		\item No assumption on $r$ and $\ell$.
-		\item \textcolor{red}{\it idea}: change of basis via $\Psi_i$
-	\end{itemize}
-	
-	\begin{center}
-		\begin{tikzpicture}
-			\footnotesize
-			\node (A) {$\F_{q^{\ell^{i}}}$};
-			\node[below left=1cm of A] (B) {$\K_i=\K_0[Y_i]/\langle Y_i^{\ell^i}-y_0\rangle$};
-			\node[below right=1cm of A] (C) {$\K_0[X_i]/\langle Q_i\rangle$};
-			\node[below=1.5cm of B] (D) {$\{y_i^e \mid 0 \le e < \ell^i\}$};
-			\node[below=1.5cm of C] (E) {$\{x_i^e \mid 0 \le e < \ell^i\}$};
-			%
-			\path[->] (A) edge node[above,sloped,inner sep=0.5pt] {$ \sim $} (B);
-			\path[->] (A) edge node[above,sloped,inner sep=0.5pt] {$ \sim $} (C);
-			\path[->] (B) edge node[above,inner sep=0.5pt] {$ \sim $} node[below,inner sep=2pt] {$\Psi_i$} (C);
-			\path[->] (B) edge node[fill = white] {has basis} (D);
-			\path[->] (C) edge node[fill = white] {has basis} (E);
-		\end{tikzpicture}
-	\end{center}
-	
-	\begin{itemize}
-		\item \textcolor{red}{\it result}: 
-		\begin{itemize}
-			\item $Q_i$ can be computed in $O(i^2\Mult(\ell^{i+1})\log(\ell))$.
-			\item $\Psi_i$ or its inverse can be computed in $O(i\Mult(\ell^{i+1}))$. 
-		\end{itemize}
-		operations in $\K_0$
-	\end{itemize}
-\end{frame}
 
 %**********************************************************
 %**********************************************************
@@ -446,27 +508,66 @@
 
 
 \begin{frame}
-	\frametitle{\insertsection}
-	
-	\begin{block}{}
-		The original idea is due to Couveignes and Lercier, 2011.
-	\end{block}
-	
-	\vspace*{3mm}
-	\begin{exampleblock}{Bottom line}
-		\begin{itemize}
-			\item Let $\phi:G' \rightarrow G$ be a surjective, separable morphism of algebraic 
-			$\F_q$-groups.
-			\item There are points $x \in G$ with fiber $G'_x$ of cardinality $\ell$.
-			\item Assume $G'(\F_q) \rightarrow G(\F_q)$ is not surjective:
-			 \begin{itemize}
-				 \item $\exists x \in G(\F_q)$ with fiber $G'_x$ in a finite extensions of $\F_q$.
-			 \end{itemize}
-			\item For appropriate $\phi$, $G'_x$ is irreducible.
-			\item Apply a linear projection to $G'_x$.
-			\item Repeat with a new map $\phi':G''\to G'$.
-		\end{itemize}
-	\end{exampleblock}
+  \frametitle{\insertsection\ (Couveignes and Lercier, 2011)}
+
+  \begin{center}
+    \large
+    Consider the map \alert{$\phi:x \mapsto x^\ell$}
+  \end{center}
+
+  \begin{columns}
+    \begin{column}{0.6\textwidth}
+      \begin{center}
+        \begin{tikzpicture}
+          \draw (-60:-1) circle (2);
+          \path (-60:-1) -- +(-1.4,0.4) node {\Large\alert{$\F_q$}};
+          \draw (0:0) node {$1$};
+          \pause
+          %%%%%%%%%% 
+          \foreach \i in {1,...,4} {
+            \draw (50*\i:0.2) -- (50*\i:0.6);
+            \draw (50*\i:0.9) node {$\zeta_\ell^\i$};
+          }
+          \pause
+          %%%%%%%%%% 
+          \foreach \i in {1,3,4} {
+            \foreach \j in {0,...,4} {
+              \draw[dotted] (50*\i:1.2) -- (50*\i+8*\j-20:1.6);
+            }
+          }
+          \foreach \j in {0,...,4} {
+            \draw (100:1.2) -- (100+8*\j-20:1.8);
+          }
+          \foreach \k in {0,...,4} {
+            \draw (104:1.8) -- (104+8*\k-20:2.3);
+          }
+          \draw (108:2.5) node {$y_0$};
+          \pause
+          %%%%%%%%%% 
+          \draw (-60:-1.5) circle (2.8);
+          \path (-60:-1) -- +(-2.1,1.4) node (Fl) {\Large\alert{$\F_{q^\ell}$}};
+          \foreach\k in {0,...,4} {
+            \draw (108:2.7) -- (108+8*\k-20:3.5);
+          }
+          \draw (112:3.7) node {$y_1$};
+          \pause
+          %%%%%%%%%% 
+          \path (-60:-1) -- +(-3.6,2.8) node (Fbar) {\Large\alert{$\bar{\F}_q$}};
+          \path (Fl) -- (Fbar) node[pos=0.5,sloped] {\Large\alert{$\dots$}};
+          \foreach\k in {0,...,4} {
+            \draw[dashed] (112:3.9) -- (112+8*\k-20:4.6);
+          }
+        \end{tikzpicture}
+      \end{center}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+      \begin{itemize}
+      \item<1-> $\ell|(q-1)$;
+      \item<3-> $\phi$ not surjective over $\F_q$;
+      \item<5-> $\phi : \mathbb{G}_m \to \mathbb{G}_m$ surjective.
+      \end{itemize}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 %###################################################
