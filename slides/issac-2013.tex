@@ -1,0 +1,821 @@
+
+\documentclass[10pt]{beamer}
+
+
+\usepackage[english]{babel}
+\usepackage{amsmath}               
+\usepackage{amsfonts}              
+\usepackage{amsthm}                
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{../mysymbols}
+\usepackage{tikz}
+\usefonttheme{serif}
+\usetikzlibrary{positioning}
+\usetikzlibrary{calc}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{matrix}
+\usetikzlibrary{intersections}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{fit}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+
+
+
+
+\usetheme{Boadilla}
+\usecolortheme{lily}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{}
+\setbeamercovered{transparent}
+\setbeamertemplate{headline}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+    \usebeamerfont{author in head/foot}\insertsection
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.6\paperwidth,ht=2.25ex,dp=1ex,right]{title in head/foot}%
+    \insertframenumber{} / \inserttotalframenumber\hspace*{1ex}\hspace*{2mm}
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+\setbeamertemplate{frametitle}{
+	\begin{centering}
+		\textbf{\small \insertframetitle}
+		\par
+	\end{centering}
+}
+
+
+\newcommand{\Cyc}{\Phi}  % Cyclotomic polynomial
+\newcommand{\bb}{\mathbf{B}}  
+\newcommand{\uu}{\mathbf{U}}  % bases for lift and push
+\DeclareMathOperator{\Res}{Res}
+
+
+\newtheorem{proposition}[theorem]{Proposition}
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+
+
+
+\title
+{\bf Fast algorithms for {\Large$\mathbf{\ell}$}-adic\\ towers over finite fields}
+
+
+\author{
+	Luca De Feo\inst{1},\and\hspace*{-3mm} 
+	Javad Doliskani\inst{2},\and\hspace*{-3mm} 
+	\'Eric Schost\inst{2}
+}
+
+\institute{
+  \inst{1}Laboratoire PRiSM, Universit\'e de Versailles \and
+  \vspace*{-2mm}
+  \inst{2}Department of Computer Science, Western University
+}
+
+\subject{Computer Algebra}
+
+\date{ISSAC 2013}
+
+\pgfdeclareimage[height = 5mm]{westernlogo}{Western_Logo_CMYK}
+\pgfdeclareimage[height = 5mm]{versailleslogo}{uvsq-logo}
+
+\begin{document}
+
+\setbeamertemplate{itemize subitem}[triangle]
+\setbeamercolor{itemize subitem}{fg=red}
+
+\begin{frame}
+	\thispagestyle{empty}
+	\titlepage
+	\begin{flushright}
+		\pgfuseimage{westernlogo}\hspace*{1mm}\pgfuseimage{versailleslogo}
+	\end{flushright}
+\end{frame}
+
+%**********************************************************
+%**********************************************************
+
+\section{Introduction}
+
+\begin{frame}
+	\frametitle{Problem statement}
+	
+	\tikzset{
+		dotstyle/.style={circle, inner sep = 1.2pt, outer sep = 4pt, fill = gray},
+		edgetower/.style={thick},
+		edgecomp/.style={thick, lightgray}
+	}
+	\begin{tikzpicture} [scale = 0.8] %, every node/.style={inner sep = 2pt, scale=0.8}]
+		\coordinate (T2) at (-2, 0.5);
+		\node (Fq) at (0, 0) {$\F_q$};
+		\node (Fq2) at ($(Fq) + (T2)$) {$\F_{q^2}$};
+		\node (Fq4) at ($(Fq2) + (T2)$) {$\F_{q^4}$};
+		\node (Fq2l) at ($(Fq4) + (T2)$) {$\F_q^{(2)}$};
+		%---------------------
+		\coordinate (T3) at (-0.7, 2);
+		\node (Fq3) at ($(Fq) + (T3)$) {$\F_{q^3}$};
+		\node (Fq9) at ($(Fq3) + (T3)$) {$\F_{q^9}$};
+		\node (Fq3l) at ($(Fq9) + (T3)$) {$\F_q^{(3)}$};
+		%---------------------
+		\coordinate (T5) at (0.7, 2);
+		\node (Fq5) at ($(Fq) + (T5)$) {$\F_{q^5}$};
+		\node (Fq25) at ($(Fq5) + (T5)$) {$\F_{q^{25}}$};
+		\node (Fq5l) at ($(Fq25) + (T5)$) {$\F_q^{(5)}$};
+		%---------------------
+		\coordinate (Tl) at (2, 1);
+		\node[blue] (Fql) at ($(Fq) + (Tl)$) {$\F_{q^\ell}$};
+		\node[blue] (Fql2) at ($(Fql) + (Tl)$) {$\F_{q^{\ell^2}}$};
+		\node[blue] (Fqll) at ($(Fql2) + (Tl)$) {$\F_q^{(\ell)}$};
+		%---------------------
+		\node[dotstyle] (dot1) at ($(Fq2) + (Fq3) - (Fq)$) {};
+		\node[dotstyle] (dot2) at ($(Fq4) + (dot1) - (Fq2)$) {};
+		\node[dotstyle] (dot3) at ($(Fq2) + (Fq5) - (Fq)$) {};
+		\node[dotstyle] (dot4) at ($(Fq3) + (Fq5) - (Fq)$) {};
+		\node[dotstyle] (dot5) at ($(Fq3) + (Fql) - (Fq)$) {};
+		\node[dotstyle] (dot6) at ($(Fq5) + (Fql) - (Fq)$) {};
+		%---------------------
+		\draw 
+			(Fq) 
+				edge[edgetower] (Fq2)
+				edge[edgetower] (Fq3)
+				edge[edgetower] (Fq5)
+				edge[edgetower, blue] (Fql)
+			(Fq2)
+				edge[edgetower] (Fq4)
+				edge[edgecomp] (dot1)
+			(Fq4)
+				edge[edgetower, dotted] (Fq2l)
+				edge[edgecomp] (dot2)
+			(dot1)
+				edge[edgecomp] (dot2)
+			(Fq3)
+				edge[edgetower] (Fq9)
+				edge[edgecomp] (dot1)
+				edge[edgecomp] (dot4)
+			(Fq9)
+				edge[edgetower, dotted] (Fq3l)
+			(Fq5)
+				edge[edgetower] (Fq25)
+				edge[edgecomp] (dot4)
+				edge[edgecomp] (dot6)
+			(Fq25)
+				edge[edgetower, dotted] (Fq5l)
+			(Fql)
+				edge[edgetower, blue] (Fql2)
+				edge[edgecomp] (dot6)
+			(Fql2)
+				edge[edgetower, blue, dotted] (Fqll)
+			(dot3)
+				edge[edgecomp] (Fq2)
+				edge[edgecomp] (Fq5)
+			(dot5)
+				edge[edgecomp] (Fq3)
+				edge[edgecomp] (Fql);
+		%---------------------
+		\draw [xshift = 4.5cm] node [right, text width = 2.5cm, 
+			rounded corners, fill=red!10, inner sep = 1mm]{
+				\small
+				\[\F_q^{(\ell)} = \bigcup_{i\ge 0}\F_{q^{\ell^i}},\]
+				\[\bar{\F}_q \cong \bigotimes_{\ell\text{ prime}} \F_q^{(\ell)}\]
+			};
+		\draw[xshift = -3.8cm] node [left, rounded corners, fill=red!10, inner sep = 1mm]{
+				\small $q$ and $\ell$ fixed
+			};
+	\end{tikzpicture}
+\end{frame}
+%###################################################
+
+\begin{frame}
+	
+	\begin{tikzpicture}
+		\node [rectangle, line width=0.7pt, draw=red!50] (abstract) { \hspace*{0.03\textwidth}%
+		    \begin{minipage}{0.92\textwidth}
+			    \vspace*{3mm}
+			    \begin{itemize}
+				    \item Efficient construction of towers
+				    \item Efficient computation of embeddings
+			    \end{itemize}
+		    \end{minipage}\hspace*{0.03\textwidth}
+		};%
+		\node[right=0.03\textwidth,
+		rectangle,
+		line width=0.5pt,
+		rounded corners=2pt,
+		draw=red,
+		fill=blue!20,
+		inner xsep=3pt, inner ysep=3pt] at (abstract.north west) {\it\bfseries Our interest};
+	\end{tikzpicture}
+	
+	\vspace*{3mm}
+	\textbf{Motivations}:
+	\begin{itemize}
+		\item Describing embeddings:
+		\begin{itemize}
+			\item Replace linear algebra by polynomial arithmetic.
+		\end{itemize}
+		\item Computing embeddings:
+		\begin{itemize}
+			\item Quasi-linear time and memory in the degree of the	extension.
+		\end{itemize}
+	\end{itemize}
+	
+	\vspace*{3mm}
+	\textbf{Application examples}:
+	\begin{itemize}
+		\item In general: finite field arithmetic.
+		\item Computing isogenies between ordinary elliptic curves, L. De Feo, 2011.
+		\item Point-counting in genus 2, Gaudry and Schost, 2012.
+	\end{itemize}
+	
+\end{frame}
+
+%###################################################
+
+\begin{frame}
+	\frametitle{Previous works}
+	
+	\begin{itemize}
+		\item Artin-Schreier towers, $\ell=p$:
+		\begin{itemize}
+			\item D.~G. Cantor, \textit{On arithmetical algorithms over finite fields}, 1989.
+			\item J.-M. Couveignes, \textit{Isomorphisms between {A}rtin-{S}chreier towers}, 2000.
+			\item De Feo and Schost, \textit{Fast arithmetics in {A}rtin-{S}chreier towers over finite fields}, 2012.
+		\end{itemize}
+		\item $\ell$-adic towers, $\ell = 2$:
+		\begin{itemize}
+			\item Doliskani and Schost, \textit{A note on computations in degree $2^k$-extensions of finite fields}, 2012.
+		\end{itemize}
+		\item Inspiration behind this work:
+		\begin{itemize}
+			\item Lenstra and De Smit, \textit{Standard models for finite fields}, 2008.
+			\item Couveignes and Lercier, \textit{Fast construction of irreducible polynomials over finite fields}, 2011.
+			\item V. Shoup, \textit{Fast construction of irreducible polynomials over finite fields}, 1994.
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+%###################################################
+
+\begin{frame}
+	\frametitle{Remarks}
+	
+	\begin{exampleblock}{}
+		\begin{itemize}
+			\item Multiplications and inversions are quasi-linear in the extension degree.
+			\item The Embedding problem is reduced to a pair of consecutive levels.
+		\end{itemize}
+	\end{exampleblock}
+	
+	\begin{center}
+		\begin{tikzpicture}
+			\footnotesize
+			\node (A) {$\F_{q^{\ell^{i}}}$};
+			\node[below left=1cm of A] (B) {$\F_q[X_{i}]/ \langle Q_{i} \rangle$};
+			\node[below right=1cm of A] (C) {$\F_q[X_{i-1},X_i]/\langle Q_{i-1}(X_{i-1}), T_i(X_{i-1},X_i)\rangle$};
+			\node[below=1.5cm of B] (D) {$\uu_i = (1,x_{i},x_{i}^2,\ldots,x_{i}^{\ell^{i}-1})$};
+			\node[below=1.5cm of C] (E) { %
+				$\begin{aligned}
+					\bb_{i} = ( & 1,\ldots,x_{i-1}^{\ell^{i-1}-1},\ldots, \\
+					& x_i^{\ell-1},\ldots,x_{i-1}^{\ell^{i-1}-1}x_i^{\ell-1})
+				\end{aligned}$ %
+			};
+			%
+			\path[->] (A) edge node[above,sloped,inner sep=0.5pt] {$ \sim $} (B);
+			\path[->] (A) edge node[above,sloped,inner sep=0.5pt] {$ \sim $} (C);
+			\path[->] (B) edge node[fill = white] {has basis} (D);
+			\path[->] (C) edge node[fill = white] {has basis} (E);
+			\path[->] (D.north east) edge[out = 30, in = 150] node[above] {\color{blue} \it push} (E.north west);
+			\path[->] (E.west) edge[out = 210, in = 330] node[below] {\color{blue} \it lift} (D.south east);
+		\end{tikzpicture}
+	\end{center}
+\end{frame}
+
+%###################################################
+
+\begin{frame}
+	\frametitle{Summary of Main Results}
+	
+	\resizebox{0.93\textwidth}{!}{
+		\begin{minipage}{\textwidth}
+			\[
+			\begin{array}{c|cccc}
+				\text{Condition} & \text{\bf Initialization} & \mathbf{Q_i, T_i} & \text{\bf Lift, push}\\
+				\hline \hline
+				q = 1 \bmod \ell & O_e(1)  & O(\ell^i) & O(\ell^i) \\
+				q = -1 \bmod \ell & O_e(1) & O(\ell^i) & O(\Mult(\ell^i) \log(\ell^i)) \\
+				- & O_e (\ell^2) & O(\Mult(\ell^{i+1})\Mult(\ell)\log(\ell^i)^2) & O( \Mult(\ell^{i+1})\Mult(\ell)\log(\ell^i))\\
+				4\ell \le q^{1 / 4} & O\tilde{_e}(\ell^3) \text{~(bit)}  & O_e(\Mult(\ell^i)\log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \\
+				4\ell \le q^{1 / 4} & O\tilde{_e}(\Mult(\ell)) & O_e(\Mult(\ell^i) \log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \vspace{-0.5cm}
+			\end{array}
+			\]
+		\end{minipage}
+	}
+	
+	\vspace*{1.5cm}
+	\begin{block}{Notations}
+		\footnotesize
+		\begin{itemize}
+			\item $\Mult$: polynomial multiplication
+			\item $O_e(\ )$: probabilistic with expected running time
+			\item $O\tilde{_e}(\ )$: additional omission of logarithmic factors.
+			\item bit: bit complexity.
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+%**********************************************************
+%**********************************************************
+
+\section{Quasi-cyclotomic towers}
+
+\begin{frame}
+	\frametitle{\insertsection 
+	\\{\small\normalfont\footnotesize \color{black} 
+	(inspired by Shoup, Lenstra and De Smit, Couveignes and Lercier)}}
+	
+	\begin{center}
+		\begin{tikzpicture}[thick, node distance=2cm, inner sep = 2pt]
+			\node[blue] (Q) {$\F_q$};
+			\node (Q0) [above left = 1cm of Q]{$\K_0=\F_q(y_0)$};
+			\node[blue] (K1) [above right of=Q]{$\F_{q^\ell}=\F_q(x_1)$};
+			\node (Q1) [above right of=Q0]{$\K_1=\K_0(y_1)$};
+			\node[blue] (K2)[above right of=K1]{$\F_{q^{\ell^2}}=\F_q(x_2)$};
+			\node (Q2) [above right of=Q1]{$\K_2=\K_1(y_2)$};
+			\node[blue] (Koo)[above right of=K2]{$\quad \F_q^{(\ell)}$};
+			\node (Qoo) [above right of=Q2]{$\quad\K_0^{(\ell)}$};
+			%--------------------------
+			\draw (Q) edge[red] node[auto]{$r$} (Q0)
+			          edge[blue] node[auto,swap]{$\ell$} (K1)
+			      (K1) edge[red] node[red, auto] {$r$} (Q1)
+			           edge[blue] node[auto,swap]{$\ell$} (K2)
+			      (Q1) edge node[auto]{$\ell$} (Q0)
+			      (Q2) edge[red] node[red, auto, swap]{$r$} (K2)
+			           edge node[auto]{$\ell$} (Q1)
+			           edge[dotted] (Qoo)
+			      (Koo) edge[blue, dotted] (K2)
+			           edge[red] node[red, auto]{$r$} (Qoo);
+			\node[below right = 1mm of K2, text width = 4cm, fill = red!10, rounded corners, font = \small]{
+				\begin{itemize}
+					\item $\K_i= \K_0[Y_i]/\langle Y_i^{\ell^i}-y_0\rangle$
+					\item $x_i = \Tr_{\K_i / \F_{q^{\ell^i}}}(y_i)$
+					\item We are interested in $Q_i = \operatorname{minpoly}_{\F_q}(x_i)$
+				\end{itemize}
+			};
+		\end{tikzpicture}
+	\end{center}
+\end{frame}
+
+%###################################################
+
+\begin{frame}
+	\frametitle{$\mathbb{G}_m$ and Chebyshev-type extensions}
+	
+	\begin{exampleblock}{$\mathbb{G}_m$-type extensions}
+		\begin{itemize}
+			\item $\ell \mid q-1$, $r = 1$.
+			\item Initialization: $O_e(\log(q))$ operations in $\F_q$.
+			\item $Q_i=X_i^{\ell^i}-y_0 \quad\text{and}\quad T_i=X_{i}^\ell-X_{i-1}$.
+			\item Lift and push: no operation in $\F_q$.
+		\end{itemize}
+	\end{exampleblock}
+	
+	\vspace*{3mm}
+	\begin{exampleblock}{Chebyshev-type extensions}
+		\begin{itemize}
+			\item $\ell \mid q + 1$, $r = 2$.
+			\item Initialization: $O_e(\log(q))$ operations in $\F_q$.
+			\item $Q_i(X_i) = Y^{\ell^i} + Y^{-\ell^i} - x_0 \mod Y^2-X_iY+1$.
+			\begin{itemize}
+				\item $Q_i$ can be computed in $O(\Mult(\ell^i))$; a better algorithm \textcolor{blue}{later}.
+			\end{itemize}
+			\item Lift and push: \textcolor{blue}{later}.
+		\end{itemize}
+	\end{exampleblock}
+	
+\end{frame}
+
+%###################################################
+
+\begin{frame}
+	\frametitle{General extensions}
+	
+	\begin{itemize}
+		\item No assumption on $r$ and $\ell$.
+		\item \textcolor{red}{\it idea}: change of basis via $\Psi_i$
+	\end{itemize}
+	
+	\begin{center}
+		\begin{tikzpicture}
+			\footnotesize
+			\node (A) {$\F_{q^{\ell^{i}}}$};
+			\node[below left=1cm of A] (B) {$\K_i=\K_0[Y_i]/\langle Y_i^{\ell^i}-y_0\rangle$};
+			\node[below right=1cm of A] (C) {$\K_0[X_i]/\langle Q_i\rangle$};
+			\node[below=1.5cm of B] (D) {$\{y_i^e \mid 0 \le e < \ell^i\}$};
+			\node[below=1.5cm of C] (E) {$\{x_i^e \mid 0 \le e < \ell^i\}$};
+			%
+			\path[->] (A) edge node[above,sloped,inner sep=0.5pt] {$ \sim $} (B);
+			\path[->] (A) edge node[above,sloped,inner sep=0.5pt] {$ \sim $} (C);
+			\path[->] (B) edge node[above,inner sep=0.5pt] {$ \sim $} node[below,inner sep=2pt] {$\Psi_i$} (C);
+			\path[->] (B) edge node[fill = white] {has basis} (D);
+			\path[->] (C) edge node[fill = white] {has basis} (E);
+		\end{tikzpicture}
+	\end{center}
+	
+	\begin{itemize}
+		\item \textcolor{red}{\it result}: 
+		\begin{itemize}
+			\item $Q_i$ can be computed in $O(i^2\Mult(\ell^{i+1})\log(\ell))$.
+			\item $\Psi_i$ or its inverse can be computed in $O(i\Mult(\ell^{i+1}))$. 
+		\end{itemize}
+		operations in $\K_0$
+	\end{itemize}
+\end{frame}
+
+%**********************************************************
+%**********************************************************
+
+\section{Towers from irreducible fibers}
+
+
+\begin{frame}
+	\frametitle{\insertsection}
+	
+	\begin{block}{}
+		The original idea is due to Couveignes and Lercier, 2011.
+	\end{block}
+	
+	\vspace*{3mm}
+	\begin{exampleblock}{Bottom line}
+		\begin{itemize}
+			\item Let $\phi:G' \rightarrow G$ be a surjective, separable morphism of algebraic 
+			$\F_q$-groups.
+			\item There are points $x \in G$ with fiber $G'_x$ of cardinality $\ell$.
+			\item Assume $G'(\F_q) \rightarrow G(\F_q)$ is not surjective:
+			 \begin{itemize}
+				 \item $\exists x \in G(\F_q)$ with fiber $G'_x$ in a finite extensions of $\F_q$.
+			 \end{itemize}
+			\item For appropriate $\phi$, $G'_x$ is irreducible.
+			\item Apply a linear projection to $G'_x$.
+			\item Repeat with a new map $\phi':G''\to G'$.
+		\end{itemize}
+	\end{exampleblock}
+\end{frame}
+
+%###################################################
+
+\begin{frame}
+	\frametitle{Towers from algebraic tori}
+	
+	\begin{definition}
+		For $k=\F_q$, $L=\F_{q^n}$ define 
+		\begin{equation*}
+			\label{eq:Tn}
+			\mathbb{T}_n(k) \cong \{\alpha\in L^\ast \;|\; \Norm_{L/F}(\alpha) = 1 \text{ for all } k\subset F\subsetneq L \}.
+		\end{equation*}
+		Then $\mathbb{T}_n \cong \mathbb{G}_m^{\euler(n)}$ over $\overline{\F_q}$.
+	\end{definition}
+	\vspace*{5mm}
+	\begin{exampleblock}{$\mathbb{G}_m$-type extensions: $\mathbb{T}_1 \cong \mathbb{G}_m(\F_q)$}
+		Suppose $\ell \mid q-1$, $\eta \in \F_q$ a non $\ell$-adic residue, and
+		\[
+		\setlength{\arraycolsep}{2pt}
+		\begin{array}{cccc}
+			\phi: & \mathbb{T}_1 & \longrightarrow & \mathbb{T}_1 \\
+			& X & \longmapsto & X^\ell
+		\end{array}
+		\]
+		For any $i>0$, the fiber $\phi^{-i}(\eta)$ is $X^{\ell^i}-\eta$.
+	\end{exampleblock}
+\end{frame}
+
+%###################################################
+
+\begin{frame}
+	\frametitle{Towers from algebraic tori (Pell conics)}
+
+	\tikzset{
+		point style/.style={circle, inner sep=0.9pt, fill = blue},
+		extended line/.style={shorten >= -5mm, shorten <= -5mm}
+	}
+
+	\begin{center}
+		\begin{tikzpicture}[scale = 0.9, every node/.style={scale=0.9}]
+			\draw[name path = pellconic] (-1.5, 2.25) parabola bend (0, 0) (2.1, 4.41);
+			\draw[style=help lines] (-1.7, 0) grid (2.2,4.5);
+			%-----------
+			\coordinate (N) at (1.3, 1.69);
+			\coordinate (P) at (1.7, 2.89);
+			\coordinate (Q) at (-1.3, 1.69);
+			\coordinate (PQtemp) at ($(Q) + (N) - (P)$);
+			%-----------
+			\draw[extended line] (P)--(Q);
+			\path[name path = pline] (PQtemp)--(N);
+			\path [name intersections={of = pellconic and pline}];
+			\coordinate (PQ) at (intersection-1);
+			\draw [extended line] (N) -- (PQ);
+			%-----------	
+			\node[point style, fill = red, label=below right:$N$] at (N) {};
+			\node[point style, label=below right:$P$] at (P) {};
+			\node[point style, label=below left:$Q$] at (Q) {};
+			\node[point style, label=below left:$P + Q$] at (PQ) {};
+
+			\node[right = 4mm of current bounding box, text width = 7cm, fill = red!10, rounded corners, font = \small] (explain) {
+				\textcolor{blue}{\it Pell conic:}
+				\begin{equation*}
+					\label{eq:Pell}
+					C \;:\; x^2 - \Delta y^2 = 4
+				\end{equation*}
+				
+				\vspace*{1cm}
+				\textcolor{red}{Addition:} For $P=(x_1,y_1)$ and $Q=(x_2,y_2)$,
+				\begin{equation*}
+					P\oplus Q = \left(\frac{x_1x_2 + \Delta y_1y_2}{2},\; \frac{x_1y_2 + x_2y_1}{2}\right)
+				\end{equation*}
+			};
+		\end{tikzpicture}	
+	\end{center}
+\end{frame}
+
+%###################################################
+
+\begin{frame}
+	\frametitle{Towers from algebraic tori}
+	
+	\begin{lemma}
+		\begin{itemize}
+			\item $\mathbb{T}_2 \cong C$.
+			\item Let $P=(\alpha,\beta) \in C$. The abscissa of $[n]P$ is given by $C_n(\alpha)$, where $C_n\in\Z[X]$ is the $n$-th \textcolor{blue}{Chebyshev polynomial}.
+		\end{itemize}
+	\end{lemma}
+	
+	\begin{theorem}
+		\label{th:T2-irred}
+		Let $\eta\in\F_q(\delta)$ be a non $\ell$-adic residue in $\mathbb{T}_2$,
+		let $P=(\alpha,\beta)$ be its image in $C/\F_q$. Define
+		\[
+		\setlength{\arraycolsep}{2pt}
+		\begin{array}{cccc}
+			\phi: & C/\F_q & \longrightarrow & C/\F_q \\
+			& Q & \longmapsto & [\ell^i]Q
+		\end{array}
+		\]
+		Then the abscissas of the fiber $\phi^{-1}(P)$ are the roots of the \textcolor{blue}{irreducible} polynomial $C_{\ell^i}-\alpha$.
+	\end{theorem}
+
+	\begin{corollary}
+		\begin{equation*}
+			Q_i(X_i) = C_{\ell^i}(X_i) - x_0.
+		\end{equation*}
+	\end{corollary}
+\end{frame}
+
+%###################################################
+
+\begin{frame}[fragile]
+	\frametitle{Towers from elliptic curves}
+	
+	\newcommand{\EC}[1]{{\color{blue} \ensuremath{E_{#1}}}}
+	\newcommand{\IS}[1]{{\color{red} \ensuremath{\phi_{#1}}}}
+	
+	\begin{equation*}
+		E_0 \;:\; y^2 = x^3 + ax + b, \quad a, b \in\F_q,  \quad \ell \ne p, \quad \ell \mid \#E_0(\F_q)
+	\end{equation*}
+	
+	\begin{block}{}
+		Denote by
+		\begin{itemize}
+			\item $H_0 \lhd E_0/\F_q$ with $\lvert H_0 \rvert = \ell$
+			\item $\phi_0$ the unique isogeny with $\ker \phi = H_0$
+			\item $E_1$ the image curve of $\phi_0$
+		\end{itemize}
+	\end{block}
+	\vspace*{3mm}
+	\begin{center}
+		\begin{tikzpicture}
+			\def\n{4}
+			\foreach \i in {0,...,\n} {
+				\pgfmathparse{360/(\n+1)*(\i-1/2) - 90}
+				\let\angle\pgfmathresult
+				\draw (\angle:1) node (E\i) {\EC{\i}};
+				% \draw (\angle:0.4) node {\scriptsize$H_\i$};
+				% \draw (\angle:0.7) node[rotate=\angle] {\scriptsize$\subset$};
+			}
+			\foreach \i in {0,...,\n} {
+				\pgfmathparse{int(mod(\i+1, \n+1))}
+				\let\j\pgfmathresult
+				\draw (E\i) edge[->,bend right=18] node[auto, swap] {\scriptsize \IS{\i}} (E\j);
+			}
+
+			\node[left = 3mm of current bounding box.west] (explain) {
+			\begin{minipage}{0.7\textwidth}
+				Repeat the above with $H_i \lhd E_i/\F_q$ and by $$\IS{i}:\EC{i} \to \EC{i + 1}.$$
+				\textbf{\color{orange} Lemma }{\it
+				   $\EC{n} \cong \EC{0}$ for some $n \in O(\sqrt{q}\log (q))$.}
+			\end{minipage}
+			};
+			\begin{pgfonlayer}{background}
+				\path[fill=yellow!10, rounded corners = 5pt, draw = blue!20] (current bounding box.south west) rectangle
+				(current bounding box.north east);
+			\end{pgfonlayer}
+		\end{tikzpicture}
+	\end{center}
+\end{frame}
+
+%###################################################
+
+\begin{frame}
+	\frametitle{Towers from elliptic curves}
+	
+	Under the above assumptions, if $P \in E_i$ with $\ell^e \mid \lvert P \rvert$, and $\psi=\phi_{i-1}\circ\phi_{i-2}\circ\cdots\circ\phi_{j}$, then $\psi^{-1}(P)$ is irreducible of cardinality $\ell^{i-j}$.
+	\vspace*{5mm}
+	\begin{exampleblock}{V\'elu's formulas}
+		\begin{equation*}
+		  \begin{array}{crcl}
+		    \phi_i: & E_i &\longrightarrow & E_{i+1},\\
+		    & (x,y) &\longmapsto & \left(\frac{f_i(x)}{g_i(x)}, y\left(\frac{f_i(x)}{g_i(x)}\right)'\right),
+		  \end{array}
+		\end{equation*}
+	\end{exampleblock}
+	
+	\begin{block}{The $\ell$-adic tower}
+		\begin{align*}
+		  T_1 &= f_{-1}(X_1) - \eta g_{-1}(X_1),\\ 
+		  T_i &= f_{-i}(X_i) - X_{i-1} g_{-i}(X_i).
+		\end{align*}
+	\end{block}
+\end{frame}
+
+%**********************************************************
+%**********************************************************
+
+\section{Lifting and pushing}
+
+\begin{frame}
+	\frametitle{\insertsection}
+	
+	\begin{block}{Common structure}
+		The	extension at level $i$ is
+		$$\F_q[Y]/ \langle S(Y) \rangle \quad\text{and}\quad \F_q[X,Y]/\langle R(X), T(X,Y) \rangle,$$
+		with 
+		\begin{itemize}
+			\item $R$ of degree $\ell^{i-1}$, $S$ of degree	$\ell^i$
+			\item $T(X,Y)$ has the form \textcolor{blue}{$f(Y)-X g(Y)$}, with $\deg(f)=\ell$, $\deg(g) < \ell$ and $\gcd(f,g)=1$.
+		\end{itemize}
+	\end{block}
+	
+	\begin{definition}
+		Let $P \in \F_q[X,Y]$ and $n \in \N$, with $\deg(P,X)< n$. Define
+		$$P[f,g,n] = g^{n-1} P\left (\frac fg, Y\right) \in \F_q[Y].$$
+	\end{definition}
+\end{frame}
+
+%###################################################
+
+\begin{frame}
+	\frametitle{Lifting}
+	
+	\small
+	\begin{center}
+		\begin{tikzpicture}[every node/.style={scale=0.7}]
+			\node [fill = red!10, draw = red!80]{
+				\begin{minipage}{0.95\textwidth}
+					\begin{algorithm}[H]
+						\caption{Compose}
+						\label{alg:compose}
+						\begin{algorithmic}[1]
+							\REQUIRE $P\in \F_q[X,Y]$, $f,g\in \F_q[Y]$, $n\in\N$
+							\IF {$n = 1$} 
+								\RETURN $P$
+							\ELSE
+								\STATE $m \la \lceil n/2\rceil$
+								\STATE Let $P_0,P_1$ be such that $P = P_0 + X^mP_1$
+								\STATE $Q_0 \la$ Compose($P_0, f, g, m$)
+								\STATE $Q_1 \la$ Compose($P_1, f, g, n-m$)
+								\STATE $Q \la Q_0g^{n-m} + Q_1f^m$  \label{alg:compose:res}
+								\RETURN $Q$
+							\ENDIF
+						\end{algorithmic}
+					\end{algorithm}
+				\end{minipage}
+			};
+		\end{tikzpicture}
+	\end{center}
+	
+	\begin{theorem}
+	  \label{th:compose}
+	  On input $P,f,g,n$, with $\deg(P,X)<n$ and $\deg(P,Y) < \ell$,
+	  Algorithm~\ref{alg:compose} computes $Q=P[f,g,n]$ using $O(\Mult(\ell
+	  n)\log(n))$ operations in $\F_q$.
+	\end{theorem}
+\end{frame}
+
+%###################################################
+
+\begin{frame}
+	\frametitle{Pushing}
+	
+	\small
+	\begin{center}
+		\begin{tikzpicture}[every node/.style={scale=0.7}]
+			\node [fill = red!10, draw = red!80]{
+				\begin{minipage}{0.95\textwidth}
+					\begin{algorithm}[H]
+					  \caption{Decompose}
+					  \label{alg:decompose}
+					  \begin{algorithmic}[1]
+					    \REQUIRE $Q,f,g,h\in \F_q[Y]$, $n \in \N$ 
+					    \IF {$n=1$} 
+						    \RETURN $Q$
+					    \ELSE 
+						    \STATE $m \la \lceil n/2 \rceil$ 
+						    \STATE $u \la 1/ g^{n-m}\bmod f^m$ \label{alg:decompose:xgcd} 
+						    \STATE $Q_0 \la Q u \bmod f^m$ 
+						    \STATE $Q_1 \la (Q-Q_0 g^{n-m}) {\rm~div~} f^m$ 
+						    \STATE $P_0 \la$ Decompose($Q_0, f, g, h, m$) 
+						    \STATE $P_1 \la$ Decompose($Q_1, f, g, h, n-m$) 
+						    \RETURN $P_0 + X^m P_1$ 
+					    \ENDIF
+					  \end{algorithmic}
+					\end{algorithm}
+				\end{minipage}
+			};
+		\end{tikzpicture}
+	\end{center}
+	
+	\begin{theorem}
+	  On input $Q,f,g,h,n$, with $\deg(Q) < \ell n$ and $h = 1/g \bmod f$,
+	  Algorithm~\ref{alg:decompose} computes a polynomial $P\in \F_q[X,Y]$
+	  such that $\deg(P,X)<n$, $\deg(P,Y) <\ell$ and $Q=P[f,g,n]$ using
+	  $O(\Mult(\ell n)\log(n))$ operations in $\F_q$.
+	\end{theorem}
+\end{frame}
+
+%**********************************************************
+%**********************************************************
+
+\section{Implementation}
+
+\begin{frame}
+	\frametitle{\insertsection}
+	
+	\begin{center}
+		\includegraphics[width=9cm]{../creat}\\\vspace*{1mm}
+		\parbox{7cm}{\scriptsize Times for building $3$-adic towers on top of $\F_2$ (left)
+				and $\F_5$ (right), in Magma (first three lines) and using our code.}
+	\end{center}
+	
+	\begin{itemize}
+		\small
+		\item  We ran tests on an Intel Xeon E5620 clocked at 2.4 GHz, using Sage 5.5 and Magma 2.18.12
+		\item Computations that took more than 4GB RAM were	interrupted
+	\end{itemize}
+\end{frame}
+
+%**********************************************************
+%**********************************************************
+
+%\section{Conclusions}
+%
+%\begin{frame}
+%	\frametitle{\insertsection}
+%	
+%	\begin{itemize}
+%		\item We have introduced techniques for
+%		\begin{itemize}
+%			\item creating $\ell$-adic towers,
+%			\item computing embeddings
+%		\end{itemize}
+%		based on polynomial arithmetic.
+%		\item Quasi-linear time and memory in the extension degree.
+%		\item Despite its simplicity, our code consistently outperforms Magma on creation time.
+%		\begin{itemize}
+%			\item Lift and push operations take	essentially no time in Magma.
+%		\end{itemize}
+%	\end{itemize}	
+%\end{frame}
+
+
+
+
+
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
