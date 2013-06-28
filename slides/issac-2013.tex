@@ -25,7 +25,6 @@
 
 
 
-
 \usetheme{Boadilla}
 \usecolortheme{lily}
 \setbeamertemplate{navigation symbols}{}
@@ -39,6 +38,7 @@
     \usebeamerfont{author in head/foot}\insertsection
   \end{beamercolorbox}%
   \begin{beamercolorbox}[wd=.6\paperwidth,ht=2.25ex,dp=1ex,right]{title in head/foot}%
+    \url{http://defeo.lu/towers}\hfill
     \insertframenumber{} / \inserttotalframenumber\hspace*{1ex}\hspace*{2mm}
   \end{beamercolorbox}}%
   \vskip0pt%
@@ -83,7 +83,7 @@
 
 \subject{Computer Algebra}
 
-\date{ISSAC 2013}
+\date{ISSAC, June 28, 2013}
 
 \pgfdeclareimage[height = 5mm]{westernlogo}{Western_Logo_CMYK}
 \pgfdeclareimage[height = 6mm]{versailleslogo}{uvsq-logo}
@@ -96,9 +96,15 @@
 \begin{frame}
 	\thispagestyle{empty}
 	\titlepage
+
 	\begin{flushright}
 		\pgfuseimage{westernlogo}\hspace*{1mm}\pgfuseimage{versailleslogo}
 	\end{flushright}
+
+        \begin{center}
+          \scriptsize
+          Find these slides, the paper and the source code on \url{http://defeo.lu/towers}
+        \end{center}
 \end{frame}
 
 %**********************************************************
@@ -333,42 +339,6 @@
 
 %###################################################
 
-% \begin{frame}
-% 	\frametitle{Remarks}
-	
-% 	\begin{exampleblock}{}
-% 		\begin{itemize}
-% 			\item Multiplications and inversions are quasi-linear in the extension degree.
-% 			\item The Embedding problem is reduced to a pair of consecutive levels.
-% 		\end{itemize}
-% 	\end{exampleblock}
-	
-% 	\begin{center}
-% 		\begin{tikzpicture}
-% 			\footnotesize
-% 			\node (A) {$\F_{q^{\ell^{i}}}$};
-% 			\node[below left=1cm of A] (B) {$\F_q[X_{i}]/ \langle Q_{i} \rangle$};
-% 			\node[below right=1cm of A] (C) {$\F_q[X_{i-1},X_i]/\langle Q_{i-1}(X_{i-1}), T_i(X_{i-1},X_i)\rangle$};
-% 			\node[below=1.5cm of B] (D) {$\uu_i = (1,x_{i},x_{i}^2,\ldots,x_{i}^{\ell^{i}-1})$};
-% 			\node[below=1.5cm of C] (E) { %
-% 				$\begin{aligned}
-% 					\bb_{i} = ( & 1,\ldots,x_{i-1}^{\ell^{i-1}-1},\ldots, \\
-% 					& x_i^{\ell-1},\ldots,x_{i-1}^{\ell^{i-1}-1}x_i^{\ell-1})
-% 				\end{aligned}$ %
-% 			};
-% 			%
-% 			\path[->] (A) edge node[above,sloped,inner sep=0.5pt] {$ \sim $} (B);
-% 			\path[->] (A) edge node[above,sloped,inner sep=0.5pt] {$ \sim $} (C);
-% 			\path[->] (B) edge node[fill = white] {has basis} (D);
-% 			\path[->] (C) edge node[fill = white] {has basis} (E);
-% 			\path[->] (D.north east) edge[out = 30, in = 150] node[above] {\color{blue} \it push} (E.north west);
-% 			\path[->] (E.west) edge[out = 210, in = 330] node[below] {\color{blue} \it lift} (D.south east);
-% 		\end{tikzpicture}
-% 	\end{center}
-% \end{frame}
-
-%###################################################
-
 \begin{frame}
 	\frametitle{Summary of Main Results}
 	
@@ -452,7 +422,7 @@
       \begin{column}{0.35\textwidth}
         \begin{block}{}
           \begin{itemize}
-          \item<1-> $r|(\ell-1)$;
+          \item<1-> $r\mid(\ell-1)$;
           \item<1-> $x_i = \Tr_{\K_i / \F_{q^{\ell^i}}}(\zeta_{\ell^i})$;
           \item<2-> Both $T_i$ and $Q_i$
             can be computed by
@@ -466,7 +436,7 @@
 %###################################################
 
 \begin{frame}
-  \frametitle{Special cases}
+  \frametitle{\insertsection }
 
   \begin{exampleblock}{Generic algorithm}
     \begin{itemize}
@@ -477,16 +447,16 @@
 
   \begin{overlayarea}{\textwidth}{5cm}
     \begin{onlyenv}<1>
-      \begin{exampleblock}{$\ell | (q-1) \Leftrightarrow r=1$}
-        Classical case: Kummer extension
+      \begin{exampleblock}{Trivial case: $\ell \mid (q-1) \Leftrightarrow r=1$}
+        Kummer extensions
         \[\alert{Q_i=X_i^{\ell^i}-y_0} \qquad\text{and}\qquad \alert{T_i=X_{i}^\ell-X_{i-1}}\]
         Embeddings are trvial.
       \end{exampleblock}
     \end{onlyenv}	
 
     \begin{onlyenv}<2>
-      \begin{exampleblock}{$\ell \mid (q + 1) \Leftrightarrow r = 2$}
-        By direct reslutant computation
+      \begin{exampleblock}{Special case: $\ell \mid (q + 1) \Leftrightarrow r = 2$}
+        By direct resultant computation
         \[\alert{Q_i(X_i) = Y^{\ell^i} + Y^{-\ell^i} - x_0 \mod Y^2-X_iY+1}\]
 
         \vspace*{-3mm}
@@ -512,59 +482,62 @@
 
   \begin{center}
     \large
-    Consider the map \alert{$\phi:x \mapsto x^\ell$}
+    $\ell\mid(q-1)$, consider the map \alert{$\phi:x \mapsto x^\ell$}
   \end{center}
 
   \begin{columns}
     \begin{column}{0.6\textwidth}
       \begin{center}
         \begin{tikzpicture}
-          \draw (-60:-1) circle (2);
-          \path (-60:-1) -- +(-1.4,0.4) node {\Large\alert{$\F_q$}};
-          \draw (0:0) node {$1$};
-          \pause
-          %%%%%%%%%% 
-          \foreach \i in {1,...,4} {
-            \draw (50*\i:0.2) -- (50*\i:0.6);
-            \draw (50*\i:0.9) node {$\zeta_\ell^\i$};
-          }
-          \pause
-          %%%%%%%%%% 
-          \foreach \i in {1,3,4} {
-            \foreach \j in {0,...,4} {
-              \draw[dotted] (50*\i:1.2) -- (50*\i+8*\j-20:1.6);
+          \begin{uncoverenv}<1->
+            \draw (-60:-1) circle (2);
+            \path (-60:-1) -- +(-1.4,0.4) node {\Large\alert{$\F_q^\ast$}};
+            \draw (0:0) node {$1$};
+          \end{uncoverenv}
+          \begin{uncoverenv}<2->
+            \foreach \i in {1,...,4} {
+              \draw (50*\i:0.2) -- (50*\i:0.6);
+              \draw (50*\i:0.9) node {$\zeta_\ell^\i$};
             }
-          }
-          \foreach \j in {0,...,4} {
-            \draw (100:1.2) -- (100+8*\j-20:1.8);
-          }
-          \foreach \k in {0,...,4} {
-            \draw (104:1.8) -- (104+8*\k-20:2.3);
-          }
-          \draw (108:2.5) node {$y_0$};
-          \pause
-          %%%%%%%%%% 
-          \draw (-60:-1.5) circle (2.8);
-          \path (-60:-1) -- +(-2.1,1.4) node (Fl) {\Large\alert{$\F_{q^\ell}$}};
-          \foreach\k in {0,...,4} {
-            \draw (108:2.7) -- (108+8*\k-20:3.5);
-          }
-          \draw (112:3.7) node {$y_1$};
-          \pause
-          %%%%%%%%%% 
-          \path (-60:-1) -- +(-3.6,2.8) node (Fbar) {\Large\alert{$\bar{\F}_q$}};
-          \path (Fl) -- (Fbar) node[pos=0.5,sloped] {\Large\alert{$\dots$}};
-          \foreach\k in {0,...,4} {
-            \draw[dashed] (112:3.9) -- (112+8*\k-20:4.6);
-          }
+          \end{uncoverenv}
+          \begin{uncoverenv}<3->
+            \foreach \i in {1,3,4} {
+              \foreach \j in {0,...,4} {
+                \draw[dotted] (50*\i:1.2) -- (50*\i+8*\j-20:1.6);
+              }
+            }
+            \foreach \j in {0,...,4} {
+              \draw (100:1.2) -- (100+8*\j-20:1.8);
+            }
+            \foreach \k in {0,...,4} {
+              \draw (104:1.8) -- (104+8*\k-20:2.3);
+            }
+            \draw (108:2.5) node {$y_0$};
+          \end{uncoverenv}
+          \begin{uncoverenv}<4->
+            \draw (-60:-1.5) circle (2.8);
+            \path (-60:-1) -- +(-2.1,1.4) node (Fl) {\Large\alert{$\F_{q^\ell}^\ast$}};
+            \foreach\k in {0,...,4} {
+              \draw (108:2.7) -- (108+8*\k-20:3.5);
+            }
+            \draw (112:3.7) node {$y_1$};
+          \end{uncoverenv}
+          \begin{uncoverenv}<5->
+            \path (-60:-1) -- +(-3.6,2.8) node (Fbar) {\Large\alert{$\bar{\F}_q^\ast$}};
+            \path (Fl) -- (Fbar) node[pos=0.5,sloped] {\Large\alert{$\dots$}};
+            \foreach\k in {0,...,4} {
+              \draw[dashed] (112:3.9) -- (112+8*\k-20:4.6);
+            }
+          \end{uncoverenv}
         \end{tikzpicture}
       \end{center}
     \end{column}
     \begin{column}{0.4\textwidth}
       \begin{itemize}
-      \item<1-> $\ell|(q-1)$;
-      \item<3-> $\phi$ not surjective over $\F_q$;
-      \item<5-> $\phi : \mathbb{G}_m \to \mathbb{G}_m$ surjective.
+      \item<3-> $\phi|_{\F_q^\ast}$ not surjective;
+      \item<4-> $\phi : \mathbb{G}_m \to \mathbb{G}_m$ surjective;
+      \item<5-> Starting from $y_0$, every $\phi^{-1}y_i$ is an
+        irreducible set of cardinality $\ell$.
       \end{itemize}
     \end{column}
   \end{columns}
@@ -573,28 +546,68 @@
 %###################################################
 
 \begin{frame}
-	\frametitle{Towers from algebraic tori}
-	
-	\begin{definition}
-		For $k=\F_q$, $L=\F_{q^n}$ define 
-		\begin{equation*}
-			\label{eq:Tn}
-			\mathbb{T}_n(k) \cong \{\alpha\in L^\ast \;|\; \Norm_{L/F}(\alpha) = 1 \text{ for all } k\subset F\subsetneq L \}.
-		\end{equation*}
-		Then $\mathbb{T}_n \cong \mathbb{G}_m^{\euler(n)}$ over $\overline{\F_q}$.
-	\end{definition}
-	\vspace*{5mm}
-	\begin{exampleblock}{$\mathbb{G}_m$-type extensions: $\mathbb{T}_1 \cong \mathbb{G}_m(\F_q)$}
-		Suppose $\ell \mid q-1$, $\eta \in \F_q$ a non $\ell$-adic residue, and
-		\[
-		\setlength{\arraycolsep}{2pt}
-		\begin{array}{cccc}
-			\phi: & \mathbb{T}_1 & \longrightarrow & \mathbb{T}_1 \\
-			& X & \longmapsto & X^\ell
-		\end{array}
-		\]
-		For any $i>0$, the fiber $\phi^{-i}(\eta)$ is $X^{\ell^i}-\eta$.
-	\end{exampleblock}
+  \frametitle{\emph{Chebishev} case: $\ell\mid(q+1)$}
+  
+  \begin{center}
+    \large
+    Consider the map \alert{$\phi:x \mapsto x^\ell$}
+  \end{center}
+
+  \begin{columns}
+    \begin{column}{0.45\textwidth}
+      \begin{tikzpicture}[shorten >=2pt]
+        \uncover<1-2>{\draw (0:0) node {\alert{\large$\F_q^\ast$}};}
+        \foreach \i in {0,...,7} {
+          \pgfmathparse{int(2+!mod(\i,4))}
+          \let\stop\pgfmathresult
+
+          \uncover<1-\stop>{\fill (\i*45:1) circle (1pt);}
+
+          \uncover<2-\stop>{
+            \foreach \j in {0,...,3} {
+              \draw[->] (\i*45-16.875+\j*11.25:2) -- (\i*45:1);
+            }
+          }
+        }
+
+        \foreach \i in {0,...,3} {
+          \pgfmathparse{int(2+!mod(\i,2))}
+          \let\stop\pgfmathresult
+
+          \uncover<1-2>{
+            \draw[->,bend right=50] (\i*90+45:1) to (\i*90+225:1);
+          }
+          \uncover<1-\stop>{
+            \draw[->,in=\i*90+180-30,out=\i*90+180+30,loop] (\i*90:1) to ();
+          }
+        }
+
+        \uncover<2>{
+          \draw[dashed,red] (0:0) circle (1.5);
+        }
+        \uncover<2>{
+          \draw (-90:2.5) node {\large\alert{$\F_{q^2}^\ast$}};
+        }
+        \uncover<3->{
+          \draw[dashed,red] (0:0) circle [x radius=2.5, y radius=1];
+          \draw (-30:2.5) node {\large\alert{$\mathbb{T}_2$}};
+        }
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+      \item<1-> $\phi|_{\F_q^\ast}$ bijective;
+      \item<2-> $\phi|_{\F_{q^2}^\ast}$ non surjective;
+      \item<3-> $\mathbb{T}_2\subset\F_{q^2}^\ast$ \emph{algebraic torus} of
+        cardinality $q+1$.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \begin{block}{}<3>
+    \[\mathbb{T}_n(k) \cong
+    \{\alpha\in L^\ast \;|\; \Norm_{L/F}(\alpha) = 1 \text{ for all } k\subset F\subsetneq L \}.\]
+  \end{block}
 \end{frame}
 
 %###################################################
@@ -602,6 +615,13 @@
 \begin{frame}
 	\frametitle{Towers from algebraic tori (Pell conics)}
 
+        \begin{itemize}
+        \item By Weil descent, $\mathbb{T}_2$ is isomorphic to a
+          \emph{Pell conic};
+        \item Multiplication in $\bar{\F}_q$ induces a group law on
+          the points.
+        \end{itemize}
+        
 	\tikzset{
 		point style/.style={circle, inner sep=0.9pt, fill = blue},
 		extended line/.style={shorten >= -5mm, shorten <= -5mm}
@@ -649,56 +669,51 @@
 
 \begin{frame}
 	\frametitle{Towers from algebraic tori}
+
+        \begin{itemize}
+        \item $\mathbb{T}_2 \to$ Pell conic $C$,
+        \item multiplication in $\F_{q^2} \to$ addition in $C$,
+        \item $\ell$-th power $\to$ scalar multiplication $[\ell]$.
+        \end{itemize}
 	
 	\begin{lemma}
-		\begin{itemize}
-			\item $\mathbb{T}_2 \cong C$.
-			\item Let $P=(\alpha,\beta) \in C$. The abscissa of $[n]P$ is given by $C_n(\alpha)$, where $C_n\in\Z[X]$ is the $n$-th \textcolor{blue}{Chebyshev polynomial}.
-		\end{itemize}
+          The abscissa of $[n]P$ is given by $C_n(x_1)$, where
+          $C_n\in\Z[X]$ is the $n$-th \textcolor{blue}{Chebyshev
+            polynomial}.
 	\end{lemma}
 	
 	\begin{theorem}
-		\label{th:T2-irred}
-		Let $\eta\in\F_q(\delta)$ be a non $\ell$-adic residue in $\mathbb{T}_2$,
-		let $P=(\alpha,\beta)$ be its image in $C/\F_q$. Define
-		\[
-		\setlength{\arraycolsep}{2pt}
-		\begin{array}{cccc}
-			\phi: & C/\F_q & \longrightarrow & C/\F_q \\
-			& Q & \longmapsto & [\ell^i]Q
-		\end{array}
-		\]
-		Then the abscissas of the fiber $\phi^{-1}(P)$ are the roots of the \textcolor{blue}{irreducible} polynomial $C_{\ell^i}-\alpha$.
-	\end{theorem}
-
-	\begin{corollary}
-		\begin{equation*}
-			Q_i(X_i) = C_{\ell^i}(X_i) - x_0.
-		\end{equation*}
-	\end{corollary}
+          Let $P$ be a point not in $\ell C$, then we can compute
+          \begin{equation*}
+            Q_i(X_i) = C_{\ell^i}(X_i) - x_P
+            \quad\text{and}\quad
+            \alert{T_i(X_i) = C_{\ell}(X_i) - X_{i-1}}
+          \end{equation*}
+          using $O(\ell^i)$ operations.
+        \end{theorem}
 \end{frame}
 
 %###################################################
 
 \begin{frame}[fragile]
 	\frametitle{Towers from elliptic curves}
+
+        \begin{itemize}
+        \item \alert{Problem 1:} there is essentially one conic; we
+          would like to have more group choices, \alert{elliptic
+            curves} are an option.
+        \item \alert{Problem 2:} $\ell$-multiplication on elliptic
+          curves is a degree $\ell^2$ map; we must consider
+          \alert{separable isogenies} instead.
+        \end{itemize}
 	
 	\newcommand{\EC}[1]{{\color{blue} \ensuremath{E_{#1}}}}
 	\newcommand{\IS}[1]{{\color{red} \ensuremath{\phi_{#1}}}}
 	
 	\begin{equation*}
-		E_0 \;:\; y^2 = x^3 + ax + b, \quad a, b \in\F_q,  \quad \ell \ne p, \quad \ell \mid \#E_0(\F_q)
+		E_0 \;:\; y^2 = x^3 + ax + b, \quad a, b \in\F_q,  \quad \ell \nmid (q-1), \quad \ell \mid \#E_0(\F_q)
 	\end{equation*}
-	
-	\begin{block}{}
-		Denote by
-		\begin{itemize}
-			\item $H_0 \lhd E_0/\F_q$ with $\lvert H_0 \rvert = \ell$
-			\item $\phi_0$ the unique isogeny with $\ker \phi = H_0$
-			\item $E_1$ the image curve of $\phi_0$
-		\end{itemize}
-	\end{block}
-	\vspace*{3mm}
+
 	\begin{center}
 		\begin{tikzpicture}
 			\def\n{4}
@@ -715,9 +730,11 @@
 				\draw (E\i) edge[->,bend right=18] node[auto, swap] {\scriptsize \IS{\i}} (E\j);
 			}
 
-			\node[left = 3mm of current bounding box.west] (explain) {
-			\begin{minipage}{0.7\textwidth}
-				Repeat the above with $H_i \lhd E_i/\F_q$ and by $$\IS{i}:\EC{i} \to \EC{i + 1}.$$
+			\node[left = -2.5mm of current bounding box.west] (explain) {
+			\begin{minipage}{0.75\textwidth}
+				Under these assumptions, isogenies form a cycle
+                                \[\IS{i}:\EC{i} \to \EC{i + 1}.\]
+
 				\textbf{\color{orange} Lemma }{\it
 				   $\EC{n} \cong \EC{0}$ for some $n \in O(\sqrt{q}\log (q))$.}
 			\end{minipage}
@@ -735,7 +752,10 @@
 \begin{frame}
 	\frametitle{Towers from elliptic curves}
 	
-	Under the above assumptions, if $P \in E_i$ with $\ell^e \mid \lvert P \rvert$, and $\psi=\phi_{i-1}\circ\phi_{i-2}\circ\cdots\circ\phi_{j}$, then $\psi^{-1}(P)$ is irreducible of cardinality $\ell^{i-j}$.
+        \begin{lemma}[Couveignes and Lercier, 2011]
+          Let $P \not\in \ell E_i$, and $\psi=\phi_{i-1}\circ\phi_{i-2}\circ\cdots\circ\phi_{j}$,\\
+          then $\psi^{-1}(P)$ is irreducible of cardinality $\ell^{i-j}$.
+        \end{lemma}
 	\vspace*{5mm}
 	\begin{exampleblock}{V\'elu's formulas}
 		\begin{equation*}
@@ -749,7 +769,7 @@
 	\begin{block}{The $\ell$-adic tower}
 		\begin{align*}
 		  T_1 &= f_{-1}(X_1) - \eta g_{-1}(X_1),\\ 
-		  T_i &= f_{-i}(X_i) - X_{i-1} g_{-i}(X_i).
+		  \alert{T_i} &\alert{= f_{-i}(X_i) - X_{i-1} g_{-i}(X_i)}.
 		\end{align*}
 	\end{block}
 \end{frame}
@@ -757,31 +777,30 @@
 %**********************************************************
 %**********************************************************
 
-\section{Lifting and pushing}
+\section{Evaluating embeddings}
 
 \begin{frame}
-	\frametitle{\insertsection}
-	
-	\begin{block}{Common structure}
-		The	extension at level $i$ is
-		$$\F_q[Y]/ \langle S(Y) \rangle \quad\text{and}\quad \F_q[X,Y]/\langle R(X), T(X,Y) \rangle,$$
-		with 
-		\begin{itemize}
-			\item $R$ of degree $\ell^{i-1}$, $S$ of degree	$\ell^i$
-			\item $T(X,Y)$ has the form \textcolor{blue}{$f(Y)-X g(Y)$}, with $\deg(f)=\ell$, $\deg(g) < \ell$ and $\gcd(f,g)=1$.
-		\end{itemize}
-	\end{block}
-	
-	\begin{definition}
-		Let $P \in \F_q[X,Y]$ and $n \in \N$, with $\deg(P,X)< n$. Define
-		$$P[f,g,n] = g^{n-1} P\left (\frac fg, Y\right) \in \F_q[Y].$$
-	\end{definition}
+  \frametitle{\insertsection}
+  
+  \begin{block}{Observation}
+    In all previous cases, from the form of $T_i$ we deduce
+    \[X_{i-1} = f(X_i)/g(X_i)\]
+    for some $f$ and $g$.  
+    Going from multivariate to univariate is
+    \[\sum a_j \alert{X_{i-1}^{\alpha_j}} X_i^{\beta_j} \mapsto
+    \sum a_j \alert{\frac{f(X_i)^{\alpha_j}}{g(X_i)^{\alpha_j}}} X_i^{\beta_j} \]
+  \end{block}
+  
+  \begin{definition}
+    Let $P \in \F_q[X,Y]$ and $n \in \N$, with $\deg(P,X)< n$. Define
+    $$P[f,g,n] = g^{n-1} P\left (\frac fg, Y\right) \in \F_q[Y].$$
+  \end{definition}
 \end{frame}
 
 %###################################################
 
 \begin{frame}
-	\frametitle{Lifting}
+	\frametitle{Lifting: Multivariate $\to$ Univariate}
 	
 	\small
 	\begin{center}
@@ -812,7 +831,6 @@
 	
 	\begin{theorem}
 	  \label{th:compose}
-	  On input $P,f,g,n$, with $\deg(P,X)<n$ and $\deg(P,Y) < \ell$,
 	  Algorithm~\ref{alg:compose} computes $Q=P[f,g,n]$ using $O(\Mult(\ell
 	  n)\log(n))$ operations in $\F_q$.
 	\end{theorem}
@@ -821,7 +839,7 @@
 %###################################################
 
 \begin{frame}
-	\frametitle{Pushing}
+	\frametitle{Pushing: Univariate $\to$ Multivariate}
 	
 	\small
 	\begin{center}
@@ -852,9 +870,8 @@
 	\end{center}
 	
 	\begin{theorem}
-	  On input $Q,f,g,h,n$, with $\deg(Q) < \ell n$ and $h = 1/g \bmod f$,
 	  Algorithm~\ref{alg:decompose} computes a polynomial $P\in \F_q[X,Y]$
-	  such that $\deg(P,X)<n$, $\deg(P,Y) <\ell$ and $Q=P[f,g,n]$ using
+	  such that $Q=P[f,g,n]$ using
 	  $O(\Mult(\ell n)\log(n))$ operations in $\F_q$.
 	\end{theorem}
 \end{frame}
@@ -875,8 +892,8 @@
 	
 	\begin{itemize}
 		\small
-		\item  We ran tests on an Intel Xeon E5620 clocked at 2.4 GHz, using Sage 5.5 and Magma 2.18.12
-		\item Computations that took more than 4GB RAM were	interrupted
+		\item Intel Xeon E5620 clocked at 2.4 GHz, using Sage 5.5 and Magma 2.18.12
+		\item Source code at \url{http://github.com/defeo/towers}.
 	\end{itemize}
 \end{frame}
 
