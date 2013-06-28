@@ -342,6 +342,15 @@
 \begin{frame}
 	\frametitle{Summary of Main Results}
 	
+	\begin{block}{Objective}
+		\footnotesize
+		\begin{itemize}
+			\item $q$ and $\ell$ fixed,
+                        \item \alert{$\tildO(\ell^i)$} operations in $\F_q$,
+                        \item limit additional factors in $\ell$ and $q$ as much as possible.
+		\end{itemize}
+	\end{block}
+
 	\resizebox{0.93\textwidth}{!}{
           \footnotesize
 		\begin{minipage}{\textwidth}
@@ -358,16 +367,6 @@
 			\]
 		\end{minipage}
 	}
-	
-	\vspace*{1.5cm}
-	\begin{block}{Objective}
-		\footnotesize
-		\begin{itemize}
-			\item $q$ and $\ell$ fixed,
-                        \item \alert{$\tildO(\ell^i)$} operations in $\F_q$,
-                        \item limit additional factors in $\ell$ and $q$ as much as possible.
-		\end{itemize}
-	\end{block}
 \end{frame}
 
 %**********************************************************
@@ -376,9 +375,9 @@
 \section{Quasi-cyclotomic towers}
 
 \begin{frame}
-	\frametitle{\insertsection }
-%	\\{\small\normalfont\footnotesize \color{black} 
-%	(inspired by Shoup, De Smit and Lenstra)}}
+	\frametitle{\insertsection 
+	\\{\small\normalfont\footnotesize \color{black} 
+	(inspired by Shoup, De Smit and Lenstra)}}
 	
     \begin{columns}
       \begin{column}{0.65\textwidth}
@@ -450,7 +449,7 @@
       \begin{exampleblock}{Trivial case: $\ell \mid (q-1) \Leftrightarrow r=1$}
         Kummer extensions
         \[\alert{Q_i=X_i^{\ell^i}-y_0} \qquad\text{and}\qquad \alert{T_i=X_{i}^\ell-X_{i-1}}\]
-        Embeddings are trvial.
+        Embeddings are trivial.
       \end{exampleblock}
     \end{onlyenv}	
 
@@ -893,7 +892,7 @@
 	\begin{itemize}
 		\small
 		\item Intel Xeon E5620 clocked at 2.4 GHz, using Sage 5.5 and Magma 2.18.12
-		\item Source code at \url{http://github.com/defeo/towers}.
+		\item Source code at \url{https://github.com/defeo/towers}.
 	\end{itemize}
 \end{frame}
 
