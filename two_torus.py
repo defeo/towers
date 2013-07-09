@@ -12,7 +12,7 @@ from de_compose import *
 def _torsion_poly(ell, P=None):
     """
     Computes the ell-th gauss period. If `P` is given, it must be a
-    polynomial ring into which te result is coerced.
+    polynomial ring into which the result is coerced.
 
     This is my favourite equality:
     
