@@ -107,7 +107,7 @@ $$
   - & O_e (\ell^2+\Mult(\ell) \log(q)) & O(\Mult(\ell^{i+1})\Mult(\ell)\log(\ell^i)^2) & O( \Mult(\ell^{i+1})\Mult(\ell)\log(\ell^i))\\
   4\ell \le q^{\sfrac{1}{4}} & O\tilde{_e}(\ell\log^5(q)+\ell^3) \text{~(bit)}  & O_e(\ell^2+\Mult(\ell)\log(\ell
   q)+\Mult(\ell^i)\log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \\
-  4\ell \le q^{\sfrac{1}{4}} & O\tilde{_e}(\ell\log^5(q))  \text{~(bit)}  + O_e(\Mult(\ell)\sqrt{q}\log(q)) & O_e(\log(q) + \Mult(\ell^i) \log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \vspace{-0.5cm}
+  4\ell \le q^{\sfrac{1}{4}} & O\tilde{_e}(\ell\log^5(q))  \text{~(bit)}  + O\tilde{_e}(\ell\sqrt{q}) & O_e(\log(q) + \Mult(\ell^i) \log(\ell^i)) & O(\Mult(\ell^i) \log(\ell^i)) \vspace{-0.5cm}
 \end{array}
 $$
 \label{table:main}
@@ -999,7 +999,7 @@ push are detailed in the next section.
   alone to compute $E_1,E_2,\dots$ until we hit $E_0$ again. By doing
   so, we avoid using the modular polynomial $\Phi_\ell$ at each new
   level. By Lemma~\ref{th:class-number}, this requires
-  $O_e(\ell\sqrt{q}\log(q))$ operations. This is not asymptotically good
+  $O_e((\Mult(\ell)+\log(q))\sqrt{q}\log(q))$ operations. This is not asymptotically good
   in $q$, but for practical values of $q$ and $\ell$ the cycle is often
   small and this approach works well. This is accounted for in the last
   row of Table~\ref{table:main}.  
